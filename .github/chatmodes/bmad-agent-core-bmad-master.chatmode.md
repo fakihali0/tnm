@@ -1,6 +1,6 @@
 ---
 description: "Activates the Bmad Master agent persona."
-tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'chromedevtools/chrome-devtools-mcp/*', 'oraios/serena/*', 'sequentialthinking/*', 'upstash/context7/*', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runSubagent']
+tools: ['runCommands', 'runTasks', 'edit', 'runNotebooks', 'search', 'new', 'extensions', 'todos', 'runSubagent', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo']
 ---
 
 # Bmad Master Agent

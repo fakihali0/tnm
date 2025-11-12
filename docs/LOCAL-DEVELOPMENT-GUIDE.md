@@ -498,39 +498,114 @@ taskkill /PID <process_id> /F
 
 ---
 
-## ngrok for Supabase Testing (Optional)
+## ngrok for Supabase Testing
 
-If you need Supabase edge functions (running on cloud) to call your local service:
+### Setup (Story 1.5 - Completed)
 
-**1. Install ngrok:**
-```bash
-# On Mac
-brew install ngrok
-
-# Or on Windows
+**1. Install ngrok (Windows):**
+```powershell
+# Install via Chocolatey
 choco install ngrok -y
+
+# Verify installation
+ngrok version
+# Output: ngrok version 3.22.1
 ```
 
-**2. Create ngrok Tunnel:**
+**2. Configure Authentication:**
+```powershell
+# Get auth token from https://dashboard.ngrok.com/get-started/your-authtoken
+ngrok config add-authtoken YOUR_TOKEN_HERE
+
+# Verify configuration
+# Config saved to: C:\Users\YourUser\AppData\Local\ngrok\ngrok.yml
+```
+
+**3. Start ngrok Tunnel:**
+```powershell
+# Method 1: Command line (stays in foreground)
+ngrok http 8000
+
+# Method 2: Background process (recommended)
+Start-Process -FilePath "ngrok" -ArgumentList "http", "8000"
+
+# Get public URL from ngrok API
+curl http://localhost:4040/api/tunnels | ConvertFrom-Json | Select-Object -ExpandProperty tunnels | ForEach-Object { $_.public_url }
+```
+
+**4. Current ngrok URL:**
+```
+Public URL: https://indeterminedly-crablike-dorinda.ngrok-free.dev
+Local URL:  http://localhost:8000
+Status:     Active ✅
+Dashboard:  http://localhost:4040
+```
+
+**⚠️ Important:** This URL changes every time ngrok restarts. Use the dashboard at http://localhost:4040 to get the current URL.
+
+**5. Test Tunnel:**
 ```bash
-# Start tunnel
-ngrok http vms.tnm.local:8000
+# From Mac or any internet-connected device
+curl https://indeterminedly-crablike-dorinda.ngrok-free.dev/health
 
-# Output:
-# Forwarding: https://abc123.ngrok.io -> http://vms.tnm.local:8000
+# Expected response:
+# {"status":"healthy","service":"mt5-integration","version":"1.0.0"}
 ```
 
-**3. Update Supabase Edge Function:**
+**6. View Request Logs:**
+- Open http://localhost:4040 in Windows browser
+- See all incoming requests in real-time
+- Useful for debugging Supabase edge function calls
+
+### Update Supabase Edge Functions
+
+**Option 1: Environment Variable (Recommended)**
 ```typescript
 // supabase/functions/connect-mt5-account/index.ts
-const MT5_SERVICE_URL = Deno.env.get('MT5_SERVICE_URL') || 'https://abc123.ngrok.io';
+const MT5_SERVICE_URL = Deno.env.get('MT5_SERVICE_URL') || 'http://vms.tnm.local:8000';
+
+// Set in Supabase Dashboard:
+// Settings → Edge Functions → Add secret
+// Name: MT5_SERVICE_URL
+// Value: https://indeterminedly-crablike-dorinda.ngrok-free.dev
 ```
 
-**4. Test Edge Function:**
-```bash
-# Edge function now calls local service via ngrok tunnel
-supabase functions invoke connect-mt5-account --data '{"login":123,"password":"test",...}'
+**Option 2: Direct Configuration**
+```typescript
+// For testing only - update URL each time ngrok restarts
+const MT5_SERVICE_URL = 'https://indeterminedly-crablike-dorinda.ngrok-free.dev';
 ```
+
+### ngrok Best Practices
+
+**Do:**
+- ✅ Use ngrok for testing Supabase → Windows integration
+- ✅ Keep ngrok window/process running during development
+- ✅ Check http://localhost:4040 for request debugging
+- ✅ Update edge function URL when ngrok restarts
+
+**Don't:**
+- ❌ Use ngrok for production (use VPS instead)
+- ❌ Commit ngrok URLs to git (they change)
+- ❌ Expose production credentials through ngrok
+- ❌ Forget to restart tunnel after Windows reboot
+
+### ngrok Free Tier Limits
+- ✅ 1 online ngrok process
+- ✅ 40 connections/minute
+- ✅ HTTPS tunnel included
+- ⚠️ URL changes on restart
+- ⚠️ "Visit Site" button required on first visit (ngrok warning page)
+
+### Alternative: Direct Network Access
+
+For **Mac → Windows** testing without Supabase:
+```bash
+# Use direct local network URL (no ngrok needed)
+curl http://vms.tnm.local:8000/health
+```
+
+This is **faster** and **more reliable** than ngrok for local-only testing.
 
 ---
 

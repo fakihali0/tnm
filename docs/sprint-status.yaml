@@ -1,0 +1,59 @@
+# Sprint Status - TNM MT5 Integration Project
+# Generated: November 12, 2025
+# Project: tnm_concept
+# Sprint: Foundation & Infrastructure (Local Development)
+
+# =============================================================================
+# STATUS DEFINITIONS
+# =============================================================================
+# drafted          - Story created but not ready for development
+# ready-for-dev    - Context generated, approved, and ready to implement
+# in-progress      - Currently being implemented by dev agent
+# review           - Implementation complete, awaiting code review
+# ready-for-test   - Code review passed, ready for QA testing
+# blocked          - Cannot proceed due to external dependency
+# done             - All acceptance criteria met, tests passing, deployed
+
+# =============================================================================
+# DEVELOPMENT STATUS
+# =============================================================================
+development_status:
+  # Epic 1: Foundation & Infrastructure (Local Development)
+  1-1-local-windows-machine-setup-and-network-configuration: review
+  1-2-mt5-terminal-installation-and-headless-configuration: review
+  1-3-python-environment-and-dependency-setup: review
+  1-4-fastapi-service-project-structure-scaffolding: in-progress
+  1-5-ngrok-tunnel-for-supabase-edge-function-testing: drafted
+  1-6-manual-service-startup-local-development: drafted
+  1-7-environment-variable-configuration-and-secret-management: drafted
+  1-8-end-to-end-local-network-testing: drafted
+  
+  # Epic 2: Core MT5 Integration
+  2-1-mt5-connection-manager-with-connection-pooling: drafted
+
+# =============================================================================
+# SPRINT METRICS
+# =============================================================================
+sprint_metrics:
+  total_stories: 9
+  ready_for_dev: 0
+  in_progress: 0
+  in_review: 3
+  completed: 0
+  blocked: 0
+  
+  # Story points (estimate)
+  total_points: 34
+  completed_points: 0
+  
+  # Sprint dates
+  sprint_start: 2025-11-12
+  sprint_end: 2025-11-26  # 2 weeks
+  
+# =============================================================================
+# NOTES
+# =============================================================================
+# - Story 1-1 is ready with context file generated
+# - Stories 1-6, 1-7, 1-8 do not have context files yet (should be generated)
+# - Story 2-1 is drafted but should wait for Epic 1 completion
+# - All stories follow naming convention: epic-story-descriptive-name
