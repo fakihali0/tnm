@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<story-context id="1-4-fastapi-service-project-structure-scaffolding" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>1.4</storyId>
+    <title>FastAPI Service Project Structure Scaffolding</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-12</generatedAt>
+    <generator>BMAD Story Context Workflow with MCP Enhancement</generator>
+    <sourceStoryPath>docs/stories/1-4-fastapi-service-project-structure-scaffolding.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>a well-organized FastAPI project structure with placeholder files</iWant>
+    <soThat>subsequent stories can add features to a standardized codebase</soThat>
+    <tasks>
+      - Create project directory structure (app/, tests/, etc.)
+      - Implement main.py with FastAPI app and CORS middleware
+      - Create config.py with pydantic-settings for environment variables
+      - Add /health endpoint for monitoring
+      - Configure CORS for Mac frontend (localhost:5173)
+      - Create placeholder files (mt5_manager.py, security.py, logger.py)
+      - Test service startup and CORS from Mac browser
+      - Document project structure in README.md
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="1" verification="dir C:\mt5-service shows complete project structure">
+      Project directory structure created with app/, tests/, venv/ folders
+    </criterion>
+    <criterion id="2" verification="type app\main.py shows FastAPI app with CORS middleware">
+      main.py contains FastAPI app entry point with CORS configuration
+    </criterion>
+    <criterion id="3" verification="type app\config.py shows Settings class with BaseSettings">
+      config.py contains pydantic-settings configuration management
+    </criterion>
+    <criterion id="4" verification="curl http://192.168.1.100:8000/health returns JSON response">
+      /health endpoint implemented and accessible
+    </criterion>
+    <criterion id="5" verification="Browser console fetch from localhost:5173 succeeds without CORS error">
+      CORS middleware configured for http://localhost:5173 (Mac frontend)
+    </criterion>
+    <criterion id="6" verification="uvicorn app.main:app runs without errors">
+      Service starts successfully on 0.0.0.0:8000
+    </criterion>
+    <criterion id="7" verification="ping 192.168.1.100 and curl 192.168.1.100:8000/health from Mac both succeed">
+      Service is accessible from Mac development machine
+    </criterion>
+    <criterion id="8" verification="README.md contains project structure documentation">
+      Project structure and setup instructions documented
+    </criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Development Guide - MT5 Integration Service</title>
+        <section>Step 4: FastAPI Project Structure</section>
+        <snippet>
+          FastAPI project setup instructions:
+          - Create directory structure: app/, app/api/, app/core/, tests/
+          - Implement app/main.py with FastAPI app, CORS middleware, /health endpoint
+          - Implement app/config.py with pydantic-settings BaseSettings
+          - Configure CORS for Mac frontend: allow_origins=["http://localhost:5173"]
+          - Start service: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+          - Test from Mac: curl http://192.168.1.100:8000/health
+          - Test CORS: Browser console fetch("http://192.168.1.100:8000/health")
+        </snippet>
+        <relevance>Complete FastAPI project setup procedures</relevance>
+      </doc>
+      
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>Product Requirements Document</title>
+        <section>6. Technical Stack - FastAPI Architecture</section>
+        <snippet>
+          FastAPI service architecture:
+          - Framework: FastAPI (async REST API framework)
+          - Server: uvicorn (ASGI server)
+          - Config: pydantic-settings for environment management
+          - CORS: Required for Mac frontend (localhost:5173) → Windows backend (192.168.1.100:8000)
+          - Structure: Modular design with app/api/routes/, app/core/, app/models/
+          - Monitoring: /health endpoint for uptime checks
+        </snippet>
+        <relevance>Architecture requirements and design patterns</relevance>
+      </doc>
+      
+      <doc>
+        <path>C:\mt5-service\README.md</path>
+        <title>Project README</title>
+        <section>Project Structure</section>
+        <snippet>
+          Will be created in this story:
+          ```
+          C:\mt5-service\
+          ├── venv\                     # Virtual environment
+          ├── app\
+          │   ├── __init__.py
+          │   ├── main.py               # FastAPI app entry point
+          │   ├── config.py             # Environment configuration
+          │   ├── api\
+          │   │   ├── __init__.py
+          │   │   └── routes\           # API route modules (future)
+          │   ├── core\
+          │   │   ├── __init__.py
+          │   │   ├── mt5_manager.py    # Placeholder for Story 2.1
+          │   │   ├── security.py       # Placeholder for Story 3.1
+          │   │   └── logger.py         # Placeholder for Story 8.1
+          │   └── models\               # Pydantic models (future)
+          ├── tests\                    # Unit tests (future)
+          ├── .env                      # Environment variables
+          ├── requirements.txt          # Python dependencies
+          └── README.md                 # This file
+          ```
+        </snippet>
+        <relevance>This file will be created as part of this story</relevance>
+      </doc>
+    </docs>
+
+    <code>
+      <artifact>
+        <path>app/main.py</path>
+        <kind>file</kind>
+        <symbol>FastAPI app instance</symbol>
+        <lines>1-50</lines>
+        <reason>
+          This is the first code file to be created. Will contain:
+          - FastAPI app initialization
+          - CORS middleware configuration for localhost:5173
+          - /health endpoint implementation
+          - uvicorn startup (if __name__ == "__main__")
+          
+          Example structure from context7:
+          ```python
+          from fastapi import FastAPI
+          from fastapi.middleware.cors import CORSMiddleware
+          from app.config import settings
+          
+          app = FastAPI(title="MT5 Integration Service")
+          
+          # CORS middleware - CRITICAL for Mac → Windows
+          app.add_middleware(
+              CORSMiddleware,
+              allow_origins=["http://localhost:5173"],
+              allow_credentials=True,
+              allow_methods=["*"],
+              allow_headers=["*"],
+          )
+          
+          @app.get("/health")
+          async def health_check():
+              return {"status": "healthy", "service": "mt5-integration"}
+          
+          if __name__ == "__main__":
+              import uvicorn
+              uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+          ```
+        </reason>
+      </artifact>
+      
+      <artifact>
+        <path>app/config.py</path>
+        <kind>file</kind>
+        <symbol>Settings class</symbol>
+        <lines>1-30</lines>
+        <reason>
+          Configuration management with pydantic-settings.
+          
+          Example structure from context7:
+          ```python
+          from pydantic_settings import BaseSettings, SettingsConfigDict
+          
+          class Settings(BaseSettings):
+              # Application settings
+              app_name: str = "MT5 Integration Service"
+              debug: bool = False
+              
+              # Server settings
+              host: str = "0.0.0.0"
+              port: int = 8000
+              
+              # CORS settings
+              cors_origins: list[str] = ["http://localhost:5173"]
+              
+              # MT5 settings (placeholders for future stories)
+              mt5_terminal_path: str = "C:\\Program Files\\MetaTrader 5"
+              
+              model_config = SettingsConfigDict(env_file=".env")
+          
+          settings = Settings()
+          ```
+        </reason>
+      </artifact>
+      
+      <artifact>
+        <path>app/core/mt5_manager.py</path>
+        <kind>file</kind>
+        <symbol>MT5Manager class placeholder</symbol>
+        <lines>1-20</lines>
+        <reason>
+          Placeholder file for Story 2.1 (MT5 Connection Manager).
+          
+          Initial content:
+          ```python
+          """
+          MT5 Connection Manager
+          
+          To be implemented in Story 2.1: MT5 Connection Manager with Connection Pooling
+          
+          This module will handle:
+          - MT5 Terminal connection initialization
+          - Connection pooling for multiple account management
+          - Error handling and reconnection logic
+          - MT5 data retrieval functions
+          """
+          
+          class MT5Manager:
+              """Placeholder class for MT5 connection management."""
+              pass
+          ```
+        </reason>
+      </artifact>
+      
+      <artifact>
+        <path>app/core/security.py</path>
+        <kind>file</kind>
+        <symbol>Security utilities placeholder</symbol>
+        <lines>1-20</lines>
+        <reason>
+          Placeholder file for Story 3.1 (API Authentication Middleware).
+          
+          Initial content:
+          ```python
+          """
+          Security and Authentication Utilities
+          
+          To be implemented in Story 3.1: API Authentication Middleware
+          
+          This module will handle:
+          - X-API-Key authentication
+          - JWT token generation and validation
+          - Request authentication middleware
+          - Security headers
+          """
+          
+          # Placeholder functions
+          async def verify_api_key(api_key: str) -> bool:
+              """To be implemented in Story 3.1"""
+              pass
+          ```
+        </reason>
+      </artifact>
+      
+      <artifact>
+        <path>app/core/logger.py</path>
+        <kind>file</kind>
+        <symbol>Logger configuration placeholder</symbol>
+        <lines>1-20</lines>
+        <reason>
+          Placeholder file for Story 8.1 (Structured Logging Implementation).
+          
+          Initial content:
+          ```python
+          """
+          Logging Configuration
+          
+          To be implemented in Story 8.1: Structured Logging Implementation
+          
+          This module will handle:
+          - Structured JSON logging
+          - Log levels and filtering
+          - Request/response logging
+          - Performance metrics logging
+          """
+          
+          import logging
+          
+          # Basic logger for now
+          logger = logging.getLogger("mt5-service")
+          ```
+        </reason>
+      </artifact>
+    </code>
+
+    <dependencies>
+      <dependency>
+        <name>Python Environment with Dependencies</name>
+        <version>From Story 1.3</version>
+        <purpose>Python 3.11+ with fastapi, uvicorn, pydantic-settings installed</purpose>
+        <installation>Already completed in Story 1.3</installation>
+      </dependency>
+      
+      <dependency>
+        <name>Windows Network Configuration</name>
+        <version>From Story 1.1</version>
+        <purpose>Static IP 192.168.1.100 and port 8000 firewall rule</purpose>
+        <installation>Already completed in Story 1.1</installation>
+      </dependency>
+      
+      <dependency>
+        <name>FastAPI</name>
+        <version>0.104.0+ (installed in Story 1.3)</version>
+        <purpose>Web framework for REST API</purpose>
+        <installation>pip install fastapi (already done)</installation>
+      </dependency>
+      
+      <dependency>
+        <name>uvicorn</name>
+        <version>0.24.0+ with [standard] extras (installed in Story 1.3)</version>
+        <purpose>ASGI server for FastAPI</purpose>
+        <installation>pip install uvicorn[standard] (already done)</installation>
+      </dependency>
+      
+      <dependency>
+        <name>pydantic-settings</name>
+        <version>2.1.0+ (installed in Story 1.3)</version>
+        <purpose>Environment variable management with type validation</purpose>
+        <installation>pip install pydantic-settings (already done)</installation>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint type="cors-critical">
+      <description>CORS middleware is CRITICAL for Mac (localhost:5173) → Windows (192.168.1.100:8000) communication</description>
+      <rationale>Frontend on Mac must send API requests to Windows backend - browser enforces CORS policy</rationale>
+      <configuration>
+        allow_origins=["http://localhost:5173"]
+        allow_credentials=True
+        allow_methods=["*"]
+        allow_headers=["*"]
+      </configuration>
+    </constraint>
+    
+    <constraint type="host-binding">
+      <description>uvicorn must bind to 0.0.0.0 not localhost or 127.0.0.1</description>
+      <rationale>localhost/127.0.0.1 only accepts connections from same machine, 0.0.0.0 accepts from network (Mac)</rationale>
+    </constraint>
+    
+    <constraint type="port-number">
+      <description>Service must run on port 8000 (firewall rule from Story 1.1)</description>
+      <rationale>Windows Defender firewall rule configured for port 8000 in Story 1.1</rationale>
+    </constraint>
+    
+    <constraint type="pydantic-v2">
+      <description>Must use pydantic-settings v2 with SettingsConfigDict, not deprecated Config class</description>
+      <rationale>Pydantic v2 changed configuration API, old Config class is deprecated</rationale>
+    </constraint>
+    
+    <constraint type="project-structure">
+      <description>Follow FastAPI best practices for project structure (app/ folder, routers, models separation)</description>
+      <rationale>Standardized structure ensures maintainability for Stories 2.1-8.5</rationale>
+    </constraint>
+    
+    <constraint type="health-endpoint">
+      <description>/health endpoint required for monitoring (Stories 3.7, 8.2-8.5)</description>
+      <rationale>UptimeRobot and other monitoring tools need health check endpoint</rationale>
+    </constraint>
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>FastAPI App with CORS Middleware</name>
+      <kind>python-code</kind>
+      <signature>
+        from fastapi import FastAPI
+        from fastapi.middleware.cors import CORSMiddleware
+        
+        app = FastAPI(title="MT5 Integration Service", version="1.0.0")
+        
+        # CORS configuration
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["http://localhost:5173"],  # Mac frontend
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+      </signature>
+      <path>app/main.py</path>
+      <notes>CORS is critical for Mac → Windows API calls</notes>
+    </interface>
+    
+    <interface>
+      <name>Pydantic Settings Configuration</name>
+      <kind>python-code</kind>
+      <signature>
+        from pydantic_settings import BaseSettings, SettingsConfigDict
+        
+        class Settings(BaseSettings):
+            app_name: str = "MT5 Integration Service"
+            host: str = "0.0.0.0"
+            port: int = 8000
+            cors_origins: list[str] = ["http://localhost:5173"]
+            
+            model_config = SettingsConfigDict(env_file=".env")
+        
+        settings = Settings()
+      </signature>
+      <path>app/config.py</path>
+      <notes>Use SettingsConfigDict not deprecated Config class</notes>
+    </interface>
+    
+    <interface>
+      <name>Health Endpoint</name>
+      <kind>python-code</kind>
+      <signature>
+        from fastapi import FastAPI
+        
+        @app.get("/health")
+        async def health_check():
+            return {
+                "status": "healthy",
+                "service": "mt5-integration",
+                "version": "1.0.0"
+            }
+      </signature>
+      <path>app/main.py</path>
+      <notes>Required for monitoring in Stories 3.7, 8.2-8.5</notes>
+    </interface>
+    
+    <interface>
+      <name>uvicorn Server Startup</name>
+      <kind>system-command</kind>
+      <signature>
+        # From command line
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+        
+        # Or in main.py
+        if __name__ == "__main__":
+            import uvicorn
+            uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+      </signature>
+      <path>Windows Command Prompt (with venv activated)</path>
+      <notes>--reload enables auto-restart on code changes (development only)</notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <standard>Project directory structure must be complete and organized</standard>
+      <standard>FastAPI service must start without errors</standard>
+      <standard>/health endpoint must return valid JSON</standard>
+      <standard>CORS must allow requests from http://localhost:5173</standard>
+      <standard>Service must be accessible from Mac (192.168.1.100:8000)</standard>
+      <standard>All placeholder files must have docstrings explaining future implementation</standard>
+    </standards>
+    
+    <locations>
+      <location>
+        <path>docs/STORY-1-4-COMPLETION-SUMMARY.md</path>
+        <description>FastAPI project setup verification document</description>
+      </location>
+      <location>
+        <path>C:\mt5-service\README.md</path>
+        <description>Project structure and setup instructions</description>
+      </location>
+    </locations>
+    
+    <ideas>
+      <test>
+        <name>Project Structure Verification</name>
+        <command>tree /F C:\mt5-service\app</command>
+        <expected>Shows app/, app/api/, app/core/, app/models/ with __init__.py files</expected>
+      </test>
+      
+      <test>
+        <name>FastAPI Service Startup</name>
+        <command>uvicorn app.main:app --host 0.0.0.0 --port 8000</command>
+        <expected>Server starts with "Uvicorn running on http://0.0.0.0:8000" message</expected>
+      </test>
+      
+      <test>
+        <name>Health Endpoint Test (Windows)</name>
+        <command>curl http://localhost:8000/health</command>
+        <expected>{"status":"healthy","service":"mt5-integration","version":"1.0.0"}</expected>
+      </test>
+      
+      <test>
+        <name>Health Endpoint Test (Mac)</name>
+        <command>curl http://192.168.1.100:8000/health</command>
+        <expected>{"status":"healthy","service":"mt5-integration","version":"1.0.0"}</expected>
+      </test>
+      
+      <test>
+        <name>CORS Preflight Test (Mac Browser)</name>
+        <command>
+          // In Mac browser console (http://localhost:5173)
+          fetch("http://192.168.1.100:8000/health")
+            .then(r => r.json())
+            .then(console.log);
+        </command>
+        <expected>No CORS errors, response logged to console</expected>
+      </test>
+      
+      <test>
+        <name>CORS Headers Verification</name>
+        <command>curl -I -X OPTIONS http://192.168.1.100:8000/health -H "Origin: http://localhost:5173"</command>
+        <expected>Access-Control-Allow-Origin: http://localhost:5173 header present</expected>
+      </test>
+      
+      <test>
+        <name>Config Loading Test</name>
+        <command>python -c "from app.config import settings; print(settings.app_name, settings.host, settings.port)"</command>
+        <expected>MT5 Integration Service 0.0.0.0 8000</expected>
+      </test>
+      
+      <test>
+        <name>FastAPI Docs Accessible</name>
+        <command>curl http://192.168.1.100:8000/docs</command>
+        <expected>HTML page with Swagger UI (FastAPI interactive docs)</expected>
+      </test>
+      
+      <test>
+        <name>Placeholder Files Exist</name>
+        <command>dir C:\mt5-service\app\core\*.py</command>
+        <expected>mt5_manager.py, security.py, logger.py all present</expected>
+      </test>
+      
+      <test>
+        <name>README Documentation Complete</name>
+        <command>type C:\mt5-service\README.md</command>
+        <expected>Contains project structure diagram and setup instructions</expected>
+      </test>
+    </ideas>
+  </tests>
+
+  <mcpEnhancements>
+    <enhancement type="sequential-thinking" applied="yes">
+      Used sequential-thinking MCP to analyze FastAPI project requirements:
+      - Thought 1: FastAPI best practices - app/ folder structure with api/routes/, core/, models/ separation
+      - Thought 2: CORS CRITICAL for Mac (localhost:5173) → Windows (192.168.1.100:8000) - browser security policy
+      - Thought 3: pydantic-settings v2 config management - BaseSettings with SettingsConfigDict for .env loading
+      - Thought 4: Health endpoint essential for monitoring (Stories 3.7, 8.2-8.5 UptimeRobot integration)
+      - Thought 5: Placeholder files (mt5_manager.py, security.py, logger.py) prepare structure for future stories
+      - Thought 6: uvicorn must bind to 0.0.0.0 not localhost for network accessibility
+      - Thought 7: Project structure becomes foundation for all subsequent stories (2.1-8.5)
+    </enhancement>
+    <enhancement type="context7" applied="yes">
+      Retrieved FastAPI patterns (library: /fastapi/fastapi):
+      
+      1. CORS Middleware Configuration:
+      ```python
+      from fastapi.middleware.cors import CORSMiddleware
+      
+      app.add_middleware(
+          CORSMiddleware,
+          allow_origins=["http://localhost:5173"],
+          allow_credentials=True,
+          allow_methods=["*"],
+          allow_headers=["*"],
+      )
+      ```
+      
+      2. Pydantic Settings v2:
+      ```python
+      from pydantic_settings import BaseSettings, SettingsConfigDict
+      
+      class Settings(BaseSettings):
+          app_name: str = "MT5 Integration Service"
+          debug: bool = False
+          
+          model_config = SettingsConfigDict(env_file=".env")
+      ```
+      
+      3. uvicorn Startup:
+      ```python
+      import uvicorn
+      uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+      ```
+      
+      4. FastAPI Project Structure:
+      ```
+      app/
+      ├── __init__.py
+      ├── main.py          # FastAPI app instance
+      ├── config.py        # Settings with pydantic-settings
+      ├── api/
+      │   └── routes/      # API route modules
+      ├── core/            # Business logic
+      └── models/          # Pydantic models
+      ```
+      
+      5. Health Endpoint Pattern:
+      ```python
+      @app.get("/health")
+      async def health_check():
+          return {"status": "healthy"}
+      ```
+    </enhancement>
+    <enhancement type="serena" applied="not-needed">
+      No existing codebase yet (Story 1.4 creates first code files) - serena will be used from Story 2.1+ for code analysis, refactoring, and symbol navigation
+    </enhancement>
+    <note>This story creates the project structure foundation. All subsequent stories (2.1-8.5) will add features to this standardized codebase. CORS configuration is critical for Mac development workflow.</note>
+  </mcpEnhancements>
+</story-context>

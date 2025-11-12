@@ -1,0 +1,50 @@
+{
+  "install": {
+    "title": "Install Trade'n More",
+    "subtitle": "Join 50,000+ traders who trust our platform",
+    "mobileInstructions": "Tap \"Add to Home Screen\" for lightning-fast trading",
+    "desktopInstructions": "Install for instant access to your trading dashboard",
+    "button": "Install Trading App",
+    "installing": "Installing...",
+    "dismiss": "Maybe Later",
+    "learnMore": "Learn More",
+    "benefits": "Why install?",
+    "socialProof": "Trusted by traders worldwide"
+  },
+  "features": {
+    "instantAccess": "Instant access to live markets",
+    "offlineCharts": "View charts & analytics offline",
+    "pushNotifications": "Real-time trading alerts",
+    "secureBanking": "Bank-level security & encryption",
+    "oneClickTrading": "One-click trade execution",
+    "marketAnalysis": "Advanced market analysis tools"
+  },
+  "contextual": {
+    "trading": {
+      "title": "Trade faster with our app",
+      "subtitle": "Execute trades in milliseconds"
+    },
+    "education": {
+      "title": "Learn trading anywhere",
+      "subtitle": "Access educational content offline"
+    },
+    "markets": {
+      "title": "Never miss a market move",
+      "subtitle": "Get real-time alerts & analysis"
+    }
+  },
+  "installation": {
+    "steps": {
+      "title": "Easy 3-step installation",
+      "step1": "Tap the install button below",
+      "step2": "Choose 'Add to Home Screen'",
+      "step3": "Enjoy native app experience"
+    },
+    "benefits": {
+      "title": "App vs Browser",
+      "speed": "3x faster loading",
+      "storage": "Offline data access",
+      "notifications": "Instant alerts"
+    }
+  }
+}

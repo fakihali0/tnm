@@ -1,0 +1,8 @@
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://s3.tradingview.com https://www.tradingview-widget.com https://cdn.gpteng.co data: blob:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline' 'sha256-PsZll6aHYAIASf03JEonE23Kv5v8ElkuGjBGBwZ929Q=' 'sha256-JyHF32z4Ou/Ujas95CX3WgBqlTt7Dxzo/fQG5/5oBo8='; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://edzkorfdixvvvrkfzqzg.supabase.co https://s3.tradingview.com https://www.tradingview-widget.com wss:; frame-src https://www.tradingview-widget.com; worker-src 'self' blob:; manifest-src 'self' https://lovable.dev; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), location=(), payment-method=(), usb=(), midi=(), sync-xhr=(), picture-in-picture=()
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block

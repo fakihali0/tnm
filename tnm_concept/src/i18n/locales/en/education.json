@@ -1,0 +1,190 @@
+{
+  "badge": "Trading Education",
+  "hero": {
+    "title": "Master the Markets with Expert Education",
+    "subtitle": "Access comprehensive trading education, live webinars, and market analysis to accelerate your trading journey.",
+    "primaryCtaComingSoon": "Courses Coming Soon",
+    "secondaryCtaComingSoon": "Webinars Coming Soon"
+  },
+  "webinars": {
+    "title": "Upcoming Live Webinars",
+    "subtitle": "Join our expert traders for live sessions covering market analysis, strategy development, and risk management.",
+    "live": "Live",
+    "soon": "Soon",
+    "recorded": "Recorded",
+    "atTime": "at {{time}}",
+    "registerNow": "Register Now",
+    "comingSoon": "Coming Soon",
+    "watchRecording": "Watch Recording",
+    "items": {
+      "risk": {
+        "title": "Risk Management Fundamentals",
+        "date": "Coming Soon",
+        "time": "TBD",
+        "instructor": "Sarah Johnson",
+        "duration": "60 min"
+      },
+      "technical": {
+        "title": "Technical Analysis Mastery",
+        "date": "Coming Soon", 
+        "time": "TBD",
+        "instructor": "Ahmed Al-Rashid",
+        "duration": "90 min"
+      },
+      "psychology": {
+        "title": "Trading Psychology Workshop",
+        "date": "Coming Soon",
+        "time": "TBD", 
+        "instructor": "Dr. Maria Rodriguez",
+        "duration": "75 min"
+      }
+    }
+  },
+  "resources": {
+    "title": "Educational Resources",
+    "subtitle": "Download comprehensive guides, workbooks, and templates to enhance your trading knowledge.",
+    "ctaComingSoon": "Coming Soon",
+    "items": {
+      "guide": {
+        "title": "Complete Trading Guide",
+        "description": "A comprehensive guide covering all aspects of trading from basics to advanced strategies.",
+        "type": "PDF Guide",
+        "pages": "150 pages"
+      },
+      "workbook": {
+        "title": "Risk Management Workbook",
+        "description": "Interactive exercises and templates for developing your risk management skills.",
+        "type": "Interactive Workbook",
+        "pages": "75 pages"
+      },
+      "templates": {
+        "title": "Trading Plan Templates",
+        "description": "Professional templates to help you create and maintain your trading strategy.",
+        "type": "Templates Pack",
+        "pages": "25 templates"
+      }
+    }
+  },
+  "articles": {
+    "title": "Latest Trading Articles",
+    "subtitle": "Stay informed with our expert analysis, market insights, and trading tips from industry professionals.",
+    "ctaComingSoon": "Coming Soon",
+    "categories": {
+      "strategy": "Strategy",
+      "analysis": "Market Analysis", 
+      "beginner": "Beginner Tips",
+      "risk": "Risk Management",
+      "technical": "Technical Analysis",
+      "psychology": "Trading Psychology",
+      "automation": "Automation",
+      "news": "News Trading",
+      "technology": "Technology"
+    },
+    "items": {
+      "mistakes": {
+        "title": "10 Common Trading Mistakes to Avoid",
+        "excerpt": "Learn from the most common pitfalls that new traders face and how to avoid them.",
+        "readTime": "8 min read",
+        "category": "beginner"
+      },
+      "volatility": {
+        "title": "Trading in High Volatility Markets",
+        "excerpt": "Strategies for navigating and profiting from volatile market conditions.",
+        "readTime": "12 min read",
+        "category": "strategy"
+      },
+      "plan": {
+        "title": "Creating Your First Trading Plan",
+        "excerpt": "A step-by-step guide to developing a comprehensive trading strategy.",
+        "readTime": "15 min read",
+        "category": "beginner"
+      }
+    }
+  },
+  "blogs": {
+    "title": "Trading Blog & Insights",
+    "subtitle": "Expert perspectives on trading strategies, market analysis, and professional development",
+    "categories": {
+      "title": "Browse by Category",
+      "subtitle": "Find articles tailored to your interests and experience level",
+      "strategy": "Strategy",
+      "analysis": "Market Analysis",
+      "beginner": "Beginner Tips",
+      "risk": "Risk Management",
+      "technical": "Technical Analysis",
+      "psychology": "Trading Psychology",
+      "automation": "Automation",
+      "news": "News Trading",
+      "technology": "Technology"
+    },
+    "featured": {
+      "title": "Featured Articles",
+      "badge": "Featured"
+    },
+    "recent": {
+      "title": "Recent Posts"
+    },
+    "posts": {
+      "mistakes": {
+        "title": "10 Common Trading Mistakes to Avoid",
+        "excerpt": "Learn from the most common pitfalls that new traders face and how to avoid them for long-term success."
+      },
+      "volatility": {
+        "title": "Trading in High Volatility Markets",
+        "excerpt": "Strategies for navigating and profiting from volatile market conditions while managing risk effectively."
+      },
+      "plan": {
+        "title": "Creating Your First Trading Plan",
+        "excerpt": "A step-by-step guide to developing a comprehensive trading strategy that aligns with your goals."
+      },
+      "ai": {
+        "title": "AI-Powered Trading: The Future is Now",
+        "excerpt": "Discover how artificial intelligence is revolutionizing trading strategies and decision-making processes."
+      },
+      "news": {
+        "title": "How to Trade Major News Events",
+        "excerpt": "Master the art of news trading and learn to capitalize on market-moving announcements."
+      },
+      "mindset": {
+        "title": "The Winning Trader's Mindset",
+        "excerpt": "Develop the psychological resilience and discipline required for consistent trading success."
+      },
+      "indicators": {
+        "title": "Top 5 Technical Indicators Every Trader Should Know",
+        "excerpt": "Essential technical analysis tools that form the foundation of successful trading strategies."
+      },
+      "blockchain": {
+        "title": "Blockchain Technology in Modern Trading",
+        "excerpt": "Explore how blockchain is transforming transparency and efficiency in financial markets."
+      },
+      "position": {
+        "title": "Position Sizing for Risk Management",
+        "excerpt": "Learn the mathematical approach to determining optimal trade sizes for your account."
+      },
+      "backtest": {
+        "title": "The Complete Guide to Backtesting",
+        "excerpt": "Validate your trading strategies using historical data to improve future performance."
+      },
+      "correlation": {
+        "title": "Understanding Market Correlations",
+        "excerpt": "How different assets move together and how to use this knowledge in your trading."
+      },
+      "scalping": {
+        "title": "Scalping Strategies for Quick Profits",
+        "excerpt": "Fast-paced trading techniques for capturing small price movements throughout the day."
+      }
+    },
+    "newsletter": {
+      "title": "Stay Updated with Our Newsletter",
+      "subtitle": "Get the latest trading insights, market analysis, and educational content delivered to your inbox weekly.",
+      "subscribe": "Subscribe to Newsletter",
+      "comingSoon": "Coming Soon"
+    }
+  },
+  "cta": {
+    "title": "Ready to Start Your Trading Education?",
+    "subtitle": "Join our comprehensive program and get access to expert guidance, live trading sessions, and ongoing support.",
+    "joinProgram": "Join Trading Program",
+    "scheduleConsultation": "Schedule Free Consultation"
+  }
+}

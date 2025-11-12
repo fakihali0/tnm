@@ -1,0 +1,84 @@
+{
+  "badge": "Trading Tools",
+  "hero": {
+    "title": "Advanced Trading Tools",
+    "subtitle": "Professional trading calculators and analysis tools to enhance your trading decisions",
+    "description": "Access powerful trading tools designed by professionals. From risk calculators to market widgets, everything you need to make informed trading decisions.",
+    "primaryCta": "Explore Tools",
+    "secondaryCta": "Jump to Widgets",
+    "badges": {
+      "liveData": "Live Data",
+      "lightweight": "Lightweight",
+      "mobileFriendly": "Mobile Friendly", 
+      "noSignin": "No Sign-in Required"
+    }
+  },
+  "cta": {
+    "primary": "Start Trading",
+    "secondary": "Open Demo Account"
+  },
+  "trustBadges": {
+    "professional": "Professional Grade",
+    "realTime": "Real-Time Data",
+    "free": "Always Free"
+  },
+  "sections": {
+    "tradingWidgets": "Interactive Trading Widgets",
+    "subtitle": "Explore our collection of professional trading tools",
+    "economicCalendar": "Economic Calendar",
+    "marketHeatmap": "Market Heatmap", 
+    "forexCrossRates": "Forex Cross Rates",
+    "riskCalculator": "Risk Calculator"
+  },
+  "widgets": {
+    "economicCalendar": {
+      "title": "Economic Calendar",
+      "description": "Stay ahead of market-moving events with our comprehensive economic calendar"
+    },
+    "marketHeatmap": {
+      "title": "Market Heatmap",
+      "description": "Visualize market performance across different sectors and instruments"
+    },
+    "forexCrossRates": {
+      "title": "Forex Cross Rates",
+      "description": "Real-time currency exchange rates and cross pairs analysis"
+    },
+    "riskCalculator": {
+      "title": "Risk Calculator",
+      "description": "Calculate position size, risk, and potential profit for your trades"
+    }
+  },
+  "cards": {
+    "economicCalendar": {
+      "title": "Economic Calendar",
+      "description": "Track market-moving economic events and news",
+      "useNow": "Use Now"
+    },
+    "riskCalculator": {
+      "title": "Risk Calculator", 
+      "description": "Calculate optimal position sizes and risk management",
+      "useNow": "Calculate Now"
+    },
+    "heatMap": {
+      "title": "Market Heat Map",
+      "description": "Visualize market performance across sectors",
+      "useNow": "View Map"
+    },
+    "forexCrossRates": {
+      "title": "Forex Cross Rates",
+      "description": "Real-time currency exchange rates",
+      "useNow": "View Rates"
+    }
+  },
+  "descriptions": {
+    "economicCalendar": "Track important economic events and their potential market impact. Filter by importance, country, and time to stay informed about market-moving news.",
+    "marketHeatmap": "Get an instant overview of market performance with our interactive heatmap. Compare sectors, identify trends, and spot opportunities at a glance.", 
+    "forexCrossRates": "Monitor real-time forex rates and cross pairs. Track currency strength and identify arbitrage opportunities across major and minor pairs.",
+    "riskCalculator": "Calculate the optimal position size based on your risk tolerance. Determine stop loss and take profit levels for better risk management."
+  },
+  "cta_section": {
+    "title": "Ready to Start Trading?",
+    "subtitle": "Join thousands of traders using our professional tools",
+    "description": "Open your account today and get access to all trading tools, competitive spreads, and professional support."
+  }
+}

@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+tnm_concept/node_modules/
+
+# Build outputs
+dist/
+build/
+*.log
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Ephemeral BMad data
+.bmad-ephemeral/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# VPS/Production secrets
+*.pem
+*.key
+*.crt
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

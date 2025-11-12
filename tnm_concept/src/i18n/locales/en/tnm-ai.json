@@ -1,0 +1,612 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "aiHub": "AI Assistant",
+    "journal": "Trade Log",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "riskCalculator": "Risk Manager",
+    "tools": "Trading Tools",
+    "alerts": "Alerts",
+    "accounts": "Accounts"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Welcome to your professional trading command center",
+    "welcomeTitle": "Welcome to TNM AI",
+    "welcomeSubtitle": "Link your trading account to start your journey",
+    "noAccountTitle": "No Account Selected",
+    "noAccountDescription": "Please link a trading account to view your dashboard",
+    "connectToViewAnalytics": "Connect an account to view analytics",
+    "overviewAndAccounts": "Overview and accounts",
+    "performanceInsights": "Performance insights",
+    "connectedAccounts": "Connected accounts",
+    "tradingJournal": "Trading journal",
+    "aiAssistant": "AI trading assistant",
+    "riskTools": "Risk tools",
+    "recentActivity": "Recent Activity",
+    "kpis": {
+      "netPnl": "Net P/L",
+      "winRate": "Win Rate",
+      "activeTrades": "Active Trades",
+      "profitFactor": "Profit Factor",
+      "avgRiskReward": "Avg R:R",
+      "winStreak": "Win Streak",
+      "trades": "{{count}} trades",
+      "winners": "{{count}} winners",
+      "currentlyOpen": "Currently open",
+      "excellent": "Excellent",
+      "good": "Good",
+      "needsWork": "Needs work",
+      "grossProfit": "{{amount}} gross profit",
+      "avgWin": "{{amount}} avg win",
+      "openPositions": "Open positions",
+      "maxConsecutive": "Max consecutive"
+    },
+    "actions": {
+      "bestPerformance": "Best Performance",
+      "winningStreak": "Winning Streak",
+      "focusArea": "Focus Area",
+      "consecutiveWins": "{{count}} consecutive wins",
+      "improveRiskReward": "Improve risk/reward ratio",
+      "keepUpGoodRR": "Keep up good R:R"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "trades": "Trades",
+      "advanced": "Advanced"
+    },
+    "performance": {
+      "overview": "Performance Overview",
+      "account": "Account",
+      "largestWin": "Largest Win",
+      "largestLoss": "Largest Loss",
+      "avgRiskReward": "Avg Risk/Reward",
+      "bestDay": "Best Trading Day",
+      "worstDay": "Worst Trading Day"
+    },
+    "periods": {
+      "today": "Today",
+      "mtd": "Month to Date",
+      "custom": "Custom"
+    }
+  },
+  "account": {
+    "linkAccount": "Link Account",
+    "linkAccountDesc": "Connect your trading account to start tracking performance",
+    "accountLinked": "Account Linked",
+    "accountType": "Account Type",
+    "balance": "Balance",
+    "equity": "Equity",
+    "margin": "Margin",
+    "freeMargin": "Free Margin",
+    "marginLevel": "Margin Level"
+  },
+  "journal": {
+    "title": "Trading Journal",
+    "addTrade": "Add Trade",
+    "editTrade": "Edit Trade",
+    "deleteTrade": "Delete Trade",
+    "tradeDate": "Trade Date",
+    "instrument": "Instrument",
+    "direction": "Direction",
+    "entryPrice": "Entry Price",
+    "exitPrice": "Exit Price",
+    "quantity": "Quantity",
+    "pnl": "P&L",
+    "notes": "Notes",
+    "strategy": "Strategy",
+    "buy": "Buy",
+    "sell": "Sell",
+    "profit": "Profit",
+    "loss": "Loss",
+    "noTrades": "No trades recorded",
+    "addFirstTrade": "Add your first trade to start tracking performance",
+    "exportReport": "Export Report",
+    "completedTrades": "{{count}} completed trades",
+    "tabs": {
+      "timeline": "Timeline",
+      "performance": "Performance",
+      "insights": "Insights"
+    },
+    "empty": {
+      "noCompletedTrades": "No completed trades yet"
+    },
+    "insights": {
+      "topPerformer": "Top Performer",
+      "mostProfitablePair": "Most profitable pair",
+      "improvementArea": "Improvement Area",
+      "focusPositionSizing": "Focus on maintaining consistent position sizing"
+    }
+  },
+  "analytics": {
+    "analytics": "Analytics Overview",
+    "performance": "Performance",
+    "riskMetrics": "Risk Metrics",
+    "tradingHours": "Trading Hours",
+    "equityCurve": "Equity Curve",
+    "drawdownChart": "Drawdown Chart",
+    "monthlyReturns": "Monthly Returns",
+    "profitLoss": "Profit & Loss",
+    "averageWin": "Average Win",
+    "averageLoss": "Average Loss",
+    "largestWin": "Largest Win",
+    "largestLoss": "Largest Loss",
+    "consecutiveWins": "Consecutive Wins",
+    "consecutiveLosses": "Consecutive Losses",
+    "riskRewardRatio": "Risk/Reward Ratio",
+    "profitFactor": "Profit Factor",
+    "netPnL": "Net P&L",
+    "avgRiskReward": "Avg Risk/Reward",
+    "noData": "No analytics data available"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "preferences": "Alert Preferences",
+    "riskAlerts": "Risk Alerts",
+    "milestoneAlerts": "Milestone Alerts",
+    "systemAlerts": "System Alerts",
+    "performanceAlerts": "Performance Alerts",
+    "soundEnabled": "Sound Enabled",
+    "markAllRead": "Mark All Read",
+    "clearAll": "Clear All",
+    "noNotifications": "No new notifications"
+  },
+  "coaching": {
+    "welcome": {
+      "title": "Welcome to TNM AI",
+      "content": "Start by linking your trading account to unlock AI-powered analytics",
+      "action": "Link Account"
+    },
+    "journal": {
+      "title": "Track Your Trades",
+      "content": "Use the trading journal to record insights and improve your strategy"
+    },
+    "risk": {
+      "title": "Risk Management",
+      "content": "Your current position size is higher than recommended. Consider reducing risk"
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to TNM AI",
+      "description": "Your AI-powered trading intelligence platform. Let's get you started with a quick tour."
+    },
+    "dashboard": {
+      "title": "Performance Dashboard",
+      "description": "This is your main dashboard where you can see your trading performance metrics and key statistics."
+    },
+    "linkAccount": {
+      "title": "Link Your Trading Account",
+      "description": "Connect your trading account to start receiving real-time analytics and insights.",
+      "action": "Link Account"
+    },
+    "journal": {
+      "title": "Trading Journal",
+      "description": "Record your trades manually or sync them automatically to track your progress and identify patterns."
+    },
+    "analytics": {
+      "title": "Advanced Analytics",
+      "description": "Dive deep into your performance with detailed charts, risk metrics, and trading insights."
+    },
+    "complete": {
+      "title": "You're All Set!",
+      "description": "You've completed the tour. Start by linking your account or adding your first trade to see TNM AI in action.",
+      "action": "Get Started"
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create account",
+    "signInDesc": "Sign in to access your AI trading dashboard",
+    "signUpDesc": "Join TNM AI and start trading smarter with AI",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "country": "Country",
+    "phone": "Phone number",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "selectCountry": "Select country",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "createPassword": "Create a password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "accountCreated": "Account created!",
+    "accountCreatedDesc": "Your TNM AI account has been created.",
+    "authFailed": "Authentication failed",
+    "authFailedDesc": "Please check your credentials and try again.",
+    "passwordsDontMatch": "Passwords don't match",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordTooWeak": "Password is too weak, please make it stronger",
+    "fieldRequired": "This field is required",
+    "phoneInvalid": "Invalid phone number format",
+    "mustAcceptTerms": "You must accept the Terms and Conditions to continue",
+    "backToWebsite": "Back to website",
+    "resetPassword": "Reset Password",
+    "resetPasswordInstructions": "Enter your email address and we'll send you a link to reset your password.",
+    "sendReset": "Send Reset Link",
+    "sending": "Sending...",
+    "resetEmailSent": "Reset email sent!",
+    "checkEmailForReset": "Check your email for a password reset link. It will expire in 1 hour.",
+    "backToSignIn": "Back to sign in",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "resetPasswordSuccess": "Password reset successful!",
+    "resetPasswordSuccessDesc": "Your password has been updated. Redirecting to sign in...",
+    "resetPasswordError": "Reset failed",
+    "invalidResetToken": "This password reset link is invalid or has expired. Please request a new one.",
+    "enterNewPassword": "Enter your new password",
+    "passwordResetTitle": "Reset Your Password",
+    "passwordResetSubtitle": "Enter a new secure password for your account",
+    "passwordStrength": {
+      "veryWeak": "Very Weak",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "veryStrong": "Very Strong",
+      "requirements": "Password Requirements",
+      "strengthLabel": "Password Strength"
+    },
+    "verification": {
+      "processing": "Verifying your email...",
+      "pleaseWait": "Please wait while we verify your account.",
+      "success": "Email verified successfully!",
+      "redirecting": "Redirecting you to your dashboard...",
+      "failed": "Verification failed",
+      "error": "Something went wrong during verification. Please try again.",
+      "invalid": "Invalid or expired verification link.",
+      "expired": "This verification link has expired. Please request a new one.",
+      "goToLogin": "Go to Login"
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "analyticsOverview": "Analytics & Overview",
+      "tradingTools": "Trading Tools",
+      "systemSettings": "System & Settings"
+    },
+    "descriptions": {
+      "dashboard": "Real-time portfolio overview",
+      "accounts": "Connect and manage trading accounts",
+      "aiHub": "AI-powered market insights",
+      "riskCalculator": "Position sizing and risk analysis",
+      "journal": "Track and analyze your trades",
+      "alerts": "Price alerts and notifications",
+      "settings": "Account and system settings"
+    },
+    "aiPowered": "AI Powered",
+    "profileSettings": "Profile Settings",
+    "accountManagement": "Account Management"
+  },
+  "sections": {
+    "accounts": {
+      "title": "Account Linking",
+      "description": "Connect your MT4/MT5 trading accounts to unlock advanced analytics and risk management features",
+      "badge": "{{count}} Connected"
+    },
+    "riskCalculator": {
+      "title": "Professional Risk Calculator",
+      "description": "Advanced position sizing and risk management tools for professional traders",
+      "badge": "Pro Tool"
+    },
+    "journal": {
+      "title": "Trading Journal",
+      "description": "Your trading story - track, analyze, and improve",
+      "badge": "Analytics"
+    },
+    "alerts": {
+      "title": "Trading Alerts",
+      "description": "Configure and manage your trading notifications and risk alerts",
+      "badge": "Real-time"
+    },
+    "aiHub": {
+      "title": "AI Hub",
+      "description": "Advanced AI-powered trading insights and market intelligence",
+      "badge": "AI Powered"
+    }
+  },
+  "aiHub": {
+    "title": "AI Hub",
+    "description": "Advanced AI-powered trading insights and market intelligence",
+    "stats": {
+      "insightsGenerated": "AI Insights Generated",
+      "marketPredictions": "Market Predictions",
+      "chatSessions": "Chat Sessions",
+      "performanceScore": "Performance Score",
+      "thisWeek": "+{{count}} this week",
+      "accuracyRate": "accuracy rate",
+      "today": "+{{count}} today",
+      "thisMonth": "+{{value}} this month"
+    },
+    "tabs": {
+      "insights": "AI Insights",
+      "market": "Market Intelligence",
+      "chat": "AI Assistant"
+    }
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "tnmAi": "TNM AI",
+    "dashboard": "Dashboard",
+    "accounts": "Account Linking",
+    "riskCalculator": "Risk Calculator",
+    "journal": "Trading Journal",
+    "alerts": "Trading Alerts",
+    "settings": "Settings"
+  },
+  "trades": {
+    "table": {
+      "symbol": "Symbol",
+      "type": "Direction",
+      "volume": "Volume",
+      "openPrice": "Entry Price",
+      "closePrice": "Exit Price",
+      "pnl": "P&L",
+      "riskReward": "R:R",
+      "openedAt": "Opened",
+      "closedAt": "Closed",
+      "duration": "Duration",
+      "commission": "Commission",
+      "swap": "Swap",
+      "notes": "Notes",
+      "tags": "Tags",
+      "screenshot": "Screenshot",
+      "viewChart": "View Chart",
+      "search": "Search trades...",
+      "noTrades": "No trades found",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "live": "Live",
+    "today": "Today",
+    "closed": "Closed",
+    "open": "Open",
+    "tradingAccount": "Trading Account",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "date": "Date",
+    "time": "Time",
+    "amount": "Amount",
+    "percentage": "Percentage",
+    "currency": "Currency",
+    "total": "Total",
+    "average": "Average",
+    "minimum": "Minimum",
+    "maximum": "Maximum",
+    "optional": "(optional)",
+    "quickTrade": "Quick Trade",
+    "platform": "Trading Platform",
+    "aiTrader": "AI Trader",
+    "accountsConnected": "{{count}} account{{plural}} connected",
+    "noAccountsConnected": "No accounts connected",
+    "backToWebsite": "Back to Website",
+    "versionInfo": "TNM AI v2.0",
+    "aiIntelligence": "AI Trading Intelligence",
+    "signOut": "Sign Out",
+    "status": "Status"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Try again",
+    "networkError": "Network error",
+    "noData": "No data available",
+    "loadingFailed": "Failed to load",
+    "saveFailed": "Failed to save",
+    "deleteFailed": "Failed to delete",
+    "invalidData": "Invalid data",
+    "accessDenied": "Access denied",
+    "sessionExpired": "Session expired"
+  },
+  "emptyStates": {
+    "noTrades": {
+      "title": "No Trades",
+      "description": "You haven't recorded any trades yet. Start by adding your first trade.",
+      "action": "Add Trade"
+    },
+    "noData": {
+      "title": "No Data",
+      "description": "No data available to display at the moment.",
+      "action": "Refresh"
+    },
+    "noResults": {
+      "title": "No Results",
+      "description": "No results found matching your search.",
+      "action": "Clear Search"
+    },
+    "noTradingAccounts": "No Trading Accounts",
+    "connectAccount": "Connect your trading account to start tracking your performance",
+    "noRecentActivity": "No recent activity",
+    "noMoreActivity": "No more activity to show"
+  },
+  "quickActions": {
+    "newTrade": "New Trade",
+    "deposit": "Deposit",
+    "calculator": "Calculator",
+    "aiHub": "AI Hub"
+  },
+  "ai": {
+    "askAI": "Ask AI",
+    "assistant": "AI Assistant",
+    "online": "Online",
+    "thinking": "Thinking...",
+    "welcome": "👋 Welcome to your mobile AI trading assistant! I'm here to help with quick analysis and trading insights. What would you like to know?",
+    "askAboutTrading": "Ask about trading...",
+    "contextPrompts": {
+      "dashboard": "Ask about your performance",
+      "journal": "Analyze this trade",
+      "risk": "Validate my calculation",
+      "analytics": "Explain these metrics"
+    },
+    "quickActions": {
+      "calculatePosition": "Calculate position size",
+      "marketAnalysis": "Market analysis",
+      "riskAssessment": "Risk assessment",
+      "tradingSignals": "Trading signals"
+    },
+    "errors": {
+      "connectionTrouble": "I'm having trouble connecting right now. Please check your connection and try again."
+    }
+  },
+  "activity": {
+    "recentActivity": "Recent Activity",
+    "types": {
+      "bought": "Bought",
+      "sold": "Sold",
+      "deposit": "Deposit",
+      "withdrawal": "Withdrawal",
+      "priceAlert": "Price Alert"
+    },
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    }
+  },
+  "markets": {
+    "yourTopMarkets": "Your Top Markets"
+  },
+  "notifications": {
+    "center": "Notification Center",
+    "manage": "Manage your trading alerts and notifications",
+    "tabs": {
+      "notifications": "Notifications",
+      "settings": "Settings"
+    },
+    "totalNotifications": "{{count}} total notifications",
+    "markAllRead": "Mark all as read",
+    "noNotificationsYet": "No notifications yet",
+    "viewDetails": "View Details",
+    "alertPreferences": "Alert Preferences",
+    "riskAlerts": "Risk Alerts",
+    "riskAlertsDesc": "Get notified about high drawdown and risk exposure",
+    "milestoneAlerts": "Milestone Alerts",
+    "milestoneAlertsDesc": "Celebrate new profit records and achievements",
+    "performanceAlerts": "Performance Alerts",
+    "performanceAlertsDesc": "Track winning streaks and performance insights",
+    "systemAlerts": "System Alerts",
+    "systemAlertsDesc": "Account linking, exports, and system updates",
+    "soundNotifications": "Sound Notifications",
+    "soundNotificationsDesc": "Play sound for high priority alerts"
+  },
+  "accountLink": {
+    "title": "Link Trading Account",
+    "description": "Connect your MT4/MT5 account to access live data and risk management tools",
+    "platform": "Platform",
+    "selectPlatform": "Select platform",
+    "brokerServer": "Broker Server",
+    "selectServer": "Select server",
+    "serverPlaceholder": "e.g., MetaQuotes-Demo",
+    "loginNumber": "Login Number",
+    "loginPlaceholder": "Your MT4/MT5 login number",
+    "investorPassword": "Investor Password",
+    "passwordPlaceholder": "Read-only investor password",
+    "passwordHint": "Use your read-only investor password for secure access",
+    "submit": "Link Account",
+    "submitting": "Connecting...",
+    "temporarilyDisabled": "Temporarily Unavailable",
+    "disabledNotice": {
+      "title": "Integration Temporarily Disabled",
+      "description": "MT4/MT5 account linking is currently unavailable while we integrate a new solution. Your existing data remains safe and accessible."
+    },
+    "errors": {
+      "missingInfo": "Missing information",
+      "fillAllFields": "Please fill in all required fields.",
+      "connectionFailed": "Connection failed",
+      "checkCredentials": "Please check your credentials and try again."
+    },
+    "success": {
+      "title": "Account linked successfully!",
+      "description": "Your trading account has been connected to TNM AI."
+    }
+  },
+  "accountCard": {
+    "account": "{{platform}} Account",
+    "labels": {
+      "login": "Login",
+      "server": "Server",
+      "balance": "Balance",
+      "equity": "Equity",
+      "margin": "Margin",
+      "freeMargin": "Free Margin",
+      "leverage": "Leverage",
+      "connected": "Connected"
+    }
+  },
+  "riskCalculator": {
+    "title": "Risk Calculator",
+    "description": "Calculate position size based on risk parameters",
+    "linkAccountToUse": "Link a trading account to use the calculator",
+    "noAccount": {
+      "title": "No Account Selected",
+      "description": "Please link a trading account to use the risk calculator"
+    },
+    "inputs": {
+      "accountBalance": "Account Balance",
+      "riskPerTrade": "Risk per Trade (%)",
+      "stopDistance": "Stop Distance (Pips)",
+      "symbol": "Symbol",
+      "targetRiskReward": "Target Risk:Reward"
+    },
+    "results": {
+      "title": "Calculation Results",
+      "description": "Recommended position parameters",
+      "lotSize": "Lot Size",
+      "riskAmount": "Risk Amount",
+      "positionValue": "Position Value",
+      "valuePerPip": "Value per Pip",
+      "requiredMargin": "Required Margin",
+      "targetRR": "Target R:R"
+    },
+    "actions": {
+      "getAIRecommendations": "Get AI Recommendations",
+      "analyzing": "Analyzing...",
+      "applyToTrade": "Apply to Trade"
+    },
+    "assessment": {
+      "title": "Real-Time Risk Assessment",
+      "description": "Live evaluation of your current risk exposure",
+      "marginLevel": {
+        "label": "Margin Level",
+        "healthy": "Healthy margin level",
+        "acceptable": "Margin level acceptable",
+        "dangerous": "Dangerous margin level"
+      },
+      "dailyDrawdown": {
+        "label": "Daily Drawdown",
+        "low": "Low daily risk",
+        "moderate": "Moderate daily risk",
+        "high": "High daily risk"
+      },
+      "freeMargin": {
+        "label": "Free Margin After Trade",
+        "sufficient": "Sufficient free margin",
+        "limited": "Limited free margin",
+        "insufficient": "Insufficient margin"
+      }
+    }
+  }
+}

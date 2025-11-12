@@ -1,0 +1,183 @@
+{
+  "seo": {
+    "title": "Risk Calculator - Professional Position Sizing Tool | Trade'n More",
+    "description": "Free professional forex risk calculator. Calculate optimal position sizes, stop loss levels, and risk:reward ratios for Forex, Indices, Commodities & Crypto. Used by 10,000+ traders.",
+    "keywords": "risk calculator, position sizing, forex calculator, trading risk, stop loss calculator, lot size calculator, risk management, trading calculator"
+  },
+  "hero": {
+    "badge": "Professional Trading Tool",
+    "title": "Calculate Trading Risk Like a Pro",
+    "subtitle": "Free professional position sizing calculator with AI-powered insights",
+    "badges": {
+      "users": "Used by 10,000+ traders",
+      "realtime": "Real-time calculations",
+      "free": "100% free forever"
+    }
+  },
+  "benefits": {
+    "multiAsset": "Forex, Indices, Commodities, Crypto",
+    "dualMode": "Risk Assessment + Position Sizing",
+    "aiPowered": "AI-powered recommendations"
+  },
+  "sidebar": {
+    "keyFeatures": "Key Features",
+    "feature1": "Dual calculator modes for risk assessment and position sizing",
+    "feature2": "Support for all major asset classes",
+    "feature3": "Bidirectional Risk:Reward ratio calculation",
+    "feature4": "Real-time margin and pip value calculations"
+  },
+  "education": {
+    "badge": "Learn Risk Management",
+    "title": "Master Professional Risk Management",
+    "subtitle": "Understanding risk management is the key to long-term trading success",
+    "whyMatters": {
+      "title": "Why Risk Management Matters",
+      "description": "The #1 reason traders fail",
+      "stat": "80% of traders fail due to poor risk management",
+      "points": [
+        "Protects your trading capital",
+        "Prevents emotional decisions",
+        "Ensures long-term profitability"
+      ]
+    },
+    "bestPractices": {
+      "title": "Professional Best Practices",
+      "description": "How successful traders manage risk",
+      "stat": "Pro traders risk 1-2% per trade",
+      "points": [
+        "Never risk more than 2% per trade",
+        "Use stop losses on every position",
+        "Maintain proper position sizing"
+      ]
+    },
+    "mistakes": {
+      "title": "Common Mistakes to Avoid",
+      "description": "Don't let these errors blow your account",
+      "stat": "70% make these mistakes",
+      "list": [
+        "Risking more than 2% per trade",
+        "Not using stop losses",
+        "Overleveraging your account",
+        "Ignoring correlation between trades",
+        "Revenge trading after losses"
+      ]
+    },
+    "howToUse": {
+      "badge": "Step-by-Step Guide",
+      "title": "How to Use This Calculator",
+      "subtitle": "Follow these simple steps to calculate your optimal position size",
+      "steps": [
+        "Select your trading instrument",
+        "Enter your account balance",
+        "Set your desired risk percentage",
+        "Input stop loss distance in pips",
+        "Get your optimal position size"
+      ],
+      "stepsDesc": [
+        "Choose from Forex, Indices, Commodities, or Crypto markets",
+        "Enter the current balance in your trading account",
+        "Professional traders typically risk 1-2% per trade",
+        "Calculate the distance from entry to your stop loss level",
+        "The calculator shows your recommended lot size and risk metrics"
+      ]
+    }
+  },
+  "advancedFeatures": {
+    "badge": "Advanced Features",
+    "title": "Professional Features",
+    "subtitle": "Everything you need for precise risk management"
+  },
+  "features": {
+    "rrCalculation": "Risk:Reward Ratio",
+    "rrCalculationDesc": "Bidirectional calculation - set target R:R or manual take profit",
+    "multiAsset": "Multi-Asset Support",
+    "multiAssetDesc": "Accurate calculations for Forex, Indices, Commodities, and Crypto",
+    "realTimePip": "Real-time Pip Value",
+    "realTimePipDesc": "Automatic pip value calculation based on instrument type",
+    "marginCalc": "Margin Calculator",
+    "marginCalcDesc": "Know exactly how much margin you need for each trade",
+    "buyAndSell": "Buy & Sell Positions",
+    "buyAndSellDesc": "Support for both long and short positions"
+  },
+  "useCases": {
+    "badge": "Use Cases",
+    "title": "Perfect For Every Trading Style",
+    "subtitle": "Whether you're a day trader, swing trader, or position trader",
+    "exampleLabel": "Example:",
+    "dayTrading": {
+      "title": "Day Trading",
+      "badge": "Intraday",
+      "description": "Quick intraday position sizing with tight stops",
+      "example": "EUR/USD scalping with 10-pip stop"
+    },
+    "swingTrading": {
+      "title": "Swing Trading",
+      "badge": "Multi-day",
+      "description": "Multi-day positions with wider stops",
+      "example": "Gold swing trade with 50-pip stop"
+    },
+    "positionTrading": {
+      "title": "Position Trading",
+      "badge": "Long-term",
+      "description": "Long-term positions with large stops",
+      "example": "Index CFD with 200-point stop"
+    }
+  },
+  "faq": {
+    "badge": "FAQ",
+    "title": "Frequently Asked Questions",
+    "items": [
+      {
+        "q": "What is the recommended risk per trade?",
+        "a": "Professional traders typically risk 1-2% of their account balance per trade. This ensures you can survive a losing streak without blowing your account."
+      },
+      {
+        "q": "How is pip value calculated?",
+        "a": "Pip value varies by instrument. For forex, it's based on contract size and leverage. For indices, it's based on the point value. Our calculator handles this automatically."
+      },
+      {
+        "q": "What is a good Risk:Reward ratio?",
+        "a": "A minimum 1:2 ratio is recommended. This means for every $1 you risk, you aim to make $2. This allows you to be profitable even with a 40% win rate."
+      },
+      {
+        "q": "Can I use this for crypto trading?",
+        "a": "Yes! The calculator supports Forex, Indices, Commodities, and Cryptocurrencies with accurate calculations for each asset class."
+      },
+      {
+        "q": "Do I need to create an account?",
+        "a": "No! The risk calculator is 100% free and requires no sign-up. Just start calculating immediately."
+      },
+      {
+        "q": "How accurate are the margin calculations?",
+        "a": "Our margin calculations are based on industry-standard formulas and are highly accurate for most brokers. Always verify with your specific broker's margin requirements."
+      },
+      {
+        "q": "What's the difference between the two calculator modes?",
+        "a": "Risk Assessment mode evaluates an existing position. Position Sizing mode tells you the optimal lot size based on your risk tolerance."
+      },
+      {
+        "q": "Can I save my calculations?",
+        "a": "Currently, calculations are session-based. You can export results to PDF or copy to clipboard for your records."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to Trade with Confidence?",
+    "subtitle": "Apply your calculations on a professional trading platform",
+    "demo": "Try Demo Account",
+    "live": "Open Live Account"
+  },
+  "presets": {
+    "quickPresets": "Quick Risk Presets",
+    "conservative": "Conservative",
+    "moderate": "Moderate",
+    "aggressive": "Aggressive"
+  },
+  "comparison": {
+    "title": "Risk Comparison",
+    "risk": "Risk %",
+    "lotSize": "Lot Size",
+    "riskAmount": "Risk Amount",
+    "potential": "Potential Profit"
+  }
+}

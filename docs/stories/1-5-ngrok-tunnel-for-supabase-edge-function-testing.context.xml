@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<story-context id="1-5-ngrok-tunnel-for-supabase-edge-function-testing" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>1.5</storyId>
+    <title>ngrok Tunnel for Supabase Edge Function Testing (Optional)</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-12</generatedAt>
+    <generator>BMAD Story Context Workflow with MCP Enhancement</generator>
+    <sourceStoryPath>docs/stories/1-5-ngrok-tunnel-for-supabase-edge-function-testing.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>a public URL tunnel to my local Windows service</iWant>
+    <soThat>Supabase edge functions (running on cloud) can call my local development service for testing</soThat>
+    <tasks>
+      - Sign up for free ngrok account and get auth token
+      - Install ngrok (brew on Mac or choco on Windows)
+      - Configure ngrok with auth token
+      - Create tunnel to 192.168.1.100:8000
+      - Test public URL accessibility
+      - Configure Supabase edge functions with ngrok URL (optional)
+      - Document alternative mock approach (skip ngrok, use mocks)
+      - Add ngrok setup to LOCAL-DEVELOPMENT-GUIDE.md
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="1" verification="ngrok version returns version number">
+      ngrok installed on Mac or Windows
+    </criterion>
+    <criterion id="2" verification="ngrok http 192.168.1.100:8000 returns public HTTPS URL">
+      ngrok tunnel created to Windows service (192.168.1.100:8000)
+    </criterion>
+    <criterion id="3" verification="curl https://abc123.ngrok.io/health from external network succeeds">
+      Public ngrok URL accessible from internet
+    </criterion>
+    <criterion id="4" verification="Supabase edge function environment variable MT5_SERVICE_URL set to ngrok URL">
+      Supabase edge function configured with ngrok URL
+    </criterion>
+    <criterion id="5" verification="Test edge function invocation returns data from local Windows service">
+      Edge function successfully calls local service through tunnel
+    </criterion>
+    <criterion id="6" verification="Visit http://localhost:4040 shows incoming requests">
+      ngrok dashboard shows request logs
+    </criterion>
+    <criterion id="7" verification="LOCAL-DEVELOPMENT-GUIDE.md contains mock approach documentation">
+      Alternative approach documented (mock edge function responses)
+    </criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Development Guide - MT5 Integration Service</title>
+        <section>Step 5: ngrok Tunnel Setup (Optional)</section>
+        <snippet>
+          ngrok setup instructions:
+          - Sign up at https://ngrok.com/signup (free tier)
+          - Install: brew install ngrok/ngrok/ngrok (Mac) or choco install ngrok (Windows)
+          - Configure auth token: ngrok config add-authtoken YOUR_TOKEN
+          - Create tunnel: ngrok http 192.168.1.100:8000
+          - Note public URL (e.g., https://abc123-xyz.ngrok-free.app)
+          - Access dashboard: http://localhost:4040
+          - Update Supabase edge function: supabase secrets set MT5_SERVICE_URL=https://abc123.ngrok-free.app
+          
+          Alternative: Skip ngrok, use mock edge function responses in frontend for local testing.
+        </snippet>
+        <relevance>Complete ngrok setup and alternative approaches</relevance>
+      </doc>
+      
+      <doc>
+        <path>https://ngrok.com/docs</path>
+        <title>ngrok Documentation</title>
+        <section>Getting Started</section>
+        <snippet>
+          External resource - official ngrok documentation:
+          - Installation instructions for all platforms
+          - Auth token configuration
+          - Tunnel creation and management
+          - Dashboard features (request inspection, replay)
+          - Free tier limitations (URL changes on restart, 2-hour session timeout)
+          - Pricing for static domains ($8/month)
+        </snippet>
+        <relevance>Official ngrok reference documentation</relevance>
+      </doc>
+      
+      <doc>
+        <path>https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/</path>
+        <title>Cloudflare Tunnel Documentation</title>
+        <section>Free ngrok Alternative</section>
+        <snippet>
+          Alternative to ngrok with better free tier:
+          - Static subdomain (no URL changes)
+          - No session timeouts
+          - Free tier available
+          - More complex setup than ngrok
+          - Consider if ngrok limitations become blocker
+        </snippet>
+        <relevance>Alternative tunnel solution if needed</relevance>
+      </doc>
+    </docs>
+
+    <code>
+      <artifact>
+        <path>N/A</path>
+        <kind>infrastructure</kind>
+        <symbol>N/A</symbol>
+        <lines>N/A</lines>
+        <reason>
+          This is infrastructure/tooling story - no code changes to MT5 service.
+          ngrok is external CLI tool creating tunnel to existing service.
+          
+          Optional: If implementing mock approach, would add:
+          - src/mocks/edge-function-responses.ts (frontend mock data)
+          - Frontend code to use mocks when VITE_USE_MOCKS=true
+          
+          But this story is focused on ngrok tunnel setup, not frontend mocks.
+        </reason>
+      </artifact>
+    </code>
+
+    <dependencies>
+      <dependency>
+        <name>ngrok CLI</name>
+        <version>Latest (3.x.x)</version>
+        <purpose>Create public tunnel to local development service</purpose>
+        <installation>
+          Mac: brew install ngrok/ngrok/ngrok
+          Windows: choco install ngrok -y
+          
+          Configure: ngrok config add-authtoken YOUR_AUTH_TOKEN
+          Verify: ngrok version
+        </installation>
+      </dependency>
+      
+      <dependency>
+        <name>ngrok Account (Free Tier)</name>
+        <version>Free tier sufficient</version>
+        <purpose>Auth token for tunnel creation</purpose>
+        <installation>
+          Sign up at https://ngrok.com/signup
+          Get auth token from dashboard
+          Free tier includes: 1 online process, 40 connections/min, HTTPS tunnel
+          Limitation: URL changes on restart, 2-hour session timeout
+        </installation>
+      </dependency>
+      
+      <dependency>
+        <name>FastAPI Service Running</name>
+        <version>From Story 1.4</version>
+        <purpose>Service that ngrok will tunnel to</purpose>
+        <installation>Already running on 192.168.1.100:8000 from Story 1.4</installation>
+      </dependency>
+      
+      <dependency>
+        <name>Supabase Edge Functions (Optional)</name>
+        <version>N/A (cloud service)</version>
+        <purpose>Cloud functions that will call local service via ngrok</purpose>
+        <installation>
+          Only needed if testing full Supabase integration locally.
+          Can skip and use mock responses instead.
+        </installation>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint type="optional-story">
+      <description>This story is OPTIONAL - only needed if testing Supabase edge functions locally</description>
+      <rationale>Epic 1-3 stories (foundation, MT5 core, REST API) don't require Supabase integration</rationale>
+      <recommendation>Skip for now, implement if/when needed in Epic 4 (Supabase Integration)</recommendation>
+    </constraint>
+    
+    <constraint type="free-tier-limitations">
+      <description>ngrok free tier has URL change and session timeout limitations</description>
+      <rationale>Free tier: URL changes on restart, 2-hour session timeout, 40 connections/min</rationale>
+      <impact>Need to update Supabase edge function env vars whenever ngrok URL changes</impact>
+      <workaround>Paid tier ($8/month) provides static domain, or use Cloudflare Tunnel (free)</workaround>
+    </constraint>
+    
+    <constraint type="security-warning">
+      <description>ngrok exposes local service to public internet - use demo accounts only</description>
+      <rationale>Anyone with ngrok URL can access service (unless additional auth added)</rationale>
+      <mitigation>Keep X-API-Key authentication enabled, use MetaQuotes-Demo broker only</mitigation>
+    </constraint>
+    
+    <constraint type="not-needed-epic-1-3">
+      <description>ngrok NOT needed for Epic 1 (Foundation), Epic 2 (MT5 Core), Epic 3 (REST API)</description>
+      <rationale>These epics test service directly from Mac (192.168.1.100:8000), no cloud integration yet</rationale>
+      <timing>Only needed in Epic 4 when testing Supabase edge functions calling MT5 service</timing>
+    </constraint>
+    
+    <constraint type="alternative-approach">
+      <description>Alternative: Mock edge function responses in frontend instead of using ngrok</description>
+      <rationale>Faster development, no ngrok URL management, works offline</rationale>
+      <tradeoff>Doesn't test full cloud integration flow, but sufficient for Epic 1-3</tradeoff>
+    </constraint>
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>ngrok Installation and Configuration</name>
+      <kind>system-command</kind>
+      <signature>
+        # Install ngrok (Mac)
+        brew install ngrok/ngrok/ngrok
+        
+        # Install ngrok (Windows)
+        choco install ngrok -y
+        
+        # Verify installation
+        ngrok version
+        # Expected: ngrok version 3.x.x
+        
+        # Configure auth token (from https://dashboard.ngrok.com)
+        ngrok config add-authtoken YOUR_AUTH_TOKEN_HERE
+        
+        # Verify configuration
+        ngrok config check
+      </signature>
+      <path>Mac Terminal or Windows PowerShell</path>
+      <notes>Auth token is required for free tier, get from ngrok dashboard after signup</notes>
+    </interface>
+    
+    <interface>
+      <name>ngrok Tunnel Creation</name>
+      <kind>system-command</kind>
+      <signature>
+        # Create tunnel to local Windows service
+        # Can run from Mac or Windows (same network)
+        ngrok http 192.168.1.100:8000
+        
+        # Output will show:
+        # Forwarding: https://abc123-xyz.ngrok-free.app -> http://192.168.1.100:8000
+        # 
+        # Keep terminal open - tunnel stays active while running
+        # Access dashboard at http://localhost:4040
+      </signature>
+      <path>Mac Terminal or Windows Command Prompt</path>
+      <notes>Public URL changes on restart, 2-hour session timeout on free tier</notes>
+    </interface>
+    
+    <interface>
+      <name>ngrok Dashboard (Request Inspection)</name>
+      <kind>web-interface</kind>
+      <signature>
+        # Access local dashboard while ngrok is running
+        http://localhost:4040
+        
+        # Features:
+        # - View all incoming requests
+        # - Inspect request/response headers and bodies
+        # - Replay requests
+        # - See request timing and status codes
+      </signature>
+      <path>Web browser on machine running ngrok</path>
+      <notes>Dashboard only accessible on localhost (same machine as ngrok process)</notes>
+    </interface>
+    
+    <interface>
+      <name>Supabase Edge Function Configuration (Optional)</name>
+      <kind>system-command</kind>
+      <signature>
+        # Update Supabase secret with ngrok URL
+        supabase secrets set MT5_SERVICE_URL=https://your-ngrok-url.ngrok-free.app
+        
+        # Verify secret set
+        supabase secrets list
+        
+        # Restart edge functions to pick up new value
+        # (Supabase automatically redeploys on secret change)
+      </signature>
+      <path>Terminal with Supabase CLI installed</path>
+      <notes>Only needed if testing Supabase edge function integration</notes>
+    </interface>
+    
+    <interface>
+      <name>Public URL Testing</name>
+      <kind>system-command</kind>
+      <signature>
+        # Test ngrok public URL from external network
+        # (Use phone data, different network, or online tool)
+        curl https://your-ngrok-url.ngrok-free.app/health
+        
+        # Expected: {"status":"healthy","service":"mt5-integration","version":"1.0.0"}
+        
+        # Test from browser
+        # Visit: https://your-ngrok-url.ngrok-free.app/docs
+        # Should show FastAPI Swagger UI
+      </signature>
+      <path>External network (not same network as service)</path>
+      <notes>Verifies tunnel is publicly accessible from internet</notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <standard>ngrok must install successfully</standard>
+      <standard>Auth token must be configured</standard>
+      <standard>Tunnel must create and return public HTTPS URL</standard>
+      <standard>Public URL must be accessible from external network</standard>
+      <standard>Dashboard must show incoming requests</standard>
+      <standard>Alternative mock approach must be documented</standard>
+    </standards>
+    
+    <locations>
+      <location>
+        <path>docs/STORY-1-5-COMPLETION-SUMMARY.md</path>
+        <description>ngrok setup verification document (if implemented)</description>
+      </location>
+      <location>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <description>Updated with ngrok section and alternative mock approach</description>
+      </location>
+    </locations>
+    
+    <ideas>
+      <test>
+        <name>ngrok Installation Verification</name>
+        <command>ngrok version</command>
+        <expected>ngrok version 3.x.x</expected>
+      </test>
+      
+      <test>
+        <name>Auth Token Configuration</name>
+        <command>ngrok config check</command>
+        <expected>Valid configuration with auth token present</expected>
+      </test>
+      
+      <test>
+        <name>Tunnel Creation Test</name>
+        <command>ngrok http 192.168.1.100:8000</command>
+        <expected>Forwarding URL displayed (https://abc123.ngrok-free.app)</expected>
+      </test>
+      
+      <test>
+        <name>Public URL Accessibility (External Network)</name>
+        <command>curl https://your-ngrok-url.ngrok-free.app/health (from phone or external network)</command>
+        <expected>{"status":"healthy",...} response received</expected>
+      </test>
+      
+      <test>
+        <name>Dashboard Accessibility</name>
+        <command>Open http://localhost:4040 in browser</command>
+        <expected>ngrok dashboard shows with request list</expected>
+      </test>
+      
+      <test>
+        <name>Dashboard Request Inspection</name>
+        <command>Make request to public URL, check dashboard</command>
+        <expected>Request appears in dashboard with full headers/body</expected>
+      </test>
+      
+      <test>
+        <name>CORS Through ngrok</name>
+        <command>
+          // From any website browser console
+          fetch('https://your-ngrok-url.ngrok-free.app/health')
+            .then(r => r.json())
+            .then(console.log);
+        </command>
+        <expected>No CORS errors, response logged</expected>
+      </test>
+      
+      <test>
+        <name>FastAPI Docs Through ngrok</name>
+        <command>Visit https://your-ngrok-url.ngrok-free.app/docs in browser</command>
+        <expected>Swagger UI loads with API documentation</expected>
+      </test>
+      
+      <test>
+        <name>Supabase Edge Function Test (Optional)</name>
+        <command>Call Supabase edge function that uses MT5_SERVICE_URL</command>
+        <expected>Edge function successfully calls local service, returns data</expected>
+      </test>
+      
+      <test>
+        <name>Documentation Completeness</name>
+        <command>Check LOCAL-DEVELOPMENT-GUIDE.md for ngrok and mock sections</command>
+        <expected>Both ngrok setup and alternative mock approach documented</expected>
+      </test>
+    </ideas>
+  </tests>
+
+  <mcpEnhancements>
+    <enhancement type="sequential-thinking" applied="yes">
+      Used sequential-thinking MCP to analyze ngrok requirements:
+      - Thought 1: ngrok only needed if testing Supabase edge functions that call MT5 service
+      - Thought 2: Free tier sufficient but has limitations (URL changes, 2-hour timeout)
+      - Thought 3: NOT needed for Epic 1-3 (foundation, MT5 core, REST API) - direct Mac→Windows testing works
+      - Thought 4: Alternative approach: Mock edge function responses in frontend (faster, no URL management)
+      - Thought 5: Security consideration: ngrok exposes service publicly - use demo accounts only
+      - Thought 6: If ngrok limitations become blocker, consider Cloudflare Tunnel (free, static subdomain)
+      - Thought 7: This is truly OPTIONAL story - can be skipped entirely until Epic 4 Supabase integration
+    </enhancement>
+    <enhancement type="context7" applied="not-applicable">
+      No library patterns needed - ngrok is infrastructure tool, not code library.
+      
+      If implementing mock approach alternative:
+      - Would create frontend mock files: src/mocks/edge-function-responses.ts
+      - Would use MSW (Mock Service Worker) or similar
+      - But this is frontend work, not backend MT5 service code
+      
+      For ngrok itself: External CLI tool, documented at https://ngrok.com/docs
+    </enhancement>
+    <enhancement type="serena" applied="not-needed">
+      No codebase changes for this story - ngrok is external tunnel tool.
+      MT5 service code from Story 1.4 remains unchanged.
+      serena will be used from Story 2.1+ for actual code implementation.
+    </enhancement>
+    <note>
+      RECOMMENDATION: Skip this story for now. 
+      
+      Epic 1-3 stories work fine without ngrok:
+      - Mac can call Windows service directly: http://192.168.1.100:8000
+      - No Supabase integration needed until Epic 4
+      
+      If/when implementing Epic 4 (Supabase Integration):
+      - Option 1: Implement ngrok (this story)
+      - Option 2: Use mock edge function responses in frontend
+      - Option 3: Wait until VPS deployment (Week 4) then use real public IP
+      
+      Optimal path: Skip ngrok, proceed directly to Story 1.6 (Manual Service Startup).
+    </note>
+  </mcpEnhancements>
+</story-context>

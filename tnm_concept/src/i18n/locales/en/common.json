@@ -1,0 +1,2863 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "education": "Education",
+    "getFunded": "Get Funded",
+    "partners": "Partners",
+    "contact": "Contact",
+    "subPages": {
+      "products": {
+        "riskCalculator": "Risk Calculator",
+        "tradingInstruments": "Trading Instruments",
+        "accountTypes": "Account Types",
+        "paymentMethods": "Payment Methods",
+        "platforms": "Platforms",
+        "tradingTools": "Trading Tools"
+      },
+      "education": {
+        "webinars": "Webinars",
+        "resources": "Educational Resources",
+        "marketReports": "Market Reports",
+        "blogs": "Blogs"
+      },
+      "descriptions": {
+        "riskcalculator": "Professional position sizing & risk management",
+        "tradinginstruments": "Access Forex, Indices, Commodities & Crypto",
+        "accounttypes": "Choose Zero Commission or Raw spreads",
+        "paymentmethods": "Secure funding & withdrawal options",
+        "platforms": "MetaTrader 5 on all devices",
+        "tradingtools": "Advanced calculators & analysis tools",
+        "webinars": "Live trading sessions with experts",
+        "resources": "Guides, eBooks & learning materials",
+        "marketreports": "Daily analysis & market insights",
+        "blogs": "Trading tips & strategy articles"
+      }
+    },
+    "tnmAi": {
+      "tagline": "Your AI Trading Assistant",
+      "goToDashboard": "Go to Dashboard",
+      "signOut": "Sign Out",
+      "startFree": "Start Free Trial",
+      "signIn": "Sign In to AI"
+    }
+  },
+  "navigation": {
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu",
+    "toggleSubmenu": "Toggle submenu"
+  },
+  "contact": {
+    "whatsappMessage": "Hello, I would like to get support with Trade'n More."
+  },
+  "demoData": "Demo Data",
+  "liveData": "Live Data",
+  "auth": {
+    "login": "Login",
+    "getStarted": "Get Started",
+    "getTradingAccount": "Get Your Trading Account",
+    "startTrading": "Start Trading Today",
+    "scheduleDemo": "Schedule Demo",
+    "startTradingNow": "Start Trading Now",
+    "startFreeDemo": "Start Free Demo",
+    "tryDemoAccount": "Demo Account"
+  },
+  "hero": {
+    "title": "Trade <primary>Smarter</primary>, Grow <accent>Faster</accent>",
+    "subtitle": "Join thousands of successful traders. Experience cutting-edge technology and expert guidance.",
+    "stats": {
+      "fundedCapital": "Funded Capital",
+      "activeTraders": "Active Traders", 
+      "uptime": "Uptime"
+    },
+    "trustBadges": {
+      "cmaRegulated": "CMA Regulated",
+      "zeroCommission": "No Hidden Fees",
+      "officialMT5": "Official MT5"
+    },
+    "features": {
+      "regulated": {
+        "title": "Regulated Brokerage Partner",
+        "subtitle": "Trade real markets under a regulated framework"
+      },
+      "realAccounts": {
+        "title": "Real Accounts: Zero Commission / Raw",
+        "subtitle": "Transparent pricing. Real execution"
+      },
+      "mt5Platform": {
+        "title": "MetaTrader 5 Platform",
+        "subtitle": "Desktop • Web • Mobile"
+      }
+    }
+  },
+  "siteSummary": {
+    "intro": {
+      "title": "Everything You Need to Start Trading",
+      "description": "From regulated accounts to educational resources, we provide the complete trading ecosystem"
+    },
+    "cards": {
+      "products": {
+        "title": "Trading Products",
+        "description": "Comprehensive trading instruments and account types",
+        "cta": "View Products"
+      },
+      "accountTypes": {
+        "title": "Account Types", 
+        "description": "Zero Commission or Raw spreads - choose what fits your strategy",
+        "cta": "Compare Accounts"
+      },
+      "tradingTools": {
+        "title": "Trading Tools",
+        "description": "Advanced calculators and analysis tools for better decisions",
+        "cta": "Explore Tools"
+      },
+      "platforms": {
+        "title": "Trading Platforms",
+        "description": "MetaTrader 5 on desktop, web, and mobile devices",
+        "cta": "Get Platform"
+      },
+      "education": {
+        "title": "Education & Learning",
+        "description": "Webinars, guides, and market reports for all skill levels",
+        "cta": "Start Learning"
+      },
+      "funding": {
+        "title": "Get Funded",
+        "description": "Access funding programs to grow your trading capital",
+        "cta": "Apply Now"
+      },
+      "navigate": "Go to {{title}}"
+    },
+    "paymentOptionLabel": "{{paymentMethod}} payment option"
+  },
+  "experienceSection": {
+    "badge": "Licensed Trading Broker",
+    "title": "Licensed Trading Broker with 5+ Years Experience", 
+    "description": "Institutional-grade platforms for professional trading.",
+    "bullets": [
+      "Licensed brokerage with institutional-grade platforms",
+      "Global markets access - Forex, commodities, indices",
+      "Advanced tools plus funded trading programs"
+    ],
+    "cta": {
+      "primary": "Open Trading Account",
+      "secondary": "Learn More"
+    },
+    "highlights": {
+      "experience": {
+        "title": "5+ Years Market Experience",
+        "description": "Proven track record in global financial markets"
+      },
+      "funded": {
+        "title": "Licensed Trading Broker",
+        "description": "Regulated brokerage with institutional-grade platforms"
+      }
+    },
+    "stats": {
+      "yearsExperience": "Years Experience",
+      "activeTraders": "Active Traders",
+      "volumeTraded": "Volume Traded"
+    }
+  },
+  "socialProof": {
+    "stats": {
+      "activeTraders": "Active Traders",
+      "countries": "Countries", 
+      "clientRating": "Client Rating",
+      "regulated": "Regulated"
+    }
+  },
+  "trustBadges": {
+    "regulated": {
+      "title": "Regulated & Compliant",
+      "description": "Trade real markets under a regulated framework"
+    },
+    "security": {
+      "title": "Bank-Grade Security", 
+      "description": "Your funds and data are protected with encryption"
+    },
+    "payments": {
+      "title": "Secure Payments",
+      "description": "Multiple safe funding methods"
+    }
+  },
+  "paymentMethods": {
+    "title": "Supported Payment Methods",
+    "visa": "Visa",
+    "mastercard": "Mastercard", 
+    "bankTransfer": "Bank Transfer",
+    "whishMoney": "Whish Money",
+    "omt": "OMT",
+    "crypto": "Cryptocurrency"
+  },
+  "insights": {
+    "title": "Latest Insights",
+    "description": "Stay informed with expert analysis and educational content",
+    "marketReport": {
+      "category": "Market Reports",
+      "title": "Daily Market Analysis",
+      "description": "Latest price action and key levels at a glance",
+      "cta": "Read Reports"
+    },
+    "blog": {
+      "category": "Blog",
+      "title": "Trading Tips & Strategies", 
+      "description": "Practical guides to sharpen your edge",
+      "cta": "Read Articles"
+    },
+    "webinar": {
+      "category": "Webinars",
+      "title": "Live Sessions with Experts",
+      "description": "Interactive learning with Q&A",
+      "cta": "Join Webinar"
+    },
+    "seeAll": "See All"
+  },
+  "marketReports": {
+    "badge": "Market Reports",
+    "hero": {
+      "title": "Market Reports",
+      "subtitle": "Stay informed with our professional market analysis, economic insights, and trading opportunities."
+    },
+    "categories": {
+      "title": "Market Analysis Categories",
+      "subtitle": "Choose from our range of market reports tailored to different trading timeframes and styles.",
+      "daily": {
+        "title": "Daily Market Briefings",
+        "description": "Quick morning briefs with key market movements and trading opportunities",
+        "frequency": "Daily"
+      },
+      "weekly": {
+        "title": "Weekly Outlooks",
+        "description": "Comprehensive weekly analysis with technical and fundamental insights",
+        "frequency": "Weekly"
+      },
+      "monthly": {
+        "title": "Monthly Deep Dives",
+        "description": "Detailed monthly reports with long-term trend analysis and forecasts",
+        "frequency": "Monthly"
+      },
+      "special": {
+        "title": "Special Event Reports",
+        "description": "Analysis of major economic events, policy changes, and market reactions",
+        "frequency": "As needed"
+      }
+    },
+    "sections": {
+      "forex": "Forex",
+      "commodities": "Commodities", 
+      "indices": "Indices",
+      "stocks": "Stocks",
+      "crypto": "Cryptocurrencies",
+      "metals": "Metals"
+    },
+    "descriptions": {
+      "forex": "Trade major, minor and exotic currency pairs with tight spreads",
+      "commodities": "Access global commodity markets including oil, gas, and agricultural products",
+      "indices": "Trade the world's major stock indices with leverage",
+      "stocks": "Invest in leading companies from global stock exchanges",
+      "crypto": "Trade popular cryptocurrencies with competitive spreads",
+      "metals": "Trade precious metals including gold, silver, platinum, and palladium"
+    },
+    "latest": {
+      "title": "Latest Market Reports",
+      "subtitle": "Download our most recent market analysis and trading insights.",
+      "reports": {
+        "weekly": {
+          "title": "Weekly Market Outlook",
+          "date": "January 8, 2024",
+          "type": "Weekly Analysis",
+          "description": "Comprehensive analysis of major currency pairs, upcoming economic events, and key support/resistance levels.",
+          "highlights": [
+            "USD strength continues",
+            "EUR/USD testing key support", 
+            "Gold shows bullish momentum"
+          ],
+          "downloadSize": "2.3 MB",
+          "pages": "12 pages"
+        },
+        "monthly": {
+          "title": "Monthly Economic Calendar Review",
+          "date": "January 1, 2024",
+          "type": "Monthly Report",
+          "description": "In-depth review of December's economic events and their market impact, plus January's key events to watch.",
+          "highlights": [
+            "Fed policy unchanged",
+            "ECB remains dovish",
+            "JPY volatility expected"
+          ],
+          "downloadSize": "3.1 MB",
+          "pages": "18 pages"
+        },
+        "sentiment": {
+          "title": "Forex Market Sentiment Analysis",
+          "date": "January 5, 2024",
+          "type": "Sentiment Report", 
+          "description": "Analysis of retail and institutional sentiment across major currency pairs with positioning data.",
+          "highlights": [
+            "Retail bullish on EUR",
+            "Institutional selling GBP",
+            "USD positioning neutral"
+          ],
+          "downloadSize": "1.8 MB",
+          "pages": "8 pages"
+        }
+      },
+      "keyHighlights": "Key Highlights:",
+      "comingSoon": "Coming Soon"
+    },
+    "upcoming": {
+      "title": "Upcoming Reports",
+      "subtitle": "Stay tuned for our upcoming market analysis and special reports.",
+      "reports": {
+        "q1Forecast": {
+          "title": "Q1 2024 Forex Forecast",
+          "releaseDate": "January 15, 2024",
+          "description": "Quarterly outlook for major currency pairs with trading strategies"
+        },
+        "centralBank": {
+          "title": "Central Bank Policy Review",
+          "releaseDate": "January 20, 2024",
+          "description": "Analysis of recent central bank decisions and future policy expectations"
+        },
+        "crypto": {
+          "title": "Crypto Market Analysis",
+          "releaseDate": "January 25, 2024",
+          "description": "Comprehensive review of cryptocurrency trends and trading opportunities"
+        }
+      },
+      "comingSoonBadge": "Coming Soon",
+      "notifyButton": "Notify Me When Available"
+    },
+    "newsletter": {
+      "title": "Never Miss a Report",
+      "subtitle": "Subscribe to our market analysis newsletter and get reports delivered directly to your inbox.",
+      "comingSoon": "Coming Soon"
+    }
+  },
+  "education": {
+    "marketReports": {
+      "badge": "Market Reports",
+      "hero": {
+        "title": "Market Reports",
+        "subtitle": "Stay informed with our professional market analysis, economic insights, and trading opportunities."
+      },
+      "categories": {
+        "title": "Market Analysis Categories",
+        "subtitle": "Choose from our range of market reports tailored to different trading timeframes and styles.",
+        "daily": {
+          "title": "Daily Market Briefings",
+          "description": "Quick morning briefs with key market movements and trading opportunities",
+          "frequency": "Daily"
+        },
+        "weekly": {
+          "title": "Weekly Outlooks",
+          "description": "Comprehensive weekly analysis with technical and fundamental insights",
+          "frequency": "Weekly"
+        },
+        "monthly": {
+          "title": "Monthly Deep Dives",
+          "description": "Detailed monthly reports with long-term trend analysis and forecasts",
+          "frequency": "Monthly"
+        },
+        "special": {
+          "title": "Special Event Reports",
+          "description": "Analysis of major economic events, policy changes, and market reactions",
+          "frequency": "As needed"
+        }
+      },
+      "sections": {
+        "forex": "Forex",
+        "commodities": "Commodities", 
+        "indices": "Indices",
+        "stocks": "Stocks",
+        "crypto": "Cryptocurrencies",
+        "metals": "Metals"
+      },
+      "descriptions": {
+        "forex": "Trade major, minor and exotic currency pairs with tight spreads",
+        "commodities": "Access global commodity markets including oil, gas, and agricultural products",
+        "indices": "Trade the world's major stock indices with leverage",
+        "stocks": "Invest in leading companies from global stock exchanges",
+        "crypto": "Trade popular cryptocurrencies with competitive spreads",
+        "metals": "Trade precious metals including gold, silver, platinum, and palladium"
+      },
+      "latest": {
+        "title": "Latest Market Reports",
+        "subtitle": "Download our most recent market analysis and trading insights.",
+        "reports": {
+          "weekly": {
+            "title": "Weekly Market Outlook",
+            "date": "January 8, 2024",
+            "type": "Weekly Analysis",
+            "description": "Comprehensive analysis of major currency pairs, upcoming economic events, and key support/resistance levels.",
+            "highlights": [
+              "USD strength continues",
+              "EUR/USD testing key support", 
+              "Gold shows bullish momentum"
+            ],
+            "downloadSize": "2.3 MB",
+            "pages": "12 pages"
+          },
+          "monthly": {
+            "title": "Monthly Economic Calendar Review",
+            "date": "January 1, 2024",
+            "type": "Monthly Report",
+            "description": "In-depth review of December's economic events and their market impact, plus January's key events to watch.",
+            "highlights": [
+              "Fed policy unchanged",
+              "ECB remains dovish",
+              "JPY volatility expected"
+            ],
+            "downloadSize": "3.1 MB",
+            "pages": "18 pages"
+          },
+          "sentiment": {
+            "title": "Forex Market Sentiment Analysis",
+            "date": "January 5, 2024",
+            "type": "Sentiment Report", 
+            "description": "Analysis of retail and institutional sentiment across major currency pairs with positioning data.",
+            "highlights": [
+              "Retail bullish on EUR",
+              "Institutional selling GBP",
+              "USD positioning neutral"
+            ],
+            "downloadSize": "1.8 MB",
+            "pages": "8 pages"
+          }
+        },
+        "keyHighlights": "Key Highlights:",
+        "comingSoon": "Coming Soon"
+      },
+      "upcoming": {
+        "title": "Upcoming Reports",
+        "subtitle": "Stay tuned for our upcoming market analysis and special reports.",
+        "reports": {
+          "q1Forecast": {
+            "title": "Q1 2024 Forex Forecast",
+            "releaseDate": "January 15, 2024",
+            "description": "Quarterly outlook for major currency pairs with trading strategies"
+          },
+          "centralBank": {
+            "title": "Central Bank Policy Review",
+            "releaseDate": "January 20, 2024",
+            "description": "Analysis of recent central bank decisions and future policy expectations"
+          },
+          "crypto": {
+            "title": "Crypto Market Analysis",
+            "releaseDate": "January 25, 2024",
+            "description": "Comprehensive review of cryptocurrency trends and trading opportunities"
+    },
+    "blogs": {
+      "badge": "Trading Blog",
+      "hero": {
+        "title": "Trading Insights & Analysis",
+        "subtitle": "Expert insights, market analysis, and trading strategies from our professional analysts"
+      },
+      "categories": {
+        "title": "Browse by Category",
+        "subtitle": "Find articles that match your trading interests and experience level",
+        "items": {
+          "trading-psychology": { "name": "Trading Psychology", "count": "8" },
+          "technical-analysis": { "name": "Technical Analysis", "count": "12" },
+          "risk-management": { "name": "Risk Management", "count": "6" },
+          "market-analysis": { "name": "Market Analysis", "count": "10" },
+          "education": { "name": "Education", "count": "15" },
+          "strategy": { "name": "Strategy", "count": "9" }
+        }
+      },
+      "featured": { "title": "Featured Articles", "subtitle": "Our top picks for essential trading knowledge" },
+      "recent": { "title": "Recent Posts", "subtitle": "Stay updated with our latest insights and analysis" },
+      "newsletter": { "title": "Stay Updated", "subtitle": "Get the latest trading insights delivered to your inbox" },
+      "posts": {
+        "trading-mistakes": { "title": "5 Common Trading Mistakes and How to Avoid Them", "excerpt": "Learn from the most common pitfalls that trap new traders and discover proven strategies to avoid them.", "author": "Sarah Johnson" },
+        "market-volatility": { "title": "Understanding Market Volatility in 2024", "excerpt": "Navigate volatile markets with confidence using these proven risk management techniques.", "author": "Michael Chen" },
+        "trading-plan": { "title": "Creating Your First Trading Plan", "excerpt": "Step-by-step guide to developing a comprehensive trading plan that fits your goals and risk tolerance.", "author": "David Rodriguez" },
+        "trading-psychology": { "title": "Mastering Trading Psychology", "excerpt": "Overcome emotional barriers and develop the mental discipline needed for consistent trading success.", "author": "Lisa Thompson" },
+        "chart-patterns": { "title": "Essential Chart Patterns Every Trader Should Know", "excerpt": "Master the most reliable chart patterns for identifying high-probability trading opportunities.", "author": "James Wilson" },
+        "risk-management": { "title": "Advanced Risk Management Strategies", "excerpt": "Protect your capital with sophisticated risk management techniques used by professional traders.", "author": "Amanda Foster" }
+      },
+      "dates": { "january": "January", "december": "December" },
+      "tags": { "beginner": "Beginner", "intermediate": "Intermediate", "advanced": "Advanced", "risk-management": "Risk Management", "psychology": "Psychology", "volatility": "Volatility", "strategy": "Strategy", "planning": "Planning", "mindset": "Mindset", "discipline": "Discipline", "charts": "Charts", "patterns": "Patterns", "risk": "Risk", "money-management": "Money Management" },
+      "ui": { "minRead": "min read", "postsPlural": "posts", "featured": "Featured", "comingSoon": "Coming Soon" }
+    }
+  },
+        "comingSoonBadge": "Coming Soon",
+        "notifyButton": "Notify Me When Available"
+      },
+      "newsletter": {
+        "title": "Never Miss a Report",
+        "subtitle": "Subscribe to our market analysis newsletter and get reports delivered directly to your inbox.",
+        "comingSoon": "Coming Soon"
+      }
+    }
+  },
+  "partnersCta": {
+    "partners": {
+      "title": "Partner With Us",
+      "description": "Join our network of partners and grow together",
+      "cta": "Become a Partner"
+    },
+    "contact": {
+      "title": "Need Help?",
+      "description": "Our team is ready to assist you",
+      "cta": "Contact Us"
+    }
+  },
+  "cta": {
+    "title": "Ready to Start Your Trading Journey?",
+    "subtitle": "Join thousands of traders who have already transformed their financial future with our platform.",
+    "testimonial": "\"The best trading platform I've ever used. The support team is incredible!\"",
+    "benefits": {
+      "noCreditCard": "No credit card required",
+      "freeDemo": "Free demo account",
+      "support": "24/7 expert support"
+    }
+  },
+  "products": {
+    "hero": {
+      "title": "Professional <gradient>Trading</gradient> Products",
+      "subtitle": "Everything you need to trade successfully - from instruments to tools and platform access"
+    },
+    "instruments": {
+      "title": "Trading Instruments",
+      "subtitle": "Access a diverse range of financial instruments from around the world",
+        "table": {
+          "symbol": "Symbol",
+          "name": "Name",
+          "assetClass": "Asset Class",
+          "livePrice": "Live Price",
+          "live": "Live",
+          "bid": "Bid",
+          "ask": "Ask",
+          "pips": "pips",
+          "long": "Long",
+          "short": "Short",
+          "liveData": "Live data",
+          "typicalSpread": "Typical Spread",
+          "tradingHours": "Trading Hours",
+          "swaps": "Swaps",
+          "actions": "Actions",
+          "details": "Details",
+          "compare": "Compare",
+          "remove": "Remove",
+          "spreadType": {
+            "zero": "Zero",
+            "raw": "Raw"
+          }
+        },
+      "items": {
+        "forex": {
+          "title": "Forex",
+          "description": "Trade 50+ currency pairs with tight spreads",
+          "pairs": ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD"]
+        },
+        "indices": {
+          "title": "Indices", 
+          "description": "Access major global stock indices",
+          "pairs": ["S&P 500", "NASDAQ", "FTSE 100", "DAX 40"]
+        },
+        "commodities": {
+          "title": "Commodities",
+          "description": "Trade precious metals and energy",
+          "pairs": ["Gold", "Silver", "Oil", "Natural Gas"]
+        },
+        "crypto": {
+          "title": "Cryptocurrencies",
+          "description": "Popular crypto pairs with 24/7 trading",
+          "pairs": ["BTC/USD", "ETH/USD", "ADA/USD", "DOT/USD"]
+        }
+      }
+    },
+    "accountTypes": {
+      "title": "Choose Your Account Type",
+      "subtitle": "Choose between our two account types designed for different trading preferences",
+      "heroTitle": "Choose Your Account Type",
+      "heroSubtitle": "Two transparent options designed for real, regulated trading. Pick based on your style and cost preference.",
+      "breadcrumb": {
+        "products": "Products",
+        "accountTypes": "Account Types"
+      },
+      "highlights": {
+        "transparentPricing": {
+          "title": "Transparent Pricing",
+          "description": "Clear spreads & commissions"
+        },
+        "fastExecution": {
+          "title": "Fast Execution",
+          "description": "MT5 desktop/web/mobile"
+        },
+        "localGlobalPayments": {
+          "title": "Local & Global Payments",
+          "description": "Trusted rails"
+        },
+        "markets247": {
+          "title": "24/5 Markets",
+          "description": "Major instruments"
+        }
+      },
+      "buttons": {
+        "openAccount": "Open an Account",
+        "compareSideBySide": "Compare Side-by-Side",
+        "seeInstruments": "See Instruments",
+        "fullSpecs": "Full Specs"
+      },
+      "zero": {
+        "name": "Zero Commission",
+        "tagline": "Simple, transparent pricing with no hidden fees",
+        "typicalSpread": "1.2 pips",
+        "commission": "None",
+        "maxLeverage": "1:200",
+        "stopOut": "0%",
+        "marginCall": "30%",
+        "minLot": "0.01",
+        "stepLot": "0.01",
+        "minDeposit": "Min Deposit",
+        "spread": "Spread",
+        "leverage": "Leverage",
+        "features": [
+          "Perfect for beginners who want simple, predictable costs",
+          "Great for swing and position traders who prefer simplicity",
+          "Ideal for those who value transparency over complexity"
+        ],
+        "whoIsItFor": [
+          "Perfect for beginners who want simple, predictable costs",
+          "Great for swing and position traders who prefer simplicity",
+          "Ideal for those who value transparency over complexity"
+        ],
+        "popular": "Most Popular"
+      },
+      "raw": {
+        "name": "Raw",
+        "tagline": "Advanced pricing for experienced traders",
+        "typicalSpread": "0.1 pips",
+        "commission": "$5 per lot",
+        "maxLeverage": "1:200",
+        "stopOut": "0%",
+        "marginCall": "30%",
+        "minLot": "0.01",
+        "stepLot": "0.01",
+        "minDeposit": "Min Deposit",
+        "spread": "Spread",
+        "leverage": "Leverage",
+        "features": [
+          "Designed for high-volume, experienced traders",
+          "Best for those who trade frequently and understand commissions",
+          "Suited for advanced strategies requiring tight spreads"
+        ],
+        "whoIsItFor": [
+          "Designed for high-volume, experienced traders",
+          "Best for those who trade frequently and understand commissions",
+          "Suited for advanced strategies requiring tight spreads"
+        ]
+      },
+      "accounts": {
+        "zero": {
+          "name": "Zero Commission",
+          "tagline": "Simple, transparent pricing with no hidden fees",
+          "typicalSpread": "1.2 pips",
+          "commission": "None",
+          "maxLeverage": "1:200",
+          "stopOut": "0%",
+          "marginCall": "30%",
+          "minLot": "0.01",
+          "stepLot": "0.01",
+          "features": [
+            "Perfect for beginners who want simple, predictable costs",
+            "Great for swing and position traders who prefer simplicity",
+            "Ideal for those who value transparency over complexity"
+          ],
+          "whoIsItFor": [
+            "Perfect for beginners who want simple, predictable costs",
+            "Great for swing and position traders who prefer simplicity",
+            "Ideal for those who value transparency over complexity"
+          ],
+          "popular": "Most Popular"
+        },
+        "raw": {
+          "name": "Raw",
+          "tagline": "Advanced pricing for experienced traders",
+          "typicalSpread": "0.1 pips",
+          "commission": "$5 per lot",
+          "maxLeverage": "1:200",
+          "stopOut": "0%",
+          "marginCall": "30%",
+          "minLot": "0.01",
+          "stepLot": "0.01",
+          "features": [
+            "Designed for high-volume, experienced traders",
+            "Best for those who trade frequently and understand commissions",
+            "Suited for advanced strategies requiring tight spreads"
+          ],
+          "whoIsItFor": [
+            "Designed for high-volume, experienced traders",
+            "Best for those who trade frequently and understand commissions",
+            "Suited for advanced strategies requiring tight spreads"
+          ]
+        }
+      },
+      "comparison": {
+        "title": "Side-by-Side Comparison",
+        "subtitle": "Compare all features, costs, and trading conditions between account types",
+        "features": {
+          "typicalSpread": "Typical Spread (EUR/USD)",
+          "commissionPerLot": "Commission per lot",
+          "maxLeverage": "Max Leverage",
+          "minStepLot": "Min/Step Lot",
+          "stopOutLevel": "Stop-out Level",
+          "marginCallLevel": "Margin Call Level",
+          "executionType": "Execution Type",
+          "hedging": "Hedging",
+          "expertAdvisors": "Expert Advisors",
+          "baseCurrencies": "Base Currencies",
+          "swapCharges": "Swap Charges"
+        },
+        "values": {
+          "auto": "Auto",
+          "free": "Free",
+          "usd": "USD"
+        }
+      },
+      "calculator": {
+        "title": "Cost Calculator",
+        "subtitle": "See exactly how much you'll pay for different trade sizes",
+        "orderSize": "Order Size (Lots)",
+        "estimatedCost": "Estimated Cost",
+        "perTrade": "per trade",
+        "recommendation": "Recommendation for",
+        "lotsPerMonth": "lots/month"
+      },
+      "quickCalc": {
+        "title": "Quick Cost Calculator",
+        "subtitle": "See which account saves you money",
+        "monthlyVolumeLabel": "Monthly Trading Volume",
+        "lotsUnit": "lots",
+        "zeroCommission": "Zero Commission",
+        "mostPopularBadge": "Most Popular",
+        "raw": "Raw",
+        "bestBadge": "Best",
+        "spreadWithPips": "Spread ({{pips}} pips):",
+        "commission": "Commission:",
+        "recommendation": {
+          "title": "Recommendation",
+          "zero": "Zero Commission offers simplicity with no commission fees",
+          "raw": "Raw account saves you ${{savings}}/month with lower total costs"
+        },
+        "yearlySavings": "Save ${{amount}}/year with Raw"
+      },
+      "faq": {
+        "title": "Account Types FAQ",
+        "items": [
+          {
+            "question": "Which account should I choose?",
+            "answer": "We recommend Zero Commission for most traders - simple, transparent pricing with no surprises. Perfect for beginners and those who prefer predictable costs. Raw Account is better for very high-volume traders (50+ lots monthly) who can benefit from tighter spreads despite the commission structure."
+          },
+          {
+            "question": "Why is Zero Commission better for most people?",
+            "answer": "Zero Commission offers complete transparency - what you see is what you pay. No complex commission calculations, no surprises. The all-in spread pricing makes it easier to calculate your trading costs and perfect for learning to trade."
+          },
+          {
+            "question": "Are there hidden fees?",
+            "answer": "No. Pricing is transparent. Costs are spread-based (Zero Commission) or spread + commission (Raw). Swaps are free on all accounts."
+          },
+          {
+            "question": "Can I change account type later?",
+            "answer": "Yes—contact support and we'll guide you through it."
+          },
+          {
+            "question": "Do both work on MT5?",
+            "answer": "Yes, on desktop, web, and mobile."
+          },
+          {
+            "question": "What about deposits & withdrawals?",
+            "answer": "We support trusted local/global methods. See details in our payment methods section."
+          }
+        ]
+      },
+      "labels": {
+        "typicalSpread": "Typical Spread",
+        "commission": "Commission",
+        "maxLeverage": "Max Leverage",
+        "minLot": "Min Lot",
+        "whoIsItFor": "Who is it for?",
+        "openAccount": "Open Account",
+        "hedging": "Hedging",
+        "eas": "EAs"
+      },
+      "modal": {
+        "accountDetails": "Account Details",
+        "completeSpecifications": "Complete specifications",
+        "tabs": {
+          "pricing": "Pricing",
+          "conditions": "Conditions",
+          "instruments": "Instruments",
+          "platform": "Platform"
+        },
+        "specs": {
+          "typicalSpread": "Typical Spread",
+          "commission": "Commission"
+        },
+        "pricingModel": {
+          "title": "Pricing Model",
+          "zero": "All costs included in the spread. No additional commissions charged.",
+          "raw": "Raw spreads from liquidity providers plus a transparent commission per lot."
+        },
+        "conditions": {
+          "maxLeverage": "Max Leverage",
+          "minStepLot": "Min/Step Lot",
+          "stopOutLevel": "Stop-out Level",
+          "marginCall": "Margin Call"
+        },
+        "instruments": {
+          "description": "Access to all major trading instruments including Forex, Indices, Commodities, and Cryptocurrencies.",
+          "viewAll": "View All Instruments"
+        },
+        "platform": {
+          "description": "MetaTrader 5 available on desktop, web, and mobile platforms.",
+          "details": "Platform Details"
+        }
+      },
+      "comparison": {
+        "tableHeaders": {
+          "feature": "Feature",
+          "zeroCommission": "Zero Commission",
+          "mostPopular": "Most Popular",
+          "raw": "Raw"
+        },
+        "actions": {
+          "copyComparison": "Copy Comparison",
+          "downloadPdf": "Download PDF"
+        }
+      }
+    },
+    "mt5": {
+      "title": "MetaTrader 5 Platform",
+      "subtitle": "The world's most popular trading platform with advanced charting, algorithmic trading capabilities, and comprehensive market analysis tools for professional traders.",
+      "hero": {
+        "title": "Trade Smarter with MetaTrader 5",
+        "subtitle": "Fast execution, advanced charting, and multi-device access—configured for real, regulated trading.",
+        "trustBadges": {
+          "lowLatency": "Low Latency",
+          "secureAccess": "Secure Access", 
+          "multiDevice": "Multi-Device",
+          "markets247": "24/5 Markets"
+        },
+        "cta": {
+          "downloadFor": "Download for",
+          "launchWeb": "Launch MT5 Web",
+          "howToConnect": "How to Connect",
+          "platformFeatures": "Platform Features",
+          "mt5OnMobile": "MT5 on Mobile"
+        }
+      },
+      "setup": {
+        "title": "Guided Setup Wizard",
+        "subtitle": "Get connected in 3 simple steps",
+        "step1": {
+          "title": "Install / Launch",
+          "downloadNote": "If the download doesn't start, click here",
+          "continue": "Continue"
+        },
+        "step2": {
+          "title": "Connect to Server",
+          "serverLabel": "Trading Server",
+          "serverPlaceholder": "Choose your server",
+          "serverNote": "Use the exact server name from your welcome email"
+        },
+        "step3": {
+          "title": "Log In & Verify",
+          "loginLabel": "Login (Account Number)",
+          "loginPlaceholder": "e.g., 12345678",
+          "passwordLabel": "Password",
+          "passwordPlaceholder": "Your password",
+          "checklist": {
+            "connection": "Connection status shows \"Connected\"",
+            "marketWatch": "Market Watch displays prices",
+            "timezone": "Timezone & symbols look correct"
+          },
+          "compareAccounts": "Compare Account Types",
+          "seeInstruments": "See Instruments"
+        },
+        "troubleLink": "Having trouble? Check our troubleshooting guide"
+      },
+      "features": {
+        "title": "Platform Features",
+        "subtitle": "Professional tools designed for modern traders",
+        "items": {
+          "charting": {
+            "title": "Advanced Charting",
+            "description": "Multiple timeframes, templates"
+          },
+          "indicators": {
+            "title": "1500+ Indicators & EAs", 
+            "description": "Extend & automate"
+          },
+          "oneClick": {
+            "title": "One-Click Trading",
+            "description": "Act fast, manage risk"
+          },
+          "dom": {
+            "title": "Depth of Market (DOM)",
+            "description": "Better order insight"
+          },
+          "mobile": {
+            "title": "Mobile & Web Access",
+            "description": "Trade on the go"
+          },
+          "alerts": {
+            "title": "Alerts & Notifications",
+            "description": "Stay informed"
+          }
+        }
+      },
+      "tools": {
+        "economicCalendar": "Economic Calendar",
+        "riskCalculator": "Risk Calculator",
+        "educationHub": "Education Hub",
+        "paymentMethods": "Payment Methods",
+        "viewCalendar": "View Calendar",
+        "tryCalculator": "Try Calculator", 
+        "learnTrading": "Learn Trading",
+        "viewMethods": "View Methods"
+      },
+      "requirements": {
+        "title": "System Requirements",
+        "subtitle": "Minimum requirements for optimal performance",
+        "headers": {
+          "platform": "Platform",
+          "osVersion": "OS Version", 
+          "processor": "Processor",
+          "memory": "Memory",
+          "storage": "Storage",
+          "network": "Network"
+        }
+      },
+      "howTo": {
+        "title": "Quick How-To Guides",
+        "subtitle": "Essential tasks made simple",
+        "items": {
+          "addSymbols": {
+            "title": "Add Symbols to Market Watch",
+            "steps": [
+              "Right-click in Market Watch panel",
+              "Select 'Symbols' from context menu", 
+              "Browse or search for desired instruments",
+              "Double-click to add to Market Watch"
+            ]
+          },
+          "pendingOrders": {
+            "title": "Place Pending Orders",
+            "steps": [
+              "Right-click on chart or Market Watch",
+              "Select 'Trading' → 'New Order'",
+              "Choose 'Pending Order' type",
+              "Set price, volume, and SL/TP",
+              "Click 'Place Order'"
+            ]
+          },
+          "chartTemplate": {
+            "title": "Save Chart Template", 
+            "steps": [
+              "Configure chart with indicators/settings",
+              "Right-click on chart background",
+              "Select 'Template' → 'Save Template'",
+              "Name your template and save"
+            ]
+          },
+          "priceAlerts": {
+            "title": "Enable Price Alerts",
+            "steps": [
+              "Right-click on chart or symbol",
+              "Select 'Create Alert'",
+              "Set condition and price level", 
+              "Choose notification method",
+              "Click 'Create Alert'"
+            ]
+          }
+        },
+        "readMore": "Read more detailed guides"
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "subtitle": "Quick solutions to common issues",
+        "items": {
+          "connection": {
+            "issue": "Can't connect to server",
+            "solutions": [
+              "Verify exact server name (no extra spaces)",
+              "Check your internet connection/proxy settings",
+              "Try different server (Real vs Demo)", 
+              "Check firewall/antivirus settings",
+              "Contact support if issue persists"
+            ]
+          },
+          "prices": {
+            "issue": "No price updates",
+            "solutions": [
+              "Right-click Market Watch → Refresh",
+              "Reconnect to server",
+              "Check if market is open for selected symbols",
+              "Verify server connection status"
+            ]
+          },
+          "login": {
+            "issue": "Login failed",
+            "solutions": [
+              "Double-check account number and password",
+              "Ensure caps lock is off",
+              "Try demo server first",
+              "Reset password if needed",
+              "Contact support for account verification"
+            ]
+          },
+          "notifications": {
+            "issue": "Mobile push notifications not working",
+            "solutions": [
+              "Enable notifications in app settings",
+              "Check device notification permissions",
+              "Verify account is connected",
+              "Restart the app"
+            ]
+          },
+          "webTerminal": {
+            "issue": "Web terminal won't load",
+            "solutions": [
+              "Try different browser (Chrome recommended)",
+              "Disable aggressive ad-blockers",
+              "Clear browser cache and cookies",
+              "Enable JavaScript and pop-ups"
+            ]
+          }
+        },
+        "contactSupport": "Contact Support"
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Everything you need to know about MT5",
+        "items": {
+          "free": {
+            "question": "Is MT5 free to use?",
+            "answer": "Yes. The platform is completely free to download and use. Trading costs depend on your chosen account type (spreads and commissions)."
+          },
+          "accounts": {
+            "question": "Which account types work with MT5?",
+            "answer": "Both Zero Commission and Raw account types are fully compatible with MT5 desktop, web, and mobile versions."
+          },
+          "eas": {
+            "question": "Can I run Expert Advisors (EAs)?", 
+            "answer": "Yes, on desktop and web versions. Enable algorithmic trading in settings and review EA risks. Mobile versions don't support EAs."
+          },
+          "devices": {
+            "question": "How do I switch between devices?",
+            "answer": "Simply log in on any device using the same server name and account credentials. Your trades and settings sync automatically."
+          },
+          "server": {
+            "question": "Where do I find my server details?",
+            "answer": "Server information is provided in your welcome email or Account Dashboard. You can also copy it from the Setup wizard below."
+          }
+        }
+      },
+      "coreFeatures": {
+        "title": "Core Features",
+        "list1": [
+          "Advanced charting with 80+ technical indicators",
+          "Expert Advisors (EAs) for automated trading",
+          "Real-time market data and financial news",
+          "Multi-asset trading capabilities",
+          "Mobile, desktop, and web platform versions",
+          "Copy trading and social trading features"
+        ],
+        "list2": [
+          "Custom indicators and trading robots",
+          "Comprehensive strategy backtesting environment",
+          "Multiple order types and execution modes",
+          "Market depth and level II pricing",
+          "Built-in economic calendar",
+          "MQL5 programming language support"
+        ]
+      },
+      "instruments": {
+        "title": "300+ Trading Instruments",
+        "forex": {
+          "title": "Forex",
+          "description": "50+ currency pairs including majors, minors, and exotics"
+        },
+        "indices": {
+          "title": "Indices",
+          "description": "Global stock indices including S&P 500, NASDAQ, FTSE"
+        },
+        "commodities": {
+          "title": "Commodities",
+          "description": "Precious metals, energy, and agricultural commodities"
+        },
+        "crypto": {
+          "title": "Cryptocurrencies",
+          "description": "Popular cryptocurrencies with 24/7 trading availability"
+        }
+      },
+      "benefits": {
+        "title": "Platform Benefits",
+        "execution": {
+          "title": "Lightning-Fast Execution",
+          "description": "Low-latency execution with speeds up to 0.03 seconds"
+        },
+        "security": {
+          "title": "Enterprise-Grade Security",
+          "description": "Bank-level encryption and security protocols"
+        },
+        "support": {
+          "title": "24/7 Technical Support",
+          "description": "Round-the-clock support from trading experts"
+        },
+        "education": {
+          "title": "Free Education & Training",
+          "description": "Comprehensive MT5 tutorials and trading courses"
+        },
+        "analytics": {
+          "title": "Advanced Analytics",
+          "description": "Comprehensive analytics and reporting tools"
+        }
+      },
+      "specifications": {
+        "title": "Technical Specifications",
+        "indicators": "Technical Indicators",
+        "timeframes": "Timeframes",
+        "orderTypes": "Order Types",
+        "executionTypes": "Execution Types"
+      },
+      "download": {
+        "title": "Available on all your devices",
+        "subtitle": "Download MetaTrader 5 for your preferred platform",
+        "windows": "Download for Windows",
+        "macos": "Download for macOS",
+        "ios": "Download for iOS",
+        "android": "Download for Android",
+        "webTerminal": "Open Web Terminal"
+      }
+    },
+    "tradingTools": {
+      "title": "Advanced Trading Tools",
+      "subtitle": "Enhance your trading experience with our comprehensive suite of professional tools and calculators.",
+      "riskCalculator": {
+        "title": "Risk Calculator",
+        "description": "Calculate position sizes and risk",
+        "content": "Professional risk management tool to calculate optimal position sizes based on your account balance and risk tolerance.",
+        "cta": "Try Calculator"
+      },
+      "economicCalendar": {
+        "title": "Economic Calendar",
+        "description": "Stay updated with market events",
+        "content": "Real-time economic calendar with high-impact events that can affect your trading positions and market movements.",
+        "cta": "View Calendar"
+      }
+     }
+  },
+  "tradingCalculator": {
+    "title": "Trading Calculator",
+    "subtitle": "Calculate position size or assess risk",
+    "modes": {
+      "riskAssessment": "Risk Assessment",
+      "positionSizing": "Position Sizing"
+    },
+    "sections": {
+      "tradingParameters": "Trading Parameters",
+      "riskParameters": "Risk Parameters",
+      "calculationResults": "Calculation Results",
+      "exitPrices": "Exit Prices",
+      "riskAndProfit": "Risk & Profit",
+      "positionDetails": "Position Details"
+    },
+    "labels": {
+      "positionType": "Position Type",
+      "buy": "Buy",
+      "sell": "Sell",
+      "assetClass": "Asset Class",
+      "instrument": "Instrument",
+      "positionSize": "Position Size (Lots)",
+      "entryPrice": "Entry Price",
+      "slDistance": "SL Distance (Pips)",
+      "tpDistance": "TP Distance (Pips)",
+      "accountBalance": "Account Balance ($)",
+      "accountBalanceOptional": "Account Balance (optional)",
+      "riskPercentage": "Risk Percentage (%)",
+      "takeProfitSetup": "Take Profit Setup",
+      "manualTp": "Manual TP",
+      "autoTp": "Auto TP",
+      "targetRiskReward": "Target Risk:Reward Ratio (1:X)",
+      "stopLossPrice": "Stop Loss Price:",
+      "takeProfitPrice": "Take Profit Price:",
+      "riskAmount": "Risk Amount:",
+      "potentialProfit": "Potential Profit:",
+      "riskPercentageLabel": "Risk Percentage:",
+      "positionValue": "Position Value:",
+      "requiredMargin": "Required Margin:",
+      "riskRewardRatio": "Risk:Reward Ratio:",
+      "recommendedLotSize": "Recommended Lot Size"
+    },
+    "descriptions": {
+      "riskAssessment": "Input your position size to calculate risk amount and percentage",
+      "positionSizing": "Input your risk percentage to calculate recommended position size",
+      "riskRewardRatio": "Risk:Reward Ratio: 1:",
+      "tpDistanceCalculated": "TP Distance: {{distance}} pips (calculated)",
+      "basedOnRisk": "Based on {{percentage}}% risk of ${{balance}}"
+    },
+    "assetClasses": {
+      "all": "All Assets",
+      "forex": "Forex",
+      "indices": "Indices",
+      "commodities": "Commodities",
+      "crypto": "Crypto"
+    }
+  },
+  "education": {
+    "badge": "Education Hub",
+    "hero": {
+      "title": "Master the Markets with Expert Education",
+      "subtitle": "Elevate your trading skills with our comprehensive educational resources, live webinars, and market insights from seasoned professionals."
+    },
+    "webinars": {
+      "title": "Upcoming Webinars",
+      "subtitle": "Join our expert-led sessions to enhance your trading knowledge and strategies.",
+      "live": "Live",
+      "soon": "Soon",
+      "recorded": "Recorded",
+      "registerNow": "Register Now",
+      "comingSoon": "Coming Soon",
+      "watchRecording": "Watch Recording",
+      "items": {
+        "risk": {
+          "title": "Risk Management Fundamentals",
+          "date": "January 25, 2024",
+          "time": "2:00 PM UTC",
+          "instructor": "Sarah Johnson",
+          "duration": "60 min"
+        },
+        "technical": {
+          "title": "Technical Analysis Masterclass",
+          "date": "January 30, 2024", 
+          "time": "3:00 PM UTC",
+          "instructor": "Michael Chen",
+          "duration": "90 min"
+        },
+        "psychology": {
+          "title": "Trading Psychology Workshop",
+          "date": "February 5, 2024",
+          "time": "1:00 PM UTC", 
+          "instructor": "Dr. Emma Williams",
+          "duration": "75 min"
+        }
+      }
+    },
+    "resources": {
+      "title": "Educational Resources",
+      "subtitle": "Download our comprehensive guides and materials to accelerate your learning journey.",
+      "items": {
+        "guide": {
+          "title": "Complete Trading Guide",
+          "description": "Everything you need to know to start trading successfully",
+          "type": "PDF Guide",
+          "pages": "150 pages"
+        },
+        "workbook": {
+          "title": "Strategy Development Workbook",
+          "description": "Step-by-step exercises to build your trading strategy",
+          "type": "Workbook",
+          "pages": "80 pages"
+        },
+        "templates": {
+          "title": "Risk Management Templates",
+          "description": "Ready-to-use templates for position sizing and risk control",
+          "type": "Templates",
+          "pages": "25 pages"
+        }
+      }
+    },
+    "articles": {
+      "title": "Latest Articles",
+      "subtitle": "Stay informed with our latest market insights and educational content.",
+      "categories": {
+        "psychology": "Psychology",
+        "analysis": "Technical Analysis",
+        "strategy": "Strategy"
+      },
+      "items": {
+        "mistakes": {
+          "title": "5 Common Trading Mistakes to Avoid",
+          "excerpt": "Learn about the most frequent pitfalls that trip up new traders and how to avoid them.",
+          "readTime": "8 min read",
+          "category": "psychology"
+        },
+        "volatility": {
+          "title": "Understanding Market Volatility",
+          "excerpt": "Discover how to read and trade market volatility effectively for better results.",
+          "readTime": "12 min read", 
+          "category": "analysis"
+        },
+        "plan": {
+          "title": "Creating Your Trading Plan",
+          "excerpt": "A comprehensive guide to developing a structured approach to trading.",
+          "readTime": "15 min read",
+          "category": "strategy"
+        }
+      }
+    },
+    "calendar": {
+      "title": "Economic Calendar",
+      "subtitle": "Stay ahead of market-moving events with our comprehensive economic calendar."
+    },
+    "cta": {
+      "title": "Ready to Join Our Professional Trading Program?",
+      "subtitle": "Take your trading to the next level with personalized guidance and advanced strategies.",
+      "joinProgram": "Join Trading Program",
+      "scheduleConsultation": "Schedule Consultation"
+    }
+  },
+  "blogs": {
+    "hero": {
+      "subtitle": "Stay informed with expert trading insights, market analysis, and educational content to enhance your trading knowledge and skills."
+    },
+    "categories": {
+      "title": "Browse by Category",
+      "subtitle": "Explore our organized collection of trading insights and educational content",
+      "items": {
+        "trading-psychology": {
+          "name": "Trading Psychology",
+          "count": "12"
+        },
+        "technical-analysis": {
+          "name": "Technical Analysis", 
+          "count": "18"
+        },
+        "risk-management": {
+          "name": "Risk Management",
+          "count": "9"
+        },
+        "market-analysis": {
+          "name": "Market Analysis",
+          "count": "24"
+        },
+        "education": {
+          "name": "Education",
+          "count": "15"
+        },
+        "strategy": {
+          "name": "Strategy",
+          "count": "21"
+  },
+  "seo": {
+    "title": "Trade'n More - A Broker On Your Side",
+    "description": "A broker on your side offering MT5, prop trading accounts, education, and comprehensive trading tools. Get funded and start trading today.",
+    "keywords": "trading, forex, prop trading, get funded, MT5, trading education, financial markets",
+    "organizationDescription": "Trade'n More is a leading trading platform providing comprehensive trading solutions, education, and prop trading opportunities for traders worldwide."
+  }
+}
+    },
+    "featured": {
+      "title": "Featured Articles",
+      "subtitle": "Our most popular and insightful trading content handpicked by experts"
+    },
+    "recent": {
+      "title": "Recent Articles",
+      "subtitle": "Stay up to date with our latest trading insights and market analysis"
+    },
+    "newsletter": {
+      "title": "Never Miss a Market Update",
+      "subtitle": "Subscribe to our newsletter for weekly trading insights, market analysis, and educational content delivered to your inbox."
+    },
+    "posts": {
+      "trading-mistakes": {
+        "title": "5 Common Trading Mistakes That Cost You Money",
+        "excerpt": "Learn about the most frequent psychological and technical mistakes that trip up traders and how to avoid them for better performance.",
+        "author": "Sarah Johnson"
+      },
+      "market-volatility": {
+        "title": "Understanding Market Volatility: A Trader's Guide",
+        "excerpt": "Discover how to read market volatility signals and use them to your advantage in different market conditions.",
+        "author": "Michael Chen"
+      },
+      "trading-plan": {
+        "title": "How to Create a Winning Trading Plan",
+        "excerpt": "A comprehensive step-by-step guide to developing a structured trading plan that fits your risk tolerance and goals.",
+        "author": "David Rodriguez"
+      },
+      "trading-psychology": {
+        "title": "Mastering Trading Psychology: The Mental Game",
+        "excerpt": "Explore the psychological aspects of trading and learn proven techniques to maintain discipline and emotional control.",
+        "author": "Dr. Emma Williams"
+      },
+      "chart-patterns": {
+        "title": "Advanced Chart Patterns Every Trader Should Know",
+        "excerpt": "Deep dive into powerful chart patterns that can help you identify high-probability trading opportunities in any market.",
+        "author": "Alex Thompson"
+      },
+      "risk-management": {
+        "title": "Risk Management Strategies for Consistent Profits",
+        "excerpt": "Master the art of preserving capital with proven risk management techniques used by professional traders.",
+        "author": "Lisa Park"
+      }
+    },
+    "tags": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate", 
+      "advanced": "Advanced",
+      "risk-management": "Risk Management",
+      "psychology": "Psychology",
+      "volatility": "Volatility",
+      "strategy": "Strategy",
+      "planning": "Planning",
+      "mindset": "Mindset",
+      "discipline": "Discipline",
+      "charts": "Charts",
+      "patterns": "Patterns",
+      "risk": "Risk",
+      "money-management": "Money Management"
+    },
+    "dates": {
+      "january": "January",
+      "december": "December"
+    },
+    "ui": {
+      "minRead": "min read",
+      "postsPlural": "posts",
+      "featured": "Featured",
+      "comingSoon": "Coming Soon"
+    }
+  },
+  "partners": {
+    "badge": {
+      "program": "Partner Program"
+    },
+    "hero": {
+      "title": "Grow Your Business with Trade'n More",
+      "subtitle": "Join our global partner network and unlock unlimited earning potential with industry-leading commission rates and comprehensive support.",
+      "becomePartner": "Become a Partner",
+      "scheduleCall": "Schedule a Call"
+    },
+    "partnerTypes": {
+      "title": "Partnership Opportunities",
+      "subtitle": "Choose the partnership model that best fits your business goals and audience",
+      "affiliate": {
+        "title": "Affiliate Partner",
+        "description": "Earn commissions by referring traders to our platform",
+        "commission": "Up to 40%",
+        "benefits": [
+          "High conversion rates",
+          "Comprehensive marketing materials",
+          "Real-time tracking and reporting",
+          "Dedicated affiliate manager",
+          "Monthly payouts"
+        ]
+      },
+      "ib": {
+        "title": "Introducing Broker",
+        "description": "Build your own client base with our IB program",
+        "commission": "Up to 100%",
+        "benefits": [
+          "Volume-based commissions",
+          "Sub-affiliate network",
+          "Custom trading conditions",
+          "Branded trading platform",
+          "Priority support"
+        ]
+      },
+      "regional": {
+        "title": "Regional Partner",
+        "description": "Exclusive partnership opportunities in specific regions",
+        "commission": "Custom",
+        "benefits": [
+          "Regional exclusivity",
+          "Co-branded marketing",
+          "Local language support",
+          "Access to regional events",
+          "Custom commission structure"
+        ]
+      },
+      "commissionLabel": "Commission",
+      "learnMore": "Learn More"
+    },
+    "benefits": {
+      "title": "Why Partner with Us?",
+      "subtitle": "We provide everything you need to succeed in the competitive trading industry.",
+      "highCommission": {
+        "title": "High Commission Rates",
+        "description": "Earn industry-leading commissions on every referral"
+      },
+      "realTimeAnalytics": {
+        "title": "Real-Time Analytics",
+        "description": "Track your performance through detailed dashboards"
+      },
+      "marketingSupport": {
+        "title": "Marketing Support",
+        "description": "Get professional marketing materials and campaigns"
+      },
+      "fastPayments": {
+        "title": "Fast Payments",
+        "description": "Receive your commissions on time, every time"
+      }
+    },
+    "stats": {
+      "title": "Partnership Success",
+      "subtitle": "Numbers that speak for our partner program",
+      "activePartners": "Active Partners",
+      "countriesCovered": "Countries Covered",
+      "monthlyPayouts": "Monthly Payouts",
+      "averageCommission": "Average Commission"
+    },
+    "dashboard": {
+      "title": "Partner Dashboard",
+      "subtitle": "Track your performance, manage referrals, and access marketing materials through our comprehensive partner portal.",
+      "totalCommissions": "Total Commissions",
+      "activeReferrals": "Active Referrals",
+      "conversionRate": "Conversion Rate",
+      "fromLastMonth": "+23% from last month",
+      "newThisMonth": "+15 new this month",
+      "aboveAverage": "Above average"
+    },
+    "applicationForm": {
+      "title": "Apply for Partnership",
+      "subtitle": "Fill out the form below and our partnership team will contact you within 24 hours.",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter your last name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "phone": "Phone Number",
+      "phonePlaceholder": "Enter your phone number",
+      "company": "Company Name",
+      "companyPlaceholder": "Enter your company name",
+      "country": "Country",
+      "countryPlaceholder": "Enter your country",
+      "partnerType": "Partnership Type",
+      "partnerTypePlaceholder": "Choose partnership type",
+      "affiliateOption": "Affiliate Partner",
+      "ibOption": "Introducing Broker",
+      "regionalOption": "Regional Partner",
+      "experience": "Trading Experience",
+      "experiencePlaceholder": "Tell us about your background and experience in the trading industry",
+      "goals": "Partnership Goals",
+      "goalsPlaceholder": "What are your goals from this partnership? How many clients do you expect to refer?",
+      "submitApplication": "Submit Application",
+      "submitting": "Submitting...",
+      "success": "Application submitted successfully! We'll be in touch within 2-3 business days.",
+      "error": "Failed to submit application. Please try again.",
+      "successTitle": "Success!",
+      "errorTitle": "Error",
+      "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required", 
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email address",
+        "partnerTypeRequired": "Please select a partner type"
+      }
+    },
+    "cta": {
+      "title": "Ready to Start Earning?",
+      "subtitle": "Join our partner network today and start building a profitable partnership with Trade'n More.",
+      "contactTeam": "Contact Partnership Team",
+      "scheduleCall": "Schedule a Call"
+    }
+  },
+  "resources": {
+    "title": "Educational Resources",
+    "subtitle": "Download comprehensive guides and materials to enhance your trading knowledge.",
+    "hero": {
+      "title": "Educational Resources",
+      "subtitle": "Comprehensive collection of trading guides, tools, and educational materials to accelerate your learning."
+    },
+    "categories": {
+      "title": "Browse by Category",
+      "subtitle": "Find resources tailored to your experience level and learning goals.",
+      "beginnerGuides": "Beginner Guides",
+      "tradingStrategies": "Trading Strategies",
+      "riskManagement": "Risk Management",
+      "marketAnalysis": "Market Analysis",
+      "psychology": "Psychology",
+      "toolsTemplates": "Tools & Templates",
+      "items": "items"
+    },
+    "featured": {
+      "title": "Featured Resources",
+      "subtitle": "Start with our most popular educational materials designed for traders at all levels."
+    },
+    "additional": {
+      "title": "Additional Learning Materials",
+      "subtitle": "Expand your knowledge with our comprehensive collection of trading resources."
+    },
+    "items": {
+      "guide": {
+        "title": "Complete Trading Guide",
+        "description": "Comprehensive guide covering all aspects of forex trading from basics to advanced strategies.",
+        "type": "PDF Guide",
+        "pages": "120 pages"
+      },
+      "workbook": {
+        "title": "Trading Strategy Workbook",
+        "description": "Interactive workbook with exercises to develop and test your trading strategies.",
+        "type": "Workbook",
+        "pages": "80 pages"
+      },
+      "templates": {
+        "title": "Chart Analysis Templates",
+        "description": "Professional chart templates and indicators to enhance your technical analysis.",
+        "type": "Templates",
+        "pages": "15 templates"
+      }
+    },
+    "additionalItems": {
+      "psychologyAudio": {
+        "title": "Trading Psychology Audiobook",
+        "description": "Master the mental game of trading with our comprehensive audio guide",
+        "type": "Audio Book",
+        "duration": "4 hours"
+      },
+      "videoSeries": {
+        "title": "Market Analysis Video Series",
+        "description": "Weekly market analysis and trading opportunities breakdown",
+        "type": "Video Series",
+        "duration": "12 episodes"
+      },
+      "checklist": {
+        "title": "Forex Trading Checklist",
+        "description": "Pre-trade checklist to ensure consistent trading performance",
+        "type": "Checklist",
+        "duration": "2 pages"
+      },
+      "economicGuide": {
+        "title": "Economic Calendar Guide",
+        "description": "Learn how to read and trade economic news events effectively",
+        "type": "Guide",
+        "duration": "15 pages"
+      },
+      "riskCalculator": {
+        "title": "Risk Management Calculator",
+        "description": "Excel spreadsheet for calculating position sizes and risk exposure",
+        "type": "Spreadsheet",
+        "duration": "Template"
+      },
+      "chartPatterns": {
+        "title": "Chart Pattern Recognition Guide",
+        "description": "Visual guide to identifying and trading common chart patterns",
+        "type": "Visual Guide",
+        "duration": "25 pages"
+      }
+    },
+    "cta": {
+      "title": "Get Premium Access",
+      "subtitle": "Unlock exclusive resources, advanced guides, and personalized learning paths with a trading account.",
+      "primaryButton": "Open Trading Account",
+      "secondaryButton": "Learn More"
+    },
+    "status": {
+      "free": "Free",
+      "comingSoon": "Coming Soon"
+    }
+  },
+  "webinars": {
+    "hero": {
+      "title": "Live & Recorded Webinars",
+      "subtitle": "Join our live and recorded webinars to enhance your trading knowledge and skills."
+    },
+    "upcoming": {
+      "title": "Upcoming Webinars",
+      "subtitle": "Learn from industry experts through our interactive live sessions."
+    },
+    "series": {
+      "title": "Upcoming Webinar Series",
+      "subtitle": "Comprehensive multi-session courses covering advanced trading topics."
+    },
+    "items": {
+      "risk": {
+        "title": "Risk Management Essentials",
+        "date": "January 20, 2024",
+        "time": "2:00 PM GMT",
+        "instructor": "Sarah Johnson",
+        "duration": "90 min",
+        "description": "Learn essential risk management strategies to protect your capital and maximize your trading potential."
+      },
+      "technical": {
+        "title": "Technical Analysis Masterclass",
+        "date": "January 25, 2024",
+        "time": "3:00 PM GMT",
+        "instructor": "Michael Chen",
+        "duration": "120 min",
+        "description": "Master chart patterns, indicators, and technical analysis tools used by professional traders."
+      },
+      "psychology": {
+        "title": "Trading Psychology Workshop",
+        "date": "February 1, 2024",
+        "time": "1:00 PM GMT",
+        "instructor": "Dr. Emma Wilson",
+        "duration": "75 min",
+        "description": "Develop the mindset and emotional discipline needed for consistent trading success."
+      }
+    },
+    "seriesItems": {
+      "fundamentals": {
+        "title": "Forex Fundamentals Masterclass",
+        "sessions": "4 Sessions",
+        "startDate": "January 15, 2024",
+        "level": "Beginner",
+        "description": "Complete introduction to forex trading covering basics to advanced strategies."
+      },
+      "advancedTA": {
+        "title": "Advanced Technical Analysis",
+        "sessions": "6 Sessions",
+        "startDate": "February 1, 2024",
+        "level": "Advanced",
+        "description": "Deep dive into complex chart patterns, volume analysis, and market psychology."
+      },
+      "crypto": {
+        "title": "Crypto Trading Strategies",
+        "sessions": "3 Sessions",
+        "startDate": "February 20, 2024",
+        "level": "Intermediate",
+        "description": "Specialized strategies for trading cryptocurrencies and digital assets."
+      }
+    },
+    "status": {
+      "live": "Live",
+      "soon": "Soon",
+      "recorded": "Recorded"
+    },
+    "actions": {
+      "registerNow": "Register Now",
+      "comingSoon": "Coming Soon",
+      "watchRecording": "Watch Recording"
+    },
+    "cta": {
+      "title": "Never Miss a Webinar",
+      "subtitle": "Subscribe to our webinar notifications and get access to exclusive trading education content.",
+      "subscribe": "Subscribe to Notifications",
+      "viewArchive": "View Archive"
+    },
+    "labels": {
+      "instructor": "Instructor",
+      "sessions": "Sessions",
+      "starts": "Starts"
+    }
+  },
+  "tools": {
+    "hero": {
+      "title": "Professional Trading Tools",
+      "subtitle": "Comprehensive suite of real-time trading tools and market analysis to enhance your trading decisions.",
+      "primaryCta": "Explore Tools Below",
+      "secondaryCta": "Jump to Widgets",
+      "badges": {
+        "liveData": "Real-time Data",
+        "lightweight": "Lightweight & Fast",
+        "mobileFriendly": "Mobile Friendly",
+        "noSignin": "No Sign-in Required"
+      }
+    },
+    "cards": {
+      "economicCalendar": {
+        "title": "Economic Calendar",
+        "description": "Stay informed about important economic events and market-moving news",
+        "useNow": "Use Now"
+      },
+      "riskCalculator": {
+        "title": "Risk Calculator",
+        "description": "Calculate position sizes, risk amounts, and exit prices for optimal risk management",
+        "useNow": "Use Now"
+      },
+      "heatMap": {
+        "title": "Market Heat Map",
+        "description": "Visualize market performance across different sectors and currencies",
+        "useNow": "Use Now"
+      },
+      "forexCrossRates": {
+        "title": "Forex Cross Rates",
+        "description": "Real-time currency exchange rates for major forex pairs",
+        "useNow": "Use Now"
+      }
+    },
+    "tips": {
+      "calendar": "Click on events to see impact ratings",
+      "risk": "Always risk max 1-2% per trade",
+      "heatmap": "Green = gains, Red = losses"
+    },
+    "widgets": {
+      "economicCalendar": {
+        "title": "Economic Calendar",
+        "description": "Track important economic events that can impact market movements."
+      },
+      "heatMap": {
+        "title": "Market Heat Map",
+        "description": "Visualize market performance with our interactive heat map."
+      },
+      "forexCrossRates": {
+        "title": "Forex Cross Rates",
+        "description": "Monitor real-time exchange rates between major currencies for better forex trading decisions."
+      },
+      "riskCalculator": {
+        "title": "Risk Calculator",
+        "description": "Calculate position sizes, exit prices, and risk management details for informed trading decisions."
+      }
+    },
+    "cta": {
+      "title": "Start Using These Tools Today",
+      "subtitle": "Open a trading account and get access to all our professional trading tools and market analysis.",
+      "button": "Open Trading Account",
+      "external": "External Link"
+    }
+  },
+  "platforms": {
+    "hero": {
+      "title": "Trade Smarter with MetaTrader 5",
+      "subtitle": "Fast execution, advanced charting, and multi-device access—configured for real, regulated trading.",
+      "downloadButton": "Download for",
+      "launchButton": "Launch MT5 Web",
+      "connectButton": "How to Connect",
+      "badges": {
+        "lowLatency": "Low Latency",
+        "secureAccess": "Secure Access",
+        "multiDevice": "Multi-Device"
+      }
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "products": "Products",
+      "platforms": "Platforms (MT5)"
+    },
+    "deviceConfig": {
+      "windows": "Windows",
+      "macos": "macOS", 
+      "web": "Web Terminal",
+      "ios": "iOS",
+      "android": "Android"
+    },
+    "deviceSpecs": {
+      "version": "Version",
+      "size": "Size",
+      "updated": "Updated",
+      "webBased": "Web-based",
+      "noDownload": "No download",
+      "alwaysCurrent": "Always current"
+    },
+    "tabs": {
+      "title": "MetaTrader 5 for",
+      "downloadNote": "Free download from official source",
+      "requiresAccount": "Requires trading account to access markets"
+    },
+    "features": {
+      "title": "Platform Features",
+      "multiChart": "Multi-Chart Support",
+      "oneClick": "One-Click Trading", 
+      "indicators": "Technical Indicators",
+      "eas": "Expert Advisors (EAs)",
+      "alerts": "Price Alerts",
+      "supported": "Supported",
+      "limited": "Limited",
+      "notSupported": "Not Supported"
+    },
+    "highlights": {
+      "title": "Key Features",
+      "advancedCharting": "Advanced Charting",
+      "chartingDesc": "Multiple timeframes, templates",
+      "indicators": "1500+ Indicators & EAs",
+      "indicatorsDesc": "Extend & automate",
+      "oneClick": "One-Click Trading",
+      "oneClickDesc": "Act fast, manage risk",
+      "dom": "Depth of Market (DOM)",
+      "domDesc": "Better order insight",
+      "mobile": "Mobile & Web Access",
+      "mobileDesc": "Trade on the go",
+      "alerts": "Alerts & Notifications",
+      "alertsDesc": "Stay informed"
+    },
+    "setup": {
+      "title": "Setup Guide",
+      "subtitle": "Get connected to your trading account in 3 simple steps.",
+      "step1": {
+        "title": "1. Select Server",
+        "subtitle": "Choose your trading environment"
+      },
+      "step2": {
+        "title": "2. Enter Login Details", 
+        "subtitle": "Use your account credentials"
+      },
+      "step3": {
+        "title": "3. Start Trading",
+        "subtitle": "You're ready to trade!"
+      },
+      "serverList": {
+        "real": "Real",
+        "demo": "Demo", 
+        "ecn": "ECN"
+      },
+      "form": {
+        "selectServer": "Select a server",
+        "loginLabel": "Login ID",
+        "loginPlaceholder": "Enter your account number",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "copyButton": "Copy",
+        "nextButton": "Next Step",
+        "connectButton": "Connect Now",
+        "successMessage": "Setup complete! You can now connect to MT5.",
+        "helpText": "Need help? Contact our support team."
+      }
+    },
+    "systemReq": {
+      "title": "System Requirements", 
+      "subtitle": "Minimum specifications for optimal performance.",
+      "platform": "Platform",
+      "os": "Operating System",
+      "cpu": "Processor",
+      "ram": "Memory",
+      "disk": "Storage",
+      "network": "Network",
+      "requirements": {
+        "windows": {
+          "os": "Windows 7 or later",
+          "cpu": "Intel/AMD 1GHz+", 
+          "ram": "512MB RAM",
+          "disk": "100MB free space",
+          "network": "Stable internet"
+        },
+        "macos": {
+          "os": "macOS 10.12 or later",
+          "cpu": "Intel/Apple Silicon",
+          "ram": "1GB RAM",
+          "disk": "150MB free space", 
+          "network": "Stable internet"
+        },
+        "ios": {
+          "os": "iOS 12.0 or later",
+          "cpu": "A10 chip or newer",
+          "ram": "3GB RAM",
+          "disk": "100MB free space",
+          "network": "Wi-Fi recommended"
+        },
+        "android": {
+          "os": "Android 7.0 (API 24)",
+          "cpu": "ARMv7 or x86",
+          "ram": "2GB RAM",
+          "disk": "100MB free space",
+          "network": "Wi-Fi recommended"
+        },
+        "web": {
+          "platform": "Web",
+          "os": "Any modern browser",
+          "cpu": "Chrome/Safari/Firefox", 
+          "ram": "Pop-ups allowed",
+          "disk": "Session storage enabled",
+          "network": "Broadband connection"
+        }
+      }
+    },
+      "troubleLink": "Having trouble? Check our troubleshooting guide",
+      "troubleshooting": {
+      "title": "Troubleshooting",
+      "subtitle": "Common issues and solutions to get you trading quickly.",
+      "contactSupport": "Contact Support",
+      "serverConnection": {
+        "issue": "Can't connect to server",
+        "solutions": [
+          "Verify exact server name (no extra spaces)",
+          "Check your internet connection/proxy settings",
+          "Try different server (Real vs Demo)",
+          "Check firewall/antivirus settings",
+          "Contact support if issue persists"
+        ]
+      },
+      "priceUpdates": {
+        "issue": "No price updates",
+        "solutions": [
+          "Right-click Market Watch → Refresh",
+          "Reconnect to server",
+          "Check if market is open for selected symbols",
+          "Verify server connection status"
+        ]
+      },
+      "loginFailed": {
+        "issue": "Login failed",
+        "solutions": [
+          "Double-check account number and password",
+          "Ensure caps lock is off",
+          "Try demo server first",
+          "Reset password if needed",
+          "Contact support for account verification"
+        ]
+      },
+      "pushNotifications": {
+        "issue": "Mobile push notifications not working",
+        "solutions": [
+          "Enable notifications in app settings",
+          "Check device notification permissions",
+          "Verify account is connected",
+          "Restart the app"
+        ]
+      },
+      "webTerminal": {
+        "issue": "Web terminal won't load",
+        "solutions": [
+          "Try different browser (Chrome recommended)",
+          "Disable aggressive ad-blockers",
+          "Clear browser cache and cookies",
+          "Enable JavaScript and pop-ups"
+        ]
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about MT5",
+      "items": {
+        "free": {
+          "question": "Is MT5 free to use?",
+          "answer": "Yes. The platform is completely free to download and use. Trading costs depend on your chosen account type (spreads and commissions)."
+        },
+        "accountTypes": {
+          "question": "Which account types work with MT5?",
+          "answer": "Both Zero Commission and Raw account types are fully compatible with MT5 desktop, web, and mobile versions."
+        },
+        "eas": {
+          "question": "Can I run Expert Advisors (EAs)?",
+          "answer": "Yes, on desktop and web versions. Enable algorithmic trading in settings and review EA risks. Mobile versions don't support EAs."
+        },
+        "multiDevice": {
+          "question": "How do I switch between devices?",
+          "answer": "Simply log in on any device using the same server name and account credentials. Your trades and settings sync automatically."
+        },
+        "serverDetails": {
+          "question": "Where do I find my server details?",
+          "answer": "Server information is provided in your welcome email or Account Dashboard. You can also copy it from the Setup wizard below."
+        }
+      }
+    },
+    "howTo": {
+      "title": "How-To Guides",
+      "subtitle": "Quick tutorials for common MT5 tasks.",
+      "addSymbols": {
+        "title": "Add Symbols to Market Watch",
+        "steps": [
+          "Right-click in Market Watch panel",
+          "Select 'Symbols' from context menu",
+          "Browse or search for desired instruments",
+          "Double-click to add to Market Watch"
+        ]
+      },
+      "pendingOrders": {
+        "title": "Place Pending Orders",
+        "steps": [
+          "Right-click on chart or Market Watch",
+          "Select 'Trading' → 'New Order'",
+          "Choose 'Pending Order' type",
+          "Set price, volume, and SL/TP",
+          "Click 'Place Order'"
+        ]
+      },
+      "chartTemplate": {
+        "title": "Save Chart Template",
+        "steps": [
+          "Configure chart with indicators/settings",
+          "Right-click on chart background",
+          "Select 'Template' → 'Save Template'",
+          "Name your template and save"
+        ]
+      },
+      "priceAlerts": {
+        "title": "Enable Price Alerts",
+        "steps": [
+          "Right-click on chart or symbol",
+          "Select 'Create Alert'",
+          "Set condition and price level",
+          "Choose notification method",
+          "Click 'Create Alert'"
+        ]
+      }
+    },
+    "cta": {
+      "title": "Ready to Start Trading?",
+      "subtitle": "Open your account today and access MetaTrader 5 with professional trading conditions.",
+      "primaryButton": "Open Trading Account",
+      "secondaryButton": "Try Demo Account"
+    },
+    "guidedSetup": {
+      "title": "Guided Setup Wizard",
+      "subtitle": "Get connected in 3 simple steps",
+      "troubleLink": "Having trouble?",
+      "step1": {
+        "title": "Install / Launch",
+        "downloadButton": "Download for",
+        "openWebButton": "Open MT5 Web",
+        "downloadNote": "If the download doesn't start,",
+        "clickHere": "click here",
+        "continue": "Continue"
+      },
+      "step2": {
+        "title": "Connect to Server",
+        "serverLabel": "Trading Server",
+        "serverPlaceholder": "Choose your server",
+        "serverNote": "💡 Use the exact server name from your welcome email",
+        "continue": "Continue"
+      },
+      "step3": {
+        "title": "Log In & Verify",
+        "loginLabel": "Login (Account Number)",
+        "loginPlaceholder": "e.g., 12345678",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Your password",
+        "verifyItems": {
+          "connection": "Connection status shows \"Connected\"",
+          "marketWatch": "Market Watch displays prices",
+          "timezone": "Timezone & symbols look correct"
+        },
+        "continue": "Continue",
+        "compareAccounts": "Compare Account Types",
+        "seeInstruments": "See Instruments"
+      }
+    },
+    "tools": {
+      "economicCalendar": "Economic Calendar",
+      "viewCalendar": "View Calendar", 
+      "riskCalculator": "Risk Calculator",
+      "tryCalculator": "Try Calculator",
+      "educationHub": "Education Hub",
+      "learnTrading": "Learn Trading",
+      "paymentMethods": "Payment Methods",
+      "viewMethods": "View Methods"
+    }
+  },
+  "paymentMethodsPage": {
+    "hero": {
+      "title": "Fast, <0>Secure</0> Payments",
+      "subtitle": "Deposit and withdraw using trusted local and global methods—clear fees, transparent limits, and real timelines.",
+      "breadcrumb": {
+        "products": "Products",
+        "paymentMethods": "Payment Methods"
+      },
+      "trustBadges": {
+        "encrypted": {
+          "title": "Encrypted Connections",
+          "description": "TLS security"
+        },
+        "compliance": {
+          "title": "KYC/AML Compliance", 
+          "description": "verified accounts only"
+        },
+        "transparent": {
+          "title": "Transparent Fees",
+          "description": "no surprise charges"
+        },
+        "support": {
+          "title": "Support",
+          "description": "Help when you need it"
+        }
+      },
+      "buttons": {
+        "depositNow": "Deposit Now",
+        "withdrawFunds": "Withdraw Funds", 
+        "seeFeesLimits": "See Fees & Limits"
+      },
+      "paymentIcons": {
+        "cards": "Cards",
+        "secure": "Secure", 
+        "fast": "Fast"
+      }
+    },
+    "comparisonTable": {
+      "title": "Compare Methods",
+      "headers": {
+        "method": "Method",
+        "fee": "Fee",
+        "limits": "Limits", 
+        "processing": "Processing",
+        "kyc": "KYC",
+        "currencies": "Currencies"
+      },
+        "status": {
+          "global": "Global",
+          "basic": "Basic",
+          "advanced": "Advanced"
+        },
+        "labels": {
+          "daily": "Daily"
+        }
+    },
+    "feeEstimator": {
+      "title": "Fee Estimator",
+      "description": "Calculate estimated fees and net amounts for your transactions",
+      "labels": {
+        "direction": "Direction",
+        "method": "Method", 
+        "currency": "Currency",
+        "amount": "Amount"
+      },
+      "directions": {
+        "deposit": "Deposit",
+        "withdrawal": "Withdrawal"
+      },
+      "placeholders": {
+        "selectMethod": "Select method",
+        "enterAmount": "Enter amount"
+      },
+      "results": {
+        "estimationFor": "Estimation for",
+        "youPay": "You Pay",
+        "youRequest": "You Request", 
+        "estimatedFee": "Estimated Fee",
+        "youReceive": "You Receive",
+        "netWithdrawal": "Net Withdrawal",
+        "processing": "Processing",
+        "min": "Min",
+        "max": "Max",
+        "proceedWith": "Proceed with"
+      },
+      "disclaimer": {
+        "title": "Estimates Only",
+        "text": "Excludes third-party or FX conversion fees unless shown. Final amounts may vary based on provider rates and currency conversion."
+      },
+      "validation": {
+        "validAmount": "Enter a valid amount to see fee estimation"
+      }
+    },
+    "paymentMethods": {
+      "localBank": "Local Bank Transfer",
+      "omt": "OMT (Optimum Money Transfer)",
+      "whishMoney": "Whish Money",
+      "visionExpress": "Vision Express",
+      "bobFinance": "Bob Finance",
+      "cryptoUsdt": "USDT (Tether)",
+      "processingTimes": {
+        "instant": "Instant",
+        "sameDay": "Same day",
+        "businessDays": "1-3 business days"
+      },
+      "fees": {
+        "dependsOnBank": "Depends on bank",
+        "zeroPercent": "0%"
+      },
+      "descriptions": {
+        "localBank": "Convenient local bank transfers",
+        "omt": "Popular Lebanese money transfer service",
+        "whishMoney": "Trusted Lebanese payment solution",
+        "visionExpress": "Fast local payment service in Lebanon",
+        "bobFinance": "Modern Lebanese fintech solution",
+        "cryptoUsdt": "Stable cryptocurrency pegged to USD"
+      }
+    },
+    "troubleshooting": {
+      "title": "Troubleshooting",
+      "items": [
+        {
+          "question": "Card deposit declined",
+          "answer": "Try another card, check 3-D Secure is enabled, or contact your bank to allow online payments."
+        },
+        {
+          "question": "Bank transfer missing",
+          "answer": "Double-check the reference code, allow 1-3 business days, and send your transfer slip to support if needed."
+        },
+        {
+          "question": "Withdrawal pending",
+          "answer": "Check your KYC verification status, account ownership details, and note that processing may be delayed on weekends."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "question": "What are the fees?",
+          "answer": "We show our fees upfront in the matrix below. Banks and payment providers may add their own fees."
+        },
+        {
+          "question": "How long do transactions take?",
+          "answer": "From instant to a few business days depending on the method and your location."
+        },
+        {
+          "question": "Do I need verification?",
+          "answer": "Yes - requirements depend on the method and transaction limits you need."
+        }
+      ]
+    }
+  },
+  "trustBand": {
+    "regulated": {
+      "title": "Regulated & Transparent",
+      "description": "Full oversight and fair pricing practices"
+    },
+    "security": {
+      "title": "KYC/AML & Data Security",
+      "description": "Advanced safety and compliance protocols"
+    },
+    "riskWarning": {
+      "title": "Risk Warning",
+      "description": "Trading CFDs involves significant risk of loss"
+    }
+  },
+  "instruments": {
+    "hero": {
+      "title": "Trade Markets You Know",
+      "subtitle": "Forex, Indices, Commodities, and Crypto — transparent specs, typical spreads, trading hours, and terms all in one place.",
+      "searchPlaceholder": "Search by symbol or name — e.g. XAUUSD, NAS100, EURUSD"
+    },
+    "categories": {
+      "all": "All",
+      "forex": "Forex",
+      "indices": "Indices", 
+      "commodities": "Commodities",
+      "crypto": "Crypto"
+    },
+    "table": {
+      "symbol": "Symbol",
+      "name": "Name",
+      "spread": "Spread",
+      "leverage": "Leverage",
+      "tradingHours": "Trading Hours",
+      "swapLong": "Swap Long",
+      "swapShort": "Swap Short",
+      "actions": "Actions"
+    },
+    "filters": {
+      "spreadType": "Spread Type",
+      "accountType": "Account Type",
+      "zeroCommission": "Zero Commission",
+      "raw": "Raw",
+      "sortBy": "Sort By",
+      "assetClasses": "Asset Classes",
+      "marketStatus": "Market Status",
+      "volatility": "Volatility",
+      "all": "All",
+      "open": "Open",
+      "closed": "Closed",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "reset": "Reset",
+      "save": "Save",
+      "filters": "Filters"
+    },
+    "sort": {
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)",
+      "spreadAsc": "Spread (Low to High)",
+      "spreadDesc": "Spread (High to Low)",
+      "leverageDesc": "Leverage (High to Low)",
+      "leverageAsc": "Leverage (Low to High)"
+    },
+    "viewMode": {
+      "cards": "Cards",
+      "table": "Table"
+    },
+    "results": {
+      "showing": "Showing",
+      "of": "of",
+      "instruments": "instruments"
+    },
+    "sections": {
+      "overview": "Overview",
+      "forex": "Forex",
+      "indices": "Indices",
+      "commodities": "Commodities",
+      "crypto": "Crypto",
+      "metals": "Metals",
+      "stocks": "Stocks",
+      "favorites": "Favorites"
+    },
+    "descriptions": {
+      "forex": "Major and minor currency pairs with competitive spreads",
+      "indices": "Global stock indices from major markets",
+      "commodities": "Precious metals, energy, and agricultural products",
+      "crypto": "Major cryptocurrencies with 24/7 trading",
+      "metals": "Precious metals including gold, silver, platinum, and palladium",
+      "stocks": "Leading companies from global stock exchanges"
+    },
+    "assetClasses": {
+      "forex": "Forex",
+      "indices": "Indices",
+      "commodities": "Commodities",
+      "crypto": "Crypto"
+    },
+    "card": {
+      "details": "Details",
+      "compare": "Compare",
+      "removeFromCompare": "Remove from Compare",
+      "addToCompare": "Add to Compare",
+      "typicalSpread": "Typical Spread",
+      "leverage": "Leverage",
+      "tradingHours": "Trading Hours",
+      "marketOpen": "Market Open",
+      "marketClosed": "Market Closed",
+      "swaps": "Swaps",
+      "long": "Long",
+      "short": "Short",
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites",
+      "performance24h": "24h Performance"
+    },
+    "compare": {
+      "title": "Compare {{count}} Instruments",
+      "mobileTitle": "Compare ({{count}})",
+      "specification": "Specification",
+      "swapsLS": "Swaps (L/S)",
+      "copy": "Copy Data",
+      "copyShort": "Copy",
+      "exportCsv": "Export CSV",
+      "exportShort": "Export",
+      "empty": "No instruments selected for comparison",
+      "copySuccessTitle": "Copied to Clipboard",
+      "copySuccessDesc": "Comparison data has been copied to your clipboard",
+      "copyError": "Copy Failed",
+      "copyErrorDesc": "Unable to copy data to clipboard",
+      "downloadStartedTitle": "Download Started",
+      "downloadStartedDesc": "Your CSV file is being downloaded",
+      "showMore": "Show More Details",
+      "showLess": "Show Less",
+      "swipeHint": "Swipe left/right to view instruments",
+      "quickStats": "Quick Comparison",
+      "avgSpread": "Avg Spread",
+      "maxLeverage": "Max Leverage",
+      "assetTypes": "Asset Types"
+    },
+    "compareTray": {
+      "label": "Compare:",
+      "labelShort": "Compare",
+      "clear": "Clear",
+      "button": "Compare ({{count}})",
+      "buttonShort": "Compare {{count}}"
+    },
+    "favorites": {
+      "title": "Your Favorites",
+      "description": "Instruments you've marked as favorites for quick access"
+    },
+    "details": {
+      "tabs": {
+        "specs": "Specs",
+        "hours": "Hours", 
+        "costs": "Costs",
+        "chart": "Chart"
+      },
+      "tradingSpecifications": "Trading Specifications",
+      "maxLeverage": "Max Leverage",
+      "contractSize": "Contract Size",
+      "minTradeSize": "Min Trade Size",
+      "marginCurrency": "Margin Currency",
+      "tickSize": "Tick Size",
+      "tickValue": "Tick Value",
+      "tradingHours": "Trading Hours",
+      "weeklySchedule": "Weekly Schedule",
+      "holidaySchedule": "Holiday Schedule",
+      "hoursNote": "All times are in GMT. Trading hours may vary during holidays.",
+      "tradingCosts": "Trading Costs",
+      "typicalSpreadWithType": "Typical Spread ({{type}})",
+      "swapRates": "Swap Rates",
+      "costsInfoTitle": "Cost Information",
+      "costsInfoText": "Spreads and swaps may vary based on market conditions and volatility.",
+      "priceChart": "Price Chart",
+      "chartComingSoon": "Live price chart coming soon",
+      "realTimeDataFor": "Real-time data for {{symbol}}",
+      "openAccount": "Open Account",
+      "compareAccounts": "Compare Accounts", 
+      "platformMT5": "View Platform"
+    }
+  },
+  "marketOverview": {
+    "title": "Market Overview",
+    "subtitle": "Live prices & trending instruments",
+    "live": "Live",
+    "loadingData": "Loading market data...",
+    "dataUnavailable": "Market data unavailable",
+    "liveUpdates": "Live market data • Updates every 30s"
+  },
+  "overviewSection": {
+    "title": "Understanding Trading Costs & Conditions",
+    "subtitle": "Get familiar with key concepts that affect your trading experience and costs.",
+    "howPricingWorks": {
+      "title": "How Pricing Works",
+      "description": "Spreads, liquidity, and market conditions can affect your cost.",
+      "details": "Spreads vary based on market volatility and liquidity. During high-impact news events or low liquidity periods, spreads may widen temporarily."
+    },
+    "leverageRisk": {
+      "title": "Leverage & Risk",
+      "description": "Higher leverage increases both potential profit and loss.",
+      "details": "Leverage allows you to control larger positions with smaller capital. While this amplifies potential profits, it also increases potential losses. Use risk management tools."
+    },
+    "swapCosts": {
+      "title": "Swap Costs",
+      "description": "Overnight financing costs/credits when positions are held after rollover.",
+      "details": "Swaps are charged or credited when positions are held overnight. Rates depend on interest rate differentials between currencies and current market conditions."
+    },
+    "learnMore": "Learn More"
+  },
+  "blogs": {
+    "badge": "Trading Blog",
+    "hero": {
+      "title": "Trading Insights & Analysis",
+      "subtitle": "Expert insights, market analysis, and trading strategies from our professional analysts"
+    },
+    "categories": {
+      "title": "Browse by Category",
+      "subtitle": "Find articles that match your trading interests and experience level",
+      "items": {
+        "trading-psychology": { "name": "Trading Psychology", "count": "8" },
+        "technical-analysis": { "name": "Technical Analysis", "count": "12" },
+        "risk-management": { "name": "Risk Management", "count": "6" },
+        "market-analysis": { "name": "Market Analysis", "count": "10" },
+        "education": { "name": "Education", "count": "15" },
+        "strategy": { "name": "Strategy", "count": "9" }
+      }
+    },
+    "featured": { "title": "Featured Articles", "subtitle": "Our top picks for essential trading knowledge" },
+    "recent": { "title": "Recent Posts", "subtitle": "Stay updated with our latest insights and analysis" },
+    "newsletter": { "title": "Stay Updated", "subtitle": "Get the latest trading insights delivered to your inbox" },
+    "posts": {
+      "trading-mistakes": { "title": "5 Common Trading Mistakes and How to Avoid Them", "excerpt": "Learn from the most common pitfalls that trap new traders and discover proven strategies to avoid them.", "author": "Sarah Johnson" },
+      "market-volatility": { "title": "Understanding Market Volatility in 2024", "excerpt": "Navigate volatile markets with confidence using these proven risk management techniques.", "author": "Michael Chen" },
+      "trading-plan": { "title": "Creating Your First Trading Plan", "excerpt": "Step-by-step guide to developing a comprehensive trading plan that fits your goals and risk tolerance.", "author": "David Rodriguez" },
+      "trading-psychology": { "title": "Mastering Trading Psychology", "excerpt": "Overcome emotional barriers and develop the mental discipline needed for consistent trading success.", "author": "Lisa Thompson" },
+      "chart-patterns": { "title": "Essential Chart Patterns Every Trader Should Know", "excerpt": "Master the most reliable chart patterns for identifying high-probability trading opportunities.", "author": "James Wilson" },
+      "risk-management": { "title": "Advanced Risk Management Strategies", "excerpt": "Protect your capital with sophisticated risk management techniques used by professional traders.", "author": "Amanda Foster" }
+    },
+    "dates": { "january": "January", "december": "December" },
+    "tags": { "beginner": "Beginner", "intermediate": "Intermediate", "advanced": "Advanced", "risk-management": "Risk Management", "psychology": "Psychology", "volatility": "Volatility", "strategy": "Strategy", "planning": "Planning", "mindset": "Mindset", "discipline": "Discipline", "charts": "Charts", "patterns": "Patterns", "risk": "Risk", "money-management": "Money Management" },
+    "ui": { "minRead": "min read", "postsPlural": "posts", "featured": "Featured", "comingSoon": "Coming Soon" }
+  },
+  "webinars": {
+    "badge": "Live Training",
+    "hero": { "title": "Expert-Led Trading Webinars", "subtitle": "Join live sessions with professional traders and analysts to accelerate your learning" },
+    "upcoming": { "title": "Upcoming Webinars", "subtitle": "Reserve your spot in our next live trading sessions" },
+    "series": { "title": "Webinar Series", "subtitle": "Comprehensive multi-session courses for deep learning" },
+    "cta": { "title": "Never Miss a Session", "subtitle": "Get notified about upcoming webinars and exclusive trading insights" },
+    "items": {
+      "risk": { "title": "Risk Management Fundamentals", "date": "January 25, 2024", "time": "2:00 PM EST", "instructor": "Sarah Johnson", "duration": "90 minutes", "description": "Learn essential risk management techniques to protect your trading capital and maximize long-term profitability." },
+      "technical": { "title": "Technical Analysis Masterclass", "date": "January 30, 2024", "time": "3:00 PM EST", "instructor": "Michael Chen", "duration": "120 minutes", "description": "Master advanced chart patterns, indicators, and analysis techniques used by professional traders." },
+      "psychology": { "title": "Trading Psychology Workshop", "date": "February 5, 2024", "time": "1:00 PM EST", "instructor": "Dr. Lisa Thompson", "duration": "75 minutes", "description": "Develop the mental discipline and emotional control needed for consistent trading success." }
+    },
+    "seriesItems": {
+      "fundamentals": { "title": "Trading Fundamentals Bootcamp", "sessions": "6 sessions", "startDate": "February 12, 2024", "level": "Beginner", "description": "Complete beginner's guide to trading, covering everything from market basics to your first trades." },
+      "advancedTA": { "title": "Advanced Technical Analysis", "sessions": "8 sessions", "startDate": "February 20, 2024", "level": "Advanced", "description": "Deep dive into sophisticated technical analysis methods and algorithmic trading strategies." },
+      "crypto": { "title": "Cryptocurrency Trading Mastery", "sessions": "5 sessions", "startDate": "March 1, 2024", "level": "Intermediate", "description": "Specialized course focused on crypto markets, DeFi, and digital asset trading strategies." }
+    },
+    "status": { "live": "Live", "soon": "Soon", "recorded": "Recorded" },
+    "labels": { "instructor": "Instructor", "starts": "Starts" },
+    "actions": { "registerNow": "Register Now", "comingSoon": "Coming Soon", "watchRecording": "Watch Recording" }
+  },
+  "resources": {
+    "badge": "Free Resources",
+    "hero": { "title": "Comprehensive Trading Resources", "subtitle": "Free guides, tools, and templates to accelerate your trading education" },
+    "categories": { "title": "Resource Categories", "subtitle": "Browse our extensive library of trading materials", "beginnerGuides": "Beginner Guides", "tradingStrategies": "Trading Strategies", "riskManagement": "Risk Management", "marketAnalysis": "Market Analysis", "psychology": "Psychology", "toolsTemplates": "Tools & Templates", "items": "items" },
+    "featured": { "title": "Featured Resources", "subtitle": "Essential materials every trader should have" },
+    "additional": { "title": "Additional Resources", "subtitle": "Expand your knowledge with these specialized materials" },
+    "cta": { "title": "Get All Resources", "subtitle": "Download our complete trading resource pack" },
+    "items": {
+      "guide": { "title": "Complete Trading Guide", "description": "Comprehensive guide covering all aspects of trading from basics to advanced strategies.", "type": "PDF Guide", "pages": "150 pages" },
+      "workbook": { "title": "Trading Journal Workbook", "description": "Professional trading journal template to track and analyze your trades effectively.", "type": "Excel Template", "pages": "25 sheets" },
+      "templates": { "title": "Strategy Templates", "description": "Ready-to-use trading strategy templates for different market conditions and timeframes.", "type": "Template Pack", "pages": "12 templates" }
+    },
+    "additionalItems": {
+      "psychologyAudio": { "title": "Trading Psychology Audio Course", "description": "Audio lessons on developing the right mindset for trading success.", "type": "Audio Course", "duration": "6 hours" },
+      "videoSeries": { "title": "Chart Analysis Video Series", "description": "Step-by-step video tutorials on technical analysis and chart reading.", "type": "Video Series", "duration": "8 hours" },
+      "checklist": { "title": "Pre-Trade Checklist", "description": "Essential checklist to review before entering any trade.", "type": "Checklist", "duration": "Quick reference" },
+      "economicGuide": { "title": "Economic Calendar Guide", "description": "Learn how to use economic events to inform your trading decisions.", "type": "PDF Guide", "duration": "45 minutes" },
+      "riskCalculator": { "title": "Risk Calculator Tool", "description": "Excel-based calculator for position sizing and risk management.", "type": "Excel Tool", "duration": "Instant setup" },
+      "chartPatterns": { "title": "Chart Patterns Reference", "description": "Visual guide to the most important chart patterns with examples.", "type": "Visual Guide", "duration": "30 minutes" }
+    },
+    "status": { "free": "Free", "comingSoon": "Coming Soon" }
+  },
+  "loading": {
+    "page": "Loading page...",
+    "content": "Loading content...",
+    "economicCalendar": "Loading economic calendar...",
+    "forexRates": "Loading forex rates...",
+    "stockHeatmap": "Loading stock heatmap...",
+    "marketData": "Loading market data...",
+    "instruments": "Loading instruments...",
+    "paymentMethods": "Loading payment methods...",
+    "tradingView": "Loading TradingView widget...",
+    "chart": "Loading chart...",
+    "data": "Loading data..."
+  },
+  "accessibility": {
+    "skipToContent": "Skip to main content",
+    "loadingPage": "Page is loading, please wait",
+    "closeMenu": "Close navigation menu",
+    "openMenu": "Open navigation menu",
+    "mainNavigation": "Main navigation",
+    "footerNavigation": "Footer navigation",
+    "searchResults": "Search results",
+    "currentPage": "Current page",
+    "pageOf": "Page {{current}} of {{total}}",
+    "loading": "Loading content, please wait",
+    "error": "An error occurred while loading content"
+  },
+  "errors": {
+    "translationMissing": "Translation missing for key: {{key}}",
+    "loadingFailed": "Failed to load content",
+    "networkError": "Network connection error",
+    "tryAgain": "Please try again",
+    "contactSupport": "Contact support if the problem persists"
+  },
+  "common": {
+    "language": "Language",
+    "theme": "Theme",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "close": "Close",
+    "open": "Open",
+    "tryAgain": "Try Again",
+    "closed": "Closed",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "more": "More",
+    "less": "Less",
+    "showAll": "Show All",
+    "showLess": "Show Less",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "required": "Required",
+    "optional": "Optional",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "submit": "Submit",
+    "reset": "Reset",
+    "clear": "Clear",
+    "select": "Select",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This Week",
+    "lastWeek": "Last Week",
+    "nextWeek": "Next Week",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "nextMonth": "Next Month",
+    "thisYear": "This Year",
+    "lastYear": "Last Year",
+  "nextYear": "Next Year"
+  },
+  "education": {
+    "webinars": {
+      "badge": "Webinars",
+      "hero": {
+        "title": "Live Webinars for Traders",
+        "subtitle": "Join live sessions and learn from experts. New events added regularly."
+      },
+      "upcoming": {
+        "title": "Upcoming Webinars",
+        "subtitle": "Reserve your spot — spaces are limited."
+      },
+      "labels": {
+        "instructor": "Instructor",
+        "starts": "Starts"
+      },
+      "status": {
+        "live": "Live",
+        "soon": "Soon",
+        "recorded": "Recorded"
+      },
+      "actions": {
+        "registerNow": "Register Now",
+        "comingSoon": "Coming Soon",
+        "watchRecording": "Watch Recording"
+      },
+      "items": {
+        "risk": {
+          "title": "Advanced Risk Management Strategies",
+          "date": "2026",
+          "time": "2:00 PM EST",
+          "instructor": "John Smith",
+          "duration": "90 minutes",
+          "description": "Master practical methods to control risk and protect capital."
+        },
+        "technical": {
+          "title": "Advanced Technical Analysis Course",
+          "date": "2026",
+          "time": "Recorded",
+          "instructor": "Sarah Johnson",
+          "duration": "120 minutes",
+          "description": "Learn multi-timeframe analysis, price action, and high-probability setups."
+        },
+        "psychology": {
+          "title": "Psychology of Trading",
+          "date": "2026",
+          "time": "Recorded",
+          "instructor": "Mike Davis",
+          "duration": "75 minutes",
+          "description": "Develop discipline, patience, and emotional control while trading."
+        }
+      },
+      "series": {
+        "title": "Webinar Series",
+        "subtitle": "Structured multi-session paths to level up your skills."
+      },
+      "seriesItems": {
+        "fundamentals": {
+          "title": "Trading Fundamentals",
+          "sessions": "4 sessions",
+          "startDate": "Feb 2026",
+          "level": "Beginner",
+          "description": "From market basics to order types and risk wisdom."
+        },
+        "advancedTA": {
+          "title": "Advanced Technical Analysis",
+          "sessions": "6 sessions",
+          "startDate": "Mar 2026",
+          "level": "Intermediate",
+          "description": "Patterns, indicators, and confluence for better timing."
+        },
+        "crypto": {
+          "title": "Crypto Trading Basics",
+          "sessions": "3 sessions",
+          "startDate": "Apr 2026",
+          "level": "Beginner",
+          "description": "Volatility, risk, and strategies for crypto markets."
+        }
+      },
+      "cta": {
+        "title": "Want more live training?",
+        "subtitle": "Subscribe to get notified about new webinars and series."
+      }
+    },
+    "resources": {
+      "badge": "Educational Resources",
+      "hero": {
+        "title": "Downloadable Guides & Tools",
+        "subtitle": "Practical PDFs, workbooks, and templates to accelerate your learning."
+      },
+      "categories": {
+        "title": "Resource Categories",
+        "subtitle": "Browse by topic and skill level.",
+        "beginnerGuides": "Beginner Guides",
+        "tradingStrategies": "Trading Strategies",
+        "riskManagement": "Risk Management",
+        "marketAnalysis": "Market Analysis",
+        "psychology": "Psychology",
+        "toolsTemplates": "Tools & Templates",
+        "items": "items"
+      },
+      "featured": {
+        "title": "Featured Resources",
+        "subtitle": "Our most requested downloads."
+      },
+      "status": {
+        "free": "Free",
+        "comingSoon": "Coming Soon"
+      },
+      "items": {
+        "guide": {
+          "title": "Complete Trading Guide",
+          "description": "Comprehensive guide covering everything from basics to advanced strategies",
+          "type": "PDF Guide",
+          "pages": "150 pages"
+        },
+        "workbook": {
+          "title": "Risk Management Workbook",
+          "description": "Interactive workbook with exercises and real-world scenarios",
+          "type": "Workbook",
+          "pages": "80 pages"
+        },
+        "templates": {
+          "title": "Market Analysis Templates",
+          "description": "Professional templates for technical and fundamental analysis",
+          "type": "Templates",
+          "pages": "25 templates"
+        }
+      },
+      "additional": {
+        "title": "More Learning Materials",
+        "subtitle": "Audio lessons, video series, and checklists."
+      },
+      "additionalItems": {
+        "psychologyAudio": {
+          "title": "Trading Psychology Audio Lessons",
+          "description": "Listen and learn on the go with focused psychology sessions",
+          "type": "Audio",
+          "duration": "45 min"
+        },
+        "videoSeries": {
+          "title": "Price Action Video Series",
+          "description": "Step-by-step lessons with real chart examples",
+          "type": "Video Series",
+          "duration": "90 min"
+        },
+        "checklist": {
+          "title": "Pre-Trade Checklist",
+          "description": "Stay consistent with a practical checklist before every trade",
+          "type": "Checklist",
+          "duration": "Printable"
+        },
+        "economicGuide": {
+          "title": "Economic Events Guide",
+          "description": "Understand the key events that move markets",
+          "type": "Guide",
+          "duration": "Quick reference"
+        },
+        "riskCalculator": {
+          "title": "Risk Calculator Sheet",
+          "description": "Plan position size and risk per trade accurately",
+          "type": "Spreadsheet",
+          "duration": "Excel/Sheets"
+        },
+        "chartPatterns": {
+          "title": "Chart Patterns Handbook",
+          "description": "Recognize high-probability chart patterns",
+          "type": "eBook",
+          "duration": "60 pages"
+        }
+      },
+      "cta": {
+        "title": "Get notified when new resources drop",
+        "subtitle": "We’re adding more downloads soon."
+      }
+    }
+  },
+  "footer": {
+    "downloadMT5": "Download MT5",
+    "openAccount": "Open Account",
+    "description": "Your trusted partner in financial markets. We provide cutting-edge trading technology and comprehensive education to help you achieve your financial goals.",
+    "sectionTitles": {
+      "followUs": "Follow Us",
+      "products": "Products",
+      "education": "Education",
+      "partners": "Partners",
+      "support": "Support",
+      "riskWarning": "Risk Warning"
+    },
+    "social": {
+      "followOn": "Follow us on {{platform}}"
+    },
+    "trading": "Trading",
+    "services": "Services", 
+    "education": "Education",
+    "emailUs": "Email us",
+    "callUs": "Call us",
+    "visitUs": "Visit us",
+    "copyright": "© 2025 Trade'n More. All rights reserved.",
+    "riskWarning": "Risk Warning: Trading involves substantial risk and may result in the loss of your invested capital.",
+    "legal": {
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy"
+    },
+    "navigation": {
+      "tradingInstruments": "Trading Instruments",
+      "accountTypes": "Account Types",
+      "metaTrader5": "MetaTrader 5",
+      "tradingTools": "Trading Tools",
+      "contact": "Contact",
+      "getFunded": "Get Funded",
+      "partners": "Partners",
+      "tradingAcademy": "Trading Academy",
+      "educationalResources": "Educational Resources",
+      "marketAnalysis": "Market Analysis"
+    }
+  }
+}

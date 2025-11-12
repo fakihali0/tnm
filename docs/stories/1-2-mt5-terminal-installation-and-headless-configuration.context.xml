@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<story-context id="1-2-mt5-terminal-installation-and-headless-configuration" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>1.2</storyId>
+    <title>MT5 Terminal Installation and Headless Configuration</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-12</generatedAt>
+    <generator>BMAD Story Context Workflow with MCP Enhancement</generator>
+    <sourceStoryPath>docs/stories/1-2-mt5-terminal-installation-and-headless-configuration.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>MetaTrader 5 Terminal installed and configured for headless operation</iWant>
+    <soThat>the Python service can connect to MT5 without requiring a GUI</soThat>
+    <tasks>
+      - Download MT5 installer from MetaQuotes official website
+      - Install MT5 Terminal to C:\Program Files\MetaTrader 5
+      - Configure MT5 for headless mode (no GUI required for operation)
+      - Enable command-line startup with terminal64.exe
+      - Test connection to MetaQuotes-Demo broker server
+      - Create demo account for validation and testing
+      - Document MT5 installation path and configuration settings
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="1" verification="dir 'C:\Program Files\MetaTrader 5	erminal64.exe'">
+      MT5 Terminal is installed in C:\Program Files\MetaTrader 5    </criterion>
+    <criterion id="2" verification="terminal64.exe runs without GUI using /portable flag">
+      MT5 is configured to run in headless mode (no GUI required)
+    </criterion>
+    <criterion id="3" verification="terminal64.exe can be started via command line">
+      MT5 Terminal can be started via command line
+    </criterion>
+    <criterion id="4" verification="Python: mt5.initialize() returns True">
+      MT5 Terminal auto-starts on system boot (optional for this story)
+    </criterion>
+    <criterion id="5" verification="Python: mt5.terminal_info().connected == True">
+      Test connection to MetaQuotes-Demo broker server is successful
+    </criterion>
+    <criterion id="6" verification="Python: mt5.account_info() returns demo account details">
+      Demo account created and can be accessed via Python MT5 library
+    </criterion>
+    <criterion id="7" verification="MT5 installation path documented in LOCAL-DEVELOPMENT-GUIDE.md">
+      MT5 configuration and paths are documented
+    </criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Development Guide - MT5 Integration Service</title>
+        <section>Step 2: MT5 Terminal Installation and Configuration</section>
+        <snippet>
+          Complete step-by-step instructions for MT5 Terminal installation:
+          - Download MT5 from https://www.metatrader5.com/en/download
+          - Installation to C:\Program Files\MetaTrader 5
+          - Initial launch and setup wizard completion
+          - Connecting to MetaQuotes-Demo broker
+          - Creating demo account for testing
+          - Command-line startup: terminal64.exe /portable /config:config_file.ini
+          - Headless mode configuration for background operation
+        </snippet>
+        <relevance>Primary implementation guide for MT5 installation</relevance>
+      </doc>
+      
+      <doc>
+        <path>docs/technical/WINDOWS-DEPLOYMENT-GUIDE.md</path>
+        <title>Windows VPS Deployment Guide</title>
+        <section>3. MT5 Terminal Setup</section>
+        <snippet>
+          MT5 Terminal installation procedures for Windows Server adapted for local Windows 10/11:
+          - Download official installer from MetaQuotes (never third-party sources)
+          - Installation path requirements and permissions
+          - Broker server configuration (MetaQuotes-Demo for development)
+          - Terminal auto-start configuration
+          - Headless operation best practices
+        </snippet>
+        <relevance>Reference for MT5 installation best practices</relevance>
+      </doc>
+      
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic Breakdown</title>
+        <section>Epic 1: Foundation & Infrastructure - Story 1.2</section>
+        <snippet>
+          Business value: MT5 Terminal is the foundation for all trading data access.
+          Headless configuration enables service operation without GUI overhead.
+          Technical notes: MT5 must be installed before Python MetaTrader5 package can connect.
+          Demo account from MetaQuotes-Demo broker is free and requires no real credentials.
+        </snippet>
+        <relevance>Business context for MT5 installation requirements</relevance>
+      </doc>
+      
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>Product Requirements Document</title>
+        <section>6. Technical Stack - MT5 Integration</section>
+        <snippet>
+          MT5 Terminal: Required Windows application for broker connectivity
+          Version: MetaTrader 5 build 3700+ (latest stable)
+          Python library: MetaTrader5 v5.0.45+ communicates with installed Terminal
+          Broker: MetaQuotes-Demo for development, user's real broker for production
+        </snippet>
+        <relevance>Technical requirements for MT5 Terminal</relevance>
+      </doc>
+    </docs>
+
+    <code>
+      <artifact>
+        <path>N/A</path>
+        <kind>infrastructure</kind>
+        <symbol>N/A</symbol>
+        <lines>N/A</lines>
+        <reason>This is infrastructure setup story - MT5 Terminal is Windows application installed via GUI installer, not code. Python integration comes in Story 2.1.</reason>
+      </artifact>
+    </code>
+
+    <dependencies>
+      <dependency>
+        <name>MetaTrader 5 Terminal</name>
+        <version>Build 3700+ (latest stable from MetaQuotes)</version>
+        <purpose>Windows application that connects to broker servers and provides trading data</purpose>
+        <installation>
+          Download from https://www.metatrader5.com/en/download
+          Run mt5setup.exe installer
+          Follow installation wizard (install to C:\Program Files\MetaTrader 5)
+          Complete initial setup and connect to MetaQuotes-Demo broker
+        </installation>
+      </dependency>
+      
+      <dependency>
+        <name>Windows 10/11 with Network Access</name>
+        <version>From Story 1.1</version>
+        <purpose>Operating system and network configuration for MT5 installation</purpose>
+        <installation>Completed in Story 1.1 - static IP 192.168.1.100</installation>
+      </dependency>
+      
+      <dependency>
+        <name>MetaQuotes-Demo Broker Server</name>
+        <version>N/A (cloud service)</version>
+        <purpose>Free demo broker for testing MT5 connectivity without real trading account</purpose>
+        <installation>
+          Select "MetaQuotes-Demo" from MT5 server list during setup
+          Create demo account (no real credentials required)
+          Note account number and password for Python mt5.initialize()
+        </installation>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint type="platform">
+      <description>MT5 Terminal is Windows-only application (no Mac/Linux support)</description>
+      <rationale>This requirement dictates Windows machine setup in Story 1.1</rationale>
+    </constraint>
+    
+    <constraint type="installation-order">
+      <description>MT5 Terminal must be installed BEFORE Python MetaTrader5 package (Story 1.3)</description>
+      <rationale>Python MetaTrader5 library communicates with installed Terminal via IPC</rationale>
+    </constraint>
+    
+    <constraint type="gui-requirement">
+      <description>Initial MT5 setup requires GUI (cannot be fully automated via command-line)</description>
+      <rationale>First launch needs manual broker selection and demo account creation</rationale>
+      <workaround>After initial setup, MT5 can run headless via terminal64.exe /portable</workaround>
+    </constraint>
+    
+    <constraint type="broker-connection">
+      <description>MT5 Terminal needs internet access to connect to broker servers</description>
+      <rationale>Broker servers are cloud-hosted (MetaQuotes-Demo at demo.metaquotes.net)</rationale>
+    </constraint>
+    
+    <constraint type="documentation">
+      <description>MT5 installation path and demo account credentials must be documented</description>
+      <rationale>Stories 2.1+ will reference these paths for Python mt5.initialize() calls</rationale>
+    </constraint>
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>MT5 Terminal Command-Line Startup</name>
+      <kind>system-command</kind>
+      <signature>
+        # Standard startup
+        "C:\Program Files\MetaTrader 5	erminal64.exe"
+        
+        # Headless/portable mode
+        "C:\Program Files\MetaTrader 5	erminal64.exe" /portable /config:"path	o\config.ini"
+      </signature>
+      <path>Windows Command Prompt or PowerShell</path>
+      <notes>Headless mode prevents GUI window, useful for service operation</notes>
+    </interface>
+    
+    <interface>
+      <name>Python MetaTrader5 Library Initialization</name>
+      <kind>python-api</kind>
+      <signature>
+        import MetaTrader5 as mt5
+        
+        # Initialize connection to MT5 Terminal
+        if not mt5.initialize():
+            print("MT5 initialization failed")
+            mt5.shutdown()
+        
+        # Get terminal info
+        terminal_info = mt5.terminal_info()
+        print(f"Connected: {terminal_info.connected}")
+        print(f"Company: {terminal_info.company}")
+        
+        # Get account info
+        account_info = mt5.account_info()
+        print(f"Account: {account_info.login}")
+        print(f"Balance: {account_info.balance}")
+        
+        mt5.shutdown()
+      </signature>
+      <path>Python script using MetaTrader5 package</path>
+      <notes>This will be implemented in Story 2.1 MT5 Connection Manager</notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <standard>MT5 Terminal must install without errors</standard>
+      <standard>MT5 must connect to MetaQuotes-Demo broker successfully</standard>
+      <standard>Demo account must be created and accessible</standard>
+      <standard>Python MetaTrader5 library must be able to initialize() connection</standard>
+      <standard>Screenshot evidence required for successful broker connection</standard>
+    </standards>
+    
+    <locations>
+      <location>
+        <path>docs/STORY-1-2-COMPLETION-SUMMARY.md</path>
+        <description>Manual verification document with screenshots and test results</description>
+      </location>
+      <location>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <description>Updated with MT5 installation steps and demo account details</description>
+      </location>
+    </locations>
+    
+    <ideas>
+      <test>
+        <name>MT5 Installation Verification</name>
+        <command>dir "C:\Program Files\MetaTrader 5	erminal64.exe"</command>
+        <expected>File exists, size ~1-2 MB</expected>
+      </test>
+      
+      <test>
+        <name>MT5 Terminal Startup</name>
+        <command>"C:\Program Files\MetaTrader 5	erminal64.exe"</command>
+        <expected>MT5 Terminal window opens (or runs headless if /portable flag used)</expected>
+      </test>
+      
+      <test>
+        <name>Broker Connection Test (Python)</name>
+        <command>
+          python -c "import MetaTrader5 as mt5; print(mt5.initialize()); print(mt5.terminal_info().connected); mt5.shutdown()"
+        </command>
+        <expected>True, True (initialization and connection both successful)</expected>
+      </test>
+      
+      <test>
+        <name>Demo Account Verification (Python)</name>
+        <command>
+          python -c "import MetaTrader5 as mt5; mt5.initialize(); account = mt5.account_info(); print(f'{account.login} - {account.balance}'); mt5.shutdown()"
+        </command>
+        <expected>Account number and demo balance (e.g., "12345678 - 10000.0")</expected>
+      </test>
+      
+      <test>
+        <name>Terminal Info Check (Python)</name>
+        <command>
+          python -c "import MetaTrader5 as mt5; mt5.initialize(); info = mt5.terminal_info(); print(f'{info.company} - {info.name}'); mt5.shutdown()"
+        </command>
+        <expected>"MetaQuotes Ltd. - MetaTrader 5"</expected>
+      </test>
+      
+      <test>
+        <name>MT5 Version Check</name>
+        <command>Check Help → About in MT5 Terminal GUI</command>
+        <expected>Build 3700+ (or latest stable version)</expected>
+      </test>
+    </ideas>
+  </tests>
+
+  <mcpEnhancements>
+    <enhancement type="sequential-thinking" applied="yes">
+      Used sequential-thinking MCP to analyze MT5 installation context:
+      - Thought 1: MT5 download process from MetaQuotes official source (security critical)
+      - Thought 2: Installation path requirements (C:\Program Files\MetaTrader 5) for Python library compatibility
+      - Thought 3: Headless configuration needs for service operation (terminal64.exe /portable flag)
+      - Thought 4: Broker connection testing approach (MetaQuotes-Demo free broker)
+      - Thought 5: Demo account creation process and credential documentation
+      - Thought 6: Dependency on Story 1.1 (Windows setup) and requirement for Story 1.3 (Python MT5 package)
+    </enhancement>
+    <enhancement type="context7" applied="yes">
+      Retrieved MetaTrader5 Python library documentation (library: /lucas-campagna/mt5linux):
+      - mt5.initialize() - Establishes connection to MT5 Terminal
+      - mt5.terminal_info() - Returns terminal status and configuration
+      - mt5.account_info() - Returns account details (login, balance, leverage)
+      - Installation: pip install MetaTrader5
+      - Note: Requires MT5 Terminal installed first (this story)
+      
+      Code snippet from context7:
+      ```python
+      import MetaTrader5 as mt5
+      if not mt5.initialize():
+          print("initialize() failed")
+          mt5.shutdown()
+          quit()
+      print(mt5.terminal_info())
+      print(mt5.account_info())
+      mt5.shutdown()
+      ```
+    </enhancement>
+    <enhancement type="serena" applied="not-needed">
+      No existing codebase yet (Story 1.2 is infrastructure setup) - serena will be used from Story 2.1+ for MT5 connection manager code analysis
+    </enhancement>
+    <note>MT5 Terminal installation is prerequisite for Python MetaTrader5 package (Story 1.3) and MT5 Connection Manager (Story 2.1)</note>
+  </mcpEnhancements>
+</story-context>

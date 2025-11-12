@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<story-context id="1-3-python-environment-and-dependency-setup" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>1.3</storyId>
+    <title>Python Environment and Dependency Setup</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-12</generatedAt>
+    <generator>BMAD Story Context Workflow with MCP Enhancement</generator>
+    <sourceStoryPath>docs/stories/1-3-python-environment-and-dependency-setup.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>Python 3.11+ installed with a virtual environment and all required dependencies</iWant>
+    <soThat>I can run the FastAPI service with MT5 integration</soThat>
+    <tasks>
+      - Install Python 3.11+ via Chocolatey (choco install python311)
+      - Verify Python installation (python --version)
+      - Create virtual environment at C:\mt5-service\venv
+      - Activate virtual environment
+      - Install core dependencies: fastapi, uvicorn[standard]
+      - Install MT5 integration: MetaTrader5
+      - Install security packages: cryptography, python-jose[cryptography]
+      - Install utilities: httpx, pydantic, python-dotenv
+      - Create and freeze requirements.txt
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="1" verification="python --version returns Python 3.11.x or higher">
+      Python 3.11+ accessible via command line
+    </criterion>
+    <criterion id="2" verification="dir C:\mt5-service\venv shows virtual environment folder">
+      Virtual environment created at C:\mt5-service\venv\
+    </criterion>
+    <criterion id="3" verification="venv\Scripts\activate.bat runs without error">
+      Virtual environment can be activated
+    </criterion>
+    <criterion id="4" verification="pip list | findstr fastapi shows fastapi package">
+      fastapi package installed in virtual environment
+    </criterion>
+    <criterion id="5" verification="pip list | findstr uvicorn shows uvicorn package">
+      uvicorn[standard] ASGI server installed
+    </criterion>
+    <criterion id="6" verification="pip list | findstr MetaTrader5 shows MetaTrader5 v5.0.45+">
+      MetaTrader5 package v5.0.45+ installed
+    </criterion>
+    <criterion id="7" verification="pip list | findstr cryptography shows cryptography package">
+      cryptography package installed for AES-256 encryption
+    </criterion>
+    <criterion id="8" verification="pip list | findstr python-jose shows python-jose package">
+      python-jose[cryptography] installed for JWT handling
+    </criterion>
+    <criterion id="9" verification="pip list | findstr httpx shows httpx package">
+      httpx package installed for async HTTP requests
+    </criterion>
+    <criterion id="10" verification="dir C:\mt5-service\requirements.txt shows file exists">
+      requirements.txt file created with all dependencies
+    </criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Development Guide - MT5 Integration Service</title>
+        <section>Step 3: Python Environment Setup</section>
+        <snippet>
+          Complete Python environment setup instructions:
+          - Install Python 3.11+ via Chocolatey: choco install python311 -y
+          - Verify installation: python --version
+          - Create project directory: mkdir C:\mt5-service
+          - Create virtual environment: python -m venv C:\mt5-service\venv
+          - Activate venv: C:\mt5-service\venv\Scripts\activate.bat
+          - Upgrade pip: python -m pip install --upgrade pip
+          - Install dependencies: pip install -r requirements.txt
+          - Freeze dependencies: pip freeze > requirements.txt
+        </snippet>
+        <relevance>Step-by-step Python setup procedures</relevance>
+      </doc>
+      
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>Product Requirements Document</title>
+        <section>6. Technical Stack - Backend Dependencies</section>
+        <snippet>
+          Python 3.11+: Required for FastAPI async features and type hints
+          FastAPI: Modern async web framework for REST API
+          uvicorn: ASGI server for FastAPI (use uvicorn[standard] for all features)
+          MetaTrader5 v5.0.45+: Python library for MT5 Terminal communication
+          cryptography: AES-256 encryption for credentials (Story 7.1)
+          python-jose[cryptography]: JWT token generation and validation
+          httpx: Async HTTP client for Supabase API calls
+          pydantic-settings: Environment variable management
+          python-dotenv: .env file loading
+        </snippet>
+        <relevance>Complete dependency list and version requirements</relevance>
+      </doc>
+      
+      <doc>
+        <path>C:\mt5-service\requirements.txt</path>
+        <title>Python Dependencies File</title>
+        <section>Full Package List</section>
+        <snippet>
+          fastapi>=0.104.0
+          uvicorn[standard]>=0.24.0
+          MetaTrader5>=5.0.45
+          cryptography>=41.0.0
+          python-jose[cryptography]>=3.3.0
+          httpx>=0.25.0
+          pydantic>=2.5.0
+          pydantic-settings>=2.1.0
+          python-dotenv>=1.0.0
+        </snippet>
+        <relevance>This file will be created as part of this story</relevance>
+      </doc>
+    </docs>
+
+    <code>
+      <artifact>
+        <path>N/A</path>
+        <kind>infrastructure</kind>
+        <symbol>N/A</symbol>
+        <lines>N/A</lines>
+        <reason>This story sets up Python environment - no application code yet. Story 1.4 creates project structure with actual code files.</reason>
+      </artifact>
+    </code>
+
+    <dependencies>
+      <dependency>
+        <name>Python 3.11+</name>
+        <version>3.11.0 or higher (recommend latest 3.11.x)</version>
+        <purpose>Programming language runtime for FastAPI service</purpose>
+        <installation>
+          choco install python311 -y
+          # Verify: python --version
+        </installation>
+      </dependency>
+      
+      <dependency>
+        <name>pip (Python Package Manager)</name>
+        <version>Latest (comes with Python 3.11+)</version>
+        <purpose>Install Python packages from PyPI</purpose>
+        <installation>
+          # Included with Python, upgrade to latest:
+          python -m pip install --upgrade pip
+        </installation>
+      </dependency>
+      
+      <dependency>
+        <name>venv (Virtual Environment)</name>
+        <version>Built-in with Python 3.11+</version>
+        <purpose>Isolate project dependencies from system Python</purpose>
+        <installation>
+          # Built-in module, create venv with:
+          python -m venv C:\mt5-service\venv
+        </installation>
+      </dependency>
+      
+      <dependency>
+        <name>Chocolatey Package Manager</name>
+        <version>From Story 1.1</version>
+        <purpose>Used to install Python on Windows</purpose>
+        <installation>Already installed in Story 1.1</installation>
+      </dependency>
+      
+      <dependency>
+        <name>MT5 Terminal</name>
+        <version>From Story 1.2</version>
+        <purpose>Required for MetaTrader5 Python package to function</purpose>
+        <installation>Already installed in Story 1.2</installation>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint type="python-version">
+      <description>Python 3.11+ required for FastAPI async features and modern type hints</description>
+      <rationale>FastAPI uses Python 3.10+ features, 3.11+ provides performance improvements</rationale>
+    </constraint>
+    
+    <constraint type="virtual-environment">
+      <description>Virtual environment MUST be activated before pip install commands</description>
+      <rationale>Prevents system Python pollution and ensures clean dependency isolation</rationale>
+      <verification>Command prompt shows (venv) prefix when activated</verification>
+    </constraint>
+    
+    <constraint type="mt5-package-dependency">
+      <description>MetaTrader5 Python package requires MT5 Terminal installed (Story 1.2)</description>
+      <rationale>Package communicates with Terminal via IPC, fails if Terminal not present</rationale>
+    </constraint>
+    
+    <constraint type="uvicorn-standard">
+      <description>Must use uvicorn[standard] not just uvicorn</description>
+      <rationale>[standard] includes watchfiles (auto-reload), websockets, httptools (performance)</rationale>
+    </constraint>
+    
+    <constraint type="jose-cryptography">
+      <description>Must use python-jose[cryptography] not just python-jose</description>
+      <rationale>[cryptography] extra installs cryptography backend for secure JWT operations</rationale>
+    </constraint>
+    
+    <constraint type="requirements-file">
+      <description>requirements.txt must be created and maintained for reproducibility</description>
+      <rationale>Future deployments and VPS migration (Story 4+) need exact dependency versions</rationale>
+    </constraint>
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>Python Installation via Chocolatey</name>
+      <kind>system-command</kind>
+      <signature>
+        # Install Python 3.11
+        choco install python311 -y
+        
+        # Verify installation
+        python --version
+        # Expected: Python 3.11.x
+        
+        # Check pip
+        pip --version
+        # Expected: pip 23.x.x from C:\Python311\lib\site-packages\pip (python 3.11)
+      </signature>
+      <path>PowerShell (Run as Administrator)</path>
+      <notes>Chocolatey adds Python to PATH automatically</notes>
+    </interface>
+    
+    <interface>
+      <name>Virtual Environment Creation and Activation</name>
+      <kind>system-command</kind>
+      <signature>
+        # Create virtual environment
+        python -m venv C:\mt5-service\venv
+        
+        # Activate virtual environment (Windows)
+        C:\mt5-service\venv\Scripts\activate.bat
+        
+        # Verify activation (command prompt shows (venv) prefix)
+        # Upgrade pip in venv
+        python -m pip install --upgrade pip
+      </signature>
+      <path>Windows Command Prompt or PowerShell</path>
+      <notes>On PowerShell, may need to use: venv\Scripts\Activate.ps1</notes>
+    </interface>
+    
+    <interface>
+      <name>Dependency Installation</name>
+      <kind>system-command</kind>
+      <signature>
+        # Activate venv first!
+        C:\mt5-service\venv\Scripts\activate.bat
+        
+        # Install all dependencies
+        pip install fastapi uvicorn[standard] MetaTrader5 cryptography python-jose[cryptography] httpx pydantic pydantic-settings python-dotenv
+        
+        # Or install from requirements.txt
+        pip install -r requirements.txt
+        
+        # Freeze installed packages
+        pip freeze > requirements.txt
+      </signature>
+      <path>Windows Command Prompt (with venv activated)</path>
+      <notes>Ensure venv is activated (see (venv) prefix)</notes>
+    </interface>
+    
+    <interface>
+      <name>Package Import Tests</name>
+      <kind>python-code</kind>
+      <signature>
+        # Test imports (run in activated venv)
+        python -c "import fastapi; print(f'FastAPI {fastapi.__version__}')"
+        python -c "import uvicorn; print(f'Uvicorn {uvicorn.__version__}')"
+        python -c "import MetaTrader5 as mt5; print(f'MT5 {mt5.__version__}')"
+        python -c "import cryptography; print(f'Cryptography {cryptography.__version__}')"
+        python -c "from jose import jwt; print('python-jose OK')"
+        python -c "import httpx; print(f'httpx {httpx.__version__}')"
+        python -c "from pydantic_settings import BaseSettings; print('pydantic-settings OK')"
+        python -c "from dotenv import load_dotenv; print('python-dotenv OK')"
+      </signature>
+      <path>Windows Command Prompt (with venv activated)</path>
+      <notes>All imports should succeed without errors</notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <standard>Python 3.11+ must be installed and accessible</standard>
+      <standard>Virtual environment must be created and activatable</standard>
+      <standard>All required packages must install without errors</standard>
+      <standard>Package imports must succeed (no missing dependencies)</standard>
+      <standard>requirements.txt must contain all installed packages</standard>
+    </standards>
+    
+    <locations>
+      <location>
+        <path>docs/STORY-1-3-COMPLETION-SUMMARY.md</path>
+        <description>Python environment setup verification document</description>
+      </location>
+      <location>
+        <path>C:\mt5-service\requirements.txt</path>
+        <description>Complete dependency list created by pip freeze</description>
+      </location>
+    </locations>
+    
+    <ideas>
+      <test>
+        <name>Python Version Check</name>
+        <command>python --version</command>
+        <expected>Python 3.11.x (or higher)</expected>
+      </test>
+      
+      <test>
+        <name>Pip Version Check</name>
+        <command>pip --version</command>
+        <expected>pip 23.x.x from C:\Python311\... (python 3.11)</expected>
+      </test>
+      
+      <test>
+        <name>Virtual Environment Exists</name>
+        <command>dir C:\mt5-service\venv</command>
+        <expected>Directory exists with Scripts\, Lib\, Include\ folders</expected>
+      </test>
+      
+      <test>
+        <name>Virtual Environment Activation</name>
+        <command>C:\mt5-service\venv\Scripts\activate.bat</command>
+        <expected>Command prompt shows (venv) prefix</expected>
+      </test>
+      
+      <test>
+        <name>FastAPI Import Test</name>
+        <command>python -c "import fastapi; print(fastapi.__version__)"</command>
+        <expected>Version number (e.g., 0.104.0)</expected>
+      </test>
+      
+      <test>
+        <name>Uvicorn Import Test</name>
+        <command>python -c "import uvicorn; print(uvicorn.__version__)"</command>
+        <expected>Version number (e.g., 0.24.0)</expected>
+      </test>
+      
+      <test>
+        <name>MetaTrader5 Import Test</name>
+        <command>python -c "import MetaTrader5 as mt5; print(mt5.__version__)"</command>
+        <expected>Version 5.0.45 or higher</expected>
+      </test>
+      
+      <test>
+        <name>Cryptography Import Test</name>
+        <command>python -c "from cryptography.fernet import Fernet; print('OK')"</command>
+        <expected>OK (no import errors)</expected>
+      </test>
+      
+      <test>
+        <name>python-jose Import Test</name>
+        <command>python -c "from jose import jwt; print('OK')"</command>
+        <expected>OK (cryptography backend loaded)</expected>
+      </test>
+      
+      <test>
+        <name>httpx Import Test</name>
+        <command>python -c "import httpx; print(httpx.__version__)"</command>
+        <expected>Version number (e.g., 0.25.0)</expected>
+      </test>
+      
+      <test>
+        <name>pydantic-settings Import Test</name>
+        <command>python -c "from pydantic_settings import BaseSettings; print('OK')"</command>
+        <expected>OK (pydantic v2 settings loaded)</expected>
+      </test>
+      
+      <test>
+        <name>python-dotenv Import Test</name>
+        <command>python -c "from dotenv import load_dotenv; print('OK')"</command>
+        <expected>OK (.env file support available)</expected>
+      </test>
+      
+      <test>
+        <name>Requirements File Exists</name>
+        <command>type C:\mt5-service\requirements.txt</command>
+        <expected>File contents showing fastapi, uvicorn, MetaTrader5, etc.</expected>
+      </test>
+      
+      <test>
+        <name>All Packages Listed</name>
+        <command>pip list</command>
+        <expected>Shows all installed packages with versions</expected>
+      </test>
+    </ideas>
+  </tests>
+
+  <mcpEnhancements>
+    <enhancement type="sequential-thinking" applied="yes">
+      Used sequential-thinking MCP to analyze Python environment requirements:
+      - Thought 1: Python 3.11+ required for FastAPI async features and performance
+      - Thought 2: Virtual environment critical for dependency isolation (system vs project)
+      - Thought 3: MetaTrader5 package requires MT5 Terminal installed (Story 1.2 dependency)
+      - Thought 4: uvicorn[standard] includes watchfiles (auto-reload) and httptools (performance)
+      - Thought 5: cryptography package needed for AES-256 encryption (Story 7.1)
+      - Thought 6: pydantic-settings (v2) for environment variable management
+      - Thought 7: requirements.txt creation for reproducibility and VPS deployment (Story 4+)
+    </enhancement>
+    <enhancement type="context7" applied="yes">
+      Retrieved FastAPI dependency patterns (library: /fastapi/fastapi):
+      - pydantic-settings for environment management: BaseSettings with SettingsConfigDict(env_file=".env")
+      - uvicorn[standard] recommended over plain uvicorn for development features
+      - Installation pattern: pip install "fastapi[all]" OR separate packages for control
+      - python-dotenv used with pydantic-settings for .env file loading
+      
+      Code snippet from context7:
+      ```python
+      from pydantic_settings import BaseSettings, SettingsConfigDict
+      
+      class Settings(BaseSettings):
+          app_name: str = "MT5 Integration Service"
+          admin_email: str
+          mt5_terminal_path: str
+          
+          model_config = SettingsConfigDict(env_file=".env")
+      ```
+    </enhancement>
+    <enhancement type="serena" applied="not-needed">
+      No existing codebase yet (Story 1.3 is environment setup) - serena will be used from Story 2.1+ for code analysis and refactoring
+    </enhancement>
+    <note>This environment setup enables all subsequent stories (1.4-8.5) - dependencies prepared for FastAPI service, MT5 integration, and security features</note>
+  </mcpEnhancements>
+</story-context>

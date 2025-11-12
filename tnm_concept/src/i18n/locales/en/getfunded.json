@@ -1,0 +1,137 @@
+{
+  "badge": {
+    "propTradingProgram": "Prop Trading Program"
+  },
+  "hero": {
+    "title": "Get Funded to Trade Our Capital",
+    "subtitle": "Access up to $200K in trading capital. Prove your skills, manage risk, and start earning real profits with our funded accounts program.",
+    "startChallenge": "Start Challenge Today",
+    "viewStories": "View Success Stories"
+  },
+  "process": {
+    "title": "How Our Funding Process Works",
+    "subtitle": "Follow our simple 4-step process to get funded and start trading with our capital.",
+    "steps": {
+      "step1": {
+        "title": "Choose Your Challenge",
+        "description": "Select from our three funding tiers based on your experience and capital goals."
+      },
+      "step2": {
+        "title": "Prove Your Skills",
+        "description": "Meet the profit target while managing risk according to our guidelines."
+      },
+      "step3": {
+        "title": "Get Verified",
+        "description": "Pass our verification process and receive your funded trading account."
+      },
+      "step4": {
+        "title": "Start Earning",
+        "description": "Trade with our capital and keep up to 90% of the profits you generate."
+      }
+    }
+  },
+  "tiers": {
+    "title": "Choose Your Funding Tier",
+    "subtitle": "Select the challenge that matches your trading experience and capital goals.",
+    "mostPopular": "Most Popular",
+    "tradingCapital": "Trading Capital",
+    "unlimitedDays": "Unlimited time to complete",
+    "profitSplit": "Profit split:",
+    "upTo90": "up to 90%",
+    "evaluationFee": "Challenge Fee",
+    "startChallenge": "Start Challenge",
+    "amounts": {
+      "capital": "{{amount}} Capital",
+      "profit": "{{amount}} Target",
+      "split": "{{percentage}} Split",
+      "fee": "{{amount}} Fee"
+    },
+    "tiers": {
+      "beginners": {
+        "name": "Beginners",
+        "features": {
+          "dailyLoss": "5% daily loss limit",
+          "totalLoss": "10% total loss limit",
+          "minDays": "Minimum 5 trading days",
+          "profitTarget": "10% profit target",
+          "leverage": "1:100 maximum leverage",
+          "majorPairs": "All major currency pairs",
+          "commodities": "Gold, Silver, Oil trading"
+        }
+      },
+      "professional": {
+        "name": "Professional",
+        "features": {
+          "dailyLoss": "5% daily loss limit",
+          "totalLoss": "10% total loss limit",
+          "minDays": "Minimum 5 trading days",
+          "profitTarget": "10% profit target",
+          "leverage": "1:100 maximum leverage",
+          "majorPairs": "All major currency pairs",
+          "commodities": "Gold, Silver, Oil trading"
+        }
+      },
+      "maven": {
+        "name": "Maven",
+        "features": {
+          "dailyLoss": "5% daily loss limit",
+          "totalLoss": "10% total loss limit",
+          "minDays": "Minimum 5 trading days",
+          "profitTarget": "10% profit target",
+          "leverage": "1:100 maximum leverage",
+          "majorPairs": "All major currency pairs",
+          "commodities": "Gold, Silver, Oil trading"
+        }
+      }
+    }
+  },
+  "success": {
+    "title": "Real Traders, Real Results",
+    "subtitle": "Join thousands of successful traders who have already been funded through our program.",
+    "profitsIn": "Profits earned in",
+    "timeframes": {
+      "week": "{{count}} week",
+      "weeks": "{{count}} weeks",
+      "month": "{{count}} month"
+    },
+    "testimonials": {
+      "ali": {
+        "name": "Ali Hassan",
+        "title": "Professional Trader",
+        "quote": "The funding process was straightforward and the support team was incredibly helpful throughout my journey."
+      },
+      "cezar": {
+        "name": "Cezar Ionut",
+        "title": "Day Trader",
+        "quote": "Within my first week, I had already made my first withdrawal. The platform is excellent for serious traders."
+      },
+      "alamin": {
+        "name": "Al-Amin Kone",
+        "title": "Swing Trader",
+        "quote": "The risk management rules actually helped me become a more disciplined trader. Highly recommend!"
+      }
+    }
+  },
+  "risk": {
+    "title": "Risk Management Excellence",
+    "subtitle": "Our proven risk management framework protects both your progress and our capital.",
+    "dailyLimit": {
+      "title": "Daily Loss Limits",
+      "description": "Clear daily drawdown limits help maintain consistent risk management"
+    },
+    "totalLimit": {
+      "title": "Total Account Protection", 
+      "description": "Maximum loss limits ensure both trader and firm capital protection"
+    },
+    "profitTarget": {
+      "title": "Achievable Targets",
+      "description": "Realistic profit targets that reward skill while managing expectations"
+    }
+  },
+  "cta": {
+    "title": "Ready to Get Funded?",
+    "subtitle": "Join thousands of traders who are already trading with our capital and earning consistent profits.",
+    "startChallenge": "Start Your Challenge",
+    "learnMore": "Learn More About Requirements"
+  }
+}

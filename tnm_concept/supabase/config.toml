@@ -1,0 +1,75 @@
+project_id = "edzkorfdixvvvrkfzqzg"
+
+[functions.market-insights-generator]
+verify_jwt = false
+
+[functions.ai-risk-recommendations]
+verify_jwt = true
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+enabled = true
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1:54321"
+
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[storage]
+enabled = true
+port = 54326
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+port = 54327
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+enable_confirmations = false
+
+[functions.send-contact-email]
+verify_jwt = false
+
+[functions.submit-partner-application]
+verify_jwt = false
+
+[functions.financial-data]
+verify_jwt = false
+
+[functions.generate-demo-data]
+verify_jwt = true
+
+[functions.ai-insights-generator]
+verify_jwt = true
+
+[functions.market-insights-generator]
+verify_jwt = true
+
+[functions.ai-chat-assistant]
+verify_jwt = true
+
+[functions.send-notifications]
+verify_jwt = true
+
+[functions.technical-indicators]
+verify_jwt = false
+
+[functions.monitor-security-events]
+verify_jwt = false

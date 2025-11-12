@@ -1,0 +1,10 @@
+{
+  "common": "./common.json",
+  "contact": "./contact.json",
+  "education": "./education.json",
+  "getfunded": "./getfunded.json",
+  "pwa": "./pwa.json",
+  "tnm-ai": "./tnm-ai.json",
+  "tools": "./tools.json",
+  "risk-calculator": "./risk-calculator.json"
+}
