@@ -53,6 +53,11 @@ development_status:
   6-1-websocket-endpoint-implementation: ready-for-dev
   6-2-websocket-hook-userealtimemt5data: ready-for-dev
   6-3-websocket-connection-testing-and-load-testing: ready-for-dev
+  
+  # Epic 7: Security & Compliance
+  7-1-aes-256-credential-encryption-implementation: ready-for-dev
+  7-2-audit-logging-for-credential-access: ready-for-dev
+  7-3-gdpr-data-deletion-implementation: ready-for-dev
   5-4-update-aihub-component-for-live-data-display: drafted
   5-3-update-linkedaccountslist-component: drafted
 

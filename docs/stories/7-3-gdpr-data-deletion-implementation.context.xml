@@ -1,0 +1,127 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>7</epicId>
+    <storyId>3</storyId>
+    <title>GDPR Data Deletion Implementation</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T22:06:46Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/7-3-gdpr-data-deletion-implementation.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>a GDPR erasure workflow that removes all MT5-related user data</iWant>
+    <soThat>the service complies with right-to-erasure regulations</soThat>
+    <tasks><![CDATA[- Build CLI/admin endpoint to delete user data across tables.
+- Ensure operation completes in <24 hours and sends confirmation log/email.
+- Log request/execution via audit logger.
+- Remove MT5 credentials from Windows service.
+- Add integration tests verifying tables are cleared.
+- Document runbook for ops.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. Deletion entry point removes user data from `trading_accounts`, `account_integrations`, `trades`, `sync_logs`. [Source: docs/epics.md#Story-7.3]
+2. Operation completes within 24 hours and triggers confirmation email/log. [Source: docs/epics.md#Story-7.3]
+3. Audit logs capture request/execution status without sensitive data. [Source: docs/PRD-MT5-Integration-Service.md#8.3]
+4. Removes MT5 credentials on Windows service via script/API. [Source: docs/epics.md#Story-7.3]
+5. Integration tests verify data removal. [Source: docs/epics.md#Story-7.3]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 7 – Story 7.3</title>
+        <section>Story 7.3</section>
+        <snippet><![CDATA[Defines deletion scope, timing, confirmation, and MT5 cleanup.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §8.3 Compliance</title>
+        <section>8.3</section>
+        <snippet><![CDATA[Describes GDPR requirements for erasure and audit logging.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-3-database-schema-updates-for-mt5-integration.context.xml</path>
+        <title>Story 4.3 Context</title>
+        <section>Artifacts</section>
+        <snippet><![CDATA[Lists schema tables (`trading_accounts`, `sync_logs`) targeted during deletion.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/7-2-audit-logging-for-credential-access.context.xml</path>
+        <title>Story 7.2 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Provides audit logger contract for logging deletion request/result.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>scripts/gdpr/delete_user_data.py</path>
+        <kind>cli-script</kind>
+        <symbol>delete_user_data</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[CLI entry point that deletes user data and logs status.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/services/gdpr.py</path>
+        <kind>service-module</kind>
+        <symbol>GDPRDeletionService</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Encapsulates deletion logic for reuse (CLI + admin endpoint).]]></reason>
+      </artifact>
+      <artifact>
+        <path>scripts/windows/remove_mt5_credentials.ps1</path>
+        <kind>script</kind>
+        <symbol>remove_mt5_credentials</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Script to purge Windows-stored MT5 credentials when user deletion occurs.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tests/integration/test_gdpr_deletion.py</path>
+        <kind>integration-test</kind>
+        <symbol>test_delete_user_data</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Integration tests verifying data removal across tables.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>psycopg / Supabase client</name>
+        <version>latest</version>
+        <notes><![CDATA[Used by deletion script to run SQL operations.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>shell</ecosystem>
+        <name>PowerShell</name>
+        <version>latest</version>
+        <notes><![CDATA[Removes credentials on Windows service.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Run deletion inside transaction per table; handle retries.
+- Keep audit trail without logging sensitive data.
+- Ensure Windows credential removal runs even if Supabase deletion succeeds.
+- Provide ops runbook with confirmation steps.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>GDPRDeletionService.delete_user(user_id)</name>
+      <kind>service method</kind>
+      <signature>async delete_user(user_id: UUID) -> None</signature>
+      <path>app/services/gdpr.py</path>
+      <notes><![CDATA[Called by CLI/admin endpoint to orchestrate deletion.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Integration tests seeding data and confirming deletions; manual QA verifying Windows cleanup script output.]]></standards>
+    <locations><![CDATA[tests/integration/test_gdpr_deletion.py, docs/QA/gdpr-deletion.md]]></locations>
+    <ideas><![CDATA[
+- Seed sample data, run CLI, assert tables empty for user.
+- Simulate partial failure to ensure script logs and exits safely.
+- Manual QA: confirm Windows script removes credential files.]]></ideas>
+  </tests>
+</story-context>
