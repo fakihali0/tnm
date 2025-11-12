@@ -1,6 +1,6 @@
 # Story 1.1: Local Windows Machine Setup and Network Configuration
 
-**Status:** drafted  
+**Status:** review  
 **Epic:** 1 - Foundation & Infrastructure (Local Development)  
 **Created:** November 12, 2025  
 **Story Key:** 1-1-local-windows-machine-setup-and-network-configuration
@@ -30,26 +30,26 @@ So that **I can test the full integration locally before spending money on VPS h
 ## Tasks / Subtasks
 
 ### Task 1: Windows System Updates and Prerequisites (AC: 1)
-- [ ] **1.1** Check current Windows version: Run `winver` command
-- [ ] **1.2** Install all pending Windows updates:
+- [x] **1.1** Check current Windows version: Run `winver` command
+- [x] **1.2** Install all pending Windows updates:
   - Settings → Windows Update → Check for updates
   - Install all critical and recommended updates
   - Restart if required
-- [ ] **1.3** Verify Windows build is at least:
+- [x] **1.3** Verify Windows build is at least:
   - Windows 10: Build 19042 or higher
   - Windows 11: Any build
 
 ### Task 2: Network Configuration and Static IP Assignment (AC: 2)
-- [ ] **2.1** Document current network configuration:
+- [x] **2.1** Document current network configuration:
   ```powershell
   ipconfig /all | Out-File -FilePath "$env:USERPROFILE\Desktop\network-config-before.txt"
   ```
-- [ ] **2.2** Identify active network adapter:
+- [x] **2.2** Identify active network adapter:
   - Look for adapter with IPv4 address (e.g., "Wi-Fi" or "Ethernet")
   - Note current IP (actual: 10.4.0.180)
   - Note subnet (10.4.0.x)
   - Note gateway IP (10.4.0.1)
-- [ ] **2.3** Assign static IP address:
+- [x] **2.3** Assign static IP address:
   - **Method 1 (GUI):**
     - Settings → Network & Internet → Properties (of active adapter)
     - Under "IP assignment" click "Edit"
@@ -70,17 +70,17 @@ So that **I can test the full integration locally before spending money on VPS h
     New-NetIPAddress -InterfaceAlias "Wi-Fi" -IPAddress 10.4.0.180 -PrefixLength 24 -DefaultGateway 10.4.0.1
     Set-DnsClientServerAddress -InterfaceAlias "Wi-Fi" -ServerAddresses ("8.8.8.8","8.8.4.4")
     ```
-- [ ] **2.4** Verify static IP assignment:
+- [x] **2.4** Verify static IP assignment:
   ```powershell
   ipconfig
   # Should show 10.4.0.180
   ```
-- [ ] **2.5** Test internet connectivity after static IP:
+- [x] **2.5** Test internet connectivity after static IP:
   ```powershell
   Test-NetConnection google.com
   # Should show "PingSucceeded : True"
   ```
-- [ ] **2.6** Document IP address in project notes:
+- [x] **2.6** Document IP address in project notes:
   - Create file: `docs/DEVELOPMENT-IPS.md`
   - Content:
     ```markdown
@@ -96,23 +96,23 @@ So that **I can test the full integration locally before spending money on VPS h
     ```
 
 ### Task 3: PowerShell Configuration (AC: 3)
-- [ ] **3.1** Check current execution policy:
+- [x] **3.1** Check current execution policy:
   ```powershell
   Get-ExecutionPolicy
   ```
-- [ ] **3.2** Set execution policy for current user (if not already set):
+- [x] **3.2** Set execution policy for current user (if not already set):
   ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   ```
   - When prompted, type `Y` and press Enter
-- [ ] **3.3** Verify execution policy:
+- [x] **3.3** Verify execution policy:
   ```powershell
   Get-ExecutionPolicy -Scope CurrentUser
   # Should return "RemoteSigned"
   ```
 
 ### Task 4: Windows Defender Firewall Configuration (AC: 4)
-- [ ] **4.1** Create firewall rule for port 8000 (FastAPI):
+- [x] **4.1** Create firewall rule for port 8000 (FastAPI):
   ```powershell
   New-NetFirewallRule -DisplayName "MT5 FastAPI Local Dev" `
     -Direction Inbound `
@@ -122,7 +122,7 @@ So that **I can test the full integration locally before spending money on VPS h
     -Profile Private,Domain `
     -Description "Allow inbound HTTP traffic on port 8000 for local MT5 FastAPI development"
   ```
-- [ ] **4.2** Verify firewall rule created:
+- [x] **4.2** Verify firewall rule created:
   ```powershell
   Get-NetFirewallRule -DisplayName "MT5 FastAPI Local Dev" | Format-List
   ```
@@ -138,42 +138,42 @@ So that **I can test the full integration locally before spending money on VPS h
   ```
 
 ### Task 5: Chocolatey Package Manager Installation (AC: 5)
-- [ ] **5.1** Check if Chocolatey already installed:
+- [x] **5.1** Check if Chocolatey already installed:
   ```powershell
   choco --version
   ```
   - If version number appears, skip to 5.3
-- [ ] **5.2** Install Chocolatey:
+- [x] **5.2** Install Chocolatey:
   ```powershell
   Set-ExecutionPolicy Bypass -Scope Process -Force
   [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
   iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
   ```
   - Wait for installation to complete (1-2 minutes)
-- [ ] **5.3** Close and reopen PowerShell (to refresh PATH)
-- [ ] **5.4** Verify Chocolatey installation:
+- [x] **5.3** Close and reopen PowerShell (to refresh PATH)
+- [x] **5.4** Verify Chocolatey installation:
   ```powershell
   choco --version
   # Should show version like "2.3.0"
   ```
-- [ ] **5.5** Update Chocolatey to latest version:
+- [x] **5.5** Update Chocolatey to latest version:
   ```powershell
   choco upgrade chocolatey -y
   ```
 
 ### Task 6: Connectivity Testing from Mac (AC: 6)
-- [ ] **6.1** Test basic connectivity from Mac terminal:
+- [x] **6.1** Test basic connectivity from Mac terminal:
   ```bash
   ping vms.tnm.local
   ```
   - Expected: `64 bytes from 10.4.0.180: icmp_seq=0 ttl=128 time=X.XXX ms`
   - Stop with Ctrl+C after 5-10 successful pings
-- [ ] **6.2** Test network route from Mac:
+- [x] **6.2** Test network route from Mac:
   ```bash
   traceroute vms.tnm.local
   ```
   - Should show 1-2 hops (Mac → Router → Windows)
-- [ ] **6.3** Document successful connectivity in project notes:
+- [x] **6.3** Document successful connectivity in project notes:
   - Add to `docs/DEVELOPMENT-IPS.md`:
     ```markdown
     ## Connectivity Test Results
@@ -199,7 +199,7 @@ So that **I can test the full integration locally before spending money on VPS h
   - Connect and verify desktop appears
 
 ### Task 8: Documentation and Final Verification
-- [ ] **8.1** Create summary document:
+- [x] **8.1** Create summary document:
   - File: `docs/STORY-1-1-COMPLETION-SUMMARY.md`
   - Include:
     - Windows version
@@ -208,9 +208,9 @@ So that **I can test the full integration locally before spending money on VPS h
     - Chocolatey version
     - Ping test results
     - RDP status (enabled/disabled)
-- [ ] **8.2** Take screenshot of successful `ipconfig` output
-- [ ] **8.3** Take screenshot of successful Mac ping test
-- [ ] **8.4** Verify all acceptance criteria met:
+- [x] **8.2** Take screenshot of successful `ipconfig` output
+- [x] **8.3** Take screenshot of successful Mac ping test
+- [x] **8.4** Verify all acceptance criteria met:
   ```powershell
   # Run verification script
   Write-Host "Windows Version:" -ForegroundColor Cyan
@@ -309,27 +309,29 @@ This context file contains:
 - Dependency specifications (Windows, PowerShell, Chocolatey)
 
 ### Agent Model Used
-_To be filled by Dev Agent during implementation_
+Claude Sonnet 4.5 (via GitHub Copilot)
 
 ### Debug Log References
-_To be filled by Dev Agent if issues encountered_
+- Static IP conversion: User manually configured via Windows GUI (safer than PowerShell Remove-NetIPAddress approach)
+- All other configurations were already in place or verified successfully
 
 ### Completion Notes List
 _To be filled by Dev Agent upon story completion:_
-- [ ] Windows version and build number
-- [ ] Assigned static IP address
-- [ ] Firewall rule verification
-- [ ] Chocolatey installation path
-- [ ] Mac connectivity test results
-- [ ] RDP enabled (yes/no)
-- [ ] Any deviations from planned approach
-- [ ] Recommendations for Story 1.2
+- [x] Windows version and build number: Windows 11 Pro Build 10.0.26100
+- [x] Assigned static IP address: 10.4.0.180 (Manual/Static, converted from DHCP)
+- [x] Firewall rule verification: MT5 FastAPI Local Dev (Enabled, Port 8000, Private/Domain)
+- [x] Chocolatey installation path: v2.5.1 installed
+- [x] Mac connectivity test results: ✅ Successful - ping vms.tnm.local working (November 12, 2025)
+- [ ] RDP enabled (yes/no): Not configured (optional task skipped)
+- [x] Any deviations from planned approach: Used Windows GUI for static IP instead of PowerShell for safety
+- [x] Recommendations for Story 1.2: Foundation ready - static IP ensures stable MT5 connections
 
 ### File List
 _To be filled by Dev Agent - files created/modified:_
-- NEW: `docs/DEVELOPMENT-IPS.md`
-- NEW: `docs/STORY-1-1-COMPLETION-SUMMARY.md`
-- MODIFIED: (none expected)
+- NEW: `docs/DEVELOPMENT-IPS.md` - IP address inventory with network configuration details
+- MODIFIED: `docs/STORY-1-1-COMPLETION-SUMMARY.md` - Updated with verification results
+- MODIFIED: `docs/sprint-status.yaml` - Story status updated (ready-for-dev → in-progress → review)
+- MODIFIED: `docs/stories/1-1-local-windows-machine-setup-and-network-configuration.md` - Tasks marked complete
 
 ---
 
@@ -338,3 +340,5 @@ _To be filled by Dev Agent - files created/modified:_
 | Date | Version | Changes | Author |
 |------|---------|---------|--------|
 | 2025-11-12 | 1.0 | Initial draft created by create-story workflow | AF (via BMad Master) |
+| 2025-11-12 | 1.1 | Implementation complete - All Windows-side configuration verified (static IP, firewall, Chocolatey, execution policy). Ready for review. Mac connectivity testing pending. | AF (via Dev Agent - Amelia) |
+| 2025-11-12 | 1.2 | Mac connectivity verified - ping vms.tnm.local successful. All acceptance criteria met. Story complete. | AF (via Dev Agent - Amelia) |
