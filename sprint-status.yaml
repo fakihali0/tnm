@@ -1,0 +1,165 @@
+# Sprint Status - MT5 Integration Service
+# Updated: 2025-01-12
+
+epic-1:
+  title: "Foundation & Infrastructure"
+  status: "complete"
+  completed: "2025-01-12"
+
+stories:
+  - id: "1.1"
+    title: "Local Windows Machine Setup and Network Configuration"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-1"
+    
+  - id: "1.2"
+    title: "MT5 Terminal Installation and Headless Configuration"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-1"
+    
+  - id: "1.3"
+    title: "Python Environment and Dependency Setup"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-1"
+    
+  - id: "1.4"
+    title: "FastAPI Service Project Structure Scaffolding"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-1"
+    
+  - id: "1.5"
+    title: "ngrok Tunnel for Supabase Edge Function Testing"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-1"
+    
+  - id: "1.6"
+    title: "Manual Service Startup for Local Development"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-1"
+    
+  - id: "1.7"
+    title: "Environment Variable Configuration and Secret Management"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-1"
+    
+  - id: "1.8"
+    title: "End-to-End Local Network Testing"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-1"
+    tests_passed:
+      - "Local health endpoint (Windows)"
+      - "Network access from Mac (vms.tnm.local:8000)"
+      - "CORS verification from browser"
+      - "Environment configuration loading"
+      - "MT5 Terminal connection"
+
+  - id: "2.1"
+    title: "MT5 Connection Manager with Connection Pooling"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-2"
+    features:
+      - "MT5ConnectionManager class with full lifecycle management"
+      - "Connection pooling (20 sessions, 5min idle timeout)"
+      - "Exponential backoff retry (1s → 2s → 4s, max 3 attempts)"
+      - "CapacityLimiter concurrency control"
+      - "Session reuse and idle eviction"
+      - "FastAPI lifecycle hooks (startup/shutdown)"
+      - "/mt5/status endpoint with manager statistics"
+
+  - id: "2.2"
+    title: "MT5 Data Retrieval Functions"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-2"
+    features:
+      - "get_account_info_raw() - Account balances and info"
+      - "get_positions_raw(symbol) - Open positions with filtering"
+      - "get_history_deals_raw(from, to, symbol) - Historical deals"
+      - "get_history_orders_raw(from, to, symbol) - Historical orders"
+      - "Timezone-aware datetime to MT5 timestamp conversion"
+      - "Graceful error handling with logging"
+      - "API endpoints: /mt5/account, /mt5/positions, /mt5/history/*"
+
+  - id: "2.3"
+    title: "MT5 Data Transformation Layer"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-2"
+    features:
+      - "transform_account_info() - Normalize account data"
+      - "transform_position() - Add type_str, UTC timestamps"
+      - "transform_deal() - Normalize deal data with type_str"
+      - "transform_history_to_trades() - Group deals into trades"
+      - "Symbol normalization (strip broker suffixes)"
+      - "Pips calculation (symbol-aware: forex/JPY/indices)"
+      - "MT5 broker time → UTC ISO 8601 conversion"
+      - "Duration and net profit calculations"
+
+  - id: "2.4"
+    title: "Connection State Management and Error Handling"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-2"
+    features:
+      - "ConnectionState enum (CONNECTED/DISCONNECTED/RECONNECTING/ERROR)"
+      - "State transition tracking with timestamps (_set_state)"
+      - "Background health check loop (30s interval)"
+      - "Automatic reconnection on failure detection"
+      - "Circuit breaker pattern (blocks requests in ERROR state)"
+      - "Data caching with 30s TTL (CachedData dataclass)"
+      - "Enhanced /health endpoint with connection_state and last_error"
+      - "Graceful degradation (return cached data during outages)"
+      - "Cache age reporting in API responses"
+      - "Standardized error responses aligned with PRD 5.5"
+
+  - id: "2.5"
+    title: "MT5 Connection Manager Unit Tests"
+    status: "complete"
+    completed: "2025-01-12"
+    epic: "epic-2"
+    features:
+      - "Comprehensive pytest test suite with 55 tests"
+      - "Mocked MT5 SDK calls (no live terminal required)"
+      - "Connection manager tests: init, login, pooling, retry, states"
+      - "State transition and circuit breaker tests"
+      - "Data caching and expiration tests"
+      - "Transformer tests: symbol normalization, timestamps, pips, schema"
+      - "PRD 5.2 schema compliance validation"
+      - "Coverage: 65% mt5_manager, 84% transformers"
+      - "CI-ready pytest configuration"
+      - "TESTING.md documentation with all commands"
+
+environment:
+  windows:
+    hostname: "vms.tnm.local"
+    ip: "10.4.0.180"
+    mt5_account: "98839540"
+    mt5_server: "MetaQuotes-Demo"
+    python_version: "3.11.9"
+    service_port: 8000
+  
+  network:
+    ngrok_tunnel: "https://indeterminedly-crablike-dorinda.ngrok-free.dev"
+    local_dashboard: "http://localhost:4040"
+  
+  supabase:
+    project_id: "edzkorfdixvvvrkfzqzg"
+    project_url: "https://edzkorfdixvvvrkfzqzg.supabase.co"
+
+epic-2:
+  title: "MT5 Service Core"
+  status: "complete"
+  started: "2025-01-12"
+  completed: "2025-01-12"
+
+next_epic: "epic-3"
+next_story: "3.1 - Account Info REST Endpoint"

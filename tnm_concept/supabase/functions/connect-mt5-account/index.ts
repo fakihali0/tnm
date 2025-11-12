@@ -12,8 +12,8 @@ interface MT5ConnectionRequest {
   broker_name: string;
 }
 
-interface MT5AccountInfo {
-  login: string;
+interface MT5ServiceAccountInfo {
+  login: number;
   name: string;
   server: string;
   company: string;
@@ -21,10 +21,17 @@ interface MT5AccountInfo {
   balance: number;
   equity: number;
   margin: number;
-  freeMargin: number;
-  marginLevel: number;
+  margin_free: number;
+  margin_level: number;
   leverage: number;
-  isDemo: boolean;
+  trade_mode: string;
+}
+
+interface MT5ServiceResponse {
+  status: string;
+  account_id: string;
+  account_info: MT5ServiceAccountInfo;
+  message: string;
 }
 
 serve(async (req) => {
@@ -33,6 +40,9 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const requestId = crypto.randomUUID();
+  let userId: string | undefined;
 
   try {
     const authHeader = req.headers.get('Authorization');
@@ -55,13 +65,20 @@ serve(async (req) => {
     if (userError || !user) {
       throw new Error('User not authenticated');
     }
+    userId = user.id;
 
     const { server, login, password, broker_name }: MT5ConnectionRequest = await req.json();
 
     // SECURITY: Use secure logging that masks sensitive data (NEVER log passwords)
-    secureLog('Attempting MT5 connection:', { server, login, broker_name });
+    secureLog('Attempting MT5 connection:', { 
+      requestId, 
+      userId: user.id, 
+      server, 
+      login, 
+      broker_name 
+    });
 
-    // Enhanced input validation and security logging
+    // Enhanced input validation
     if (!server || !login || !password || !broker_name) {
       throw new Error('Missing required connection parameters');
     }
@@ -88,6 +105,7 @@ serve(async (req) => {
       await supabaseClient.rpc('log_security_event', {
         _event_type: 'mt5_connection_attempt',
         _details: {
+          request_id: requestId,
           user_id: user.id,
           broker: broker_name,
           server: server,
@@ -102,103 +120,75 @@ serve(async (req) => {
       console.warn('Failed to log security event:', logError);
     }
 
-    // Use MetaAPI or similar service for real MT5 connection
-    const metaApiKey = Deno.env.get('METAAPI_KEY');
-    if (!metaApiKey) {
-      throw new Error('MetaAPI configuration not found');
+    // Get MT5 service configuration
+    const mt5ServiceUrl = Deno.env.get('MT5_SERVICE_URL');
+    const mt5ServiceApiKey = Deno.env.get('MT5_SERVICE_API_KEY');
+    
+    if (!mt5ServiceUrl || !mt5ServiceApiKey) {
+      throw new Error('MT5 service configuration not found');
     }
 
-    // Step 1: Create MetaAPI account
-    const createAccountResponse = await fetch('https://mt-provisioning-api-v1.agiliumtrade.agiliumtrade.ai/users/current/accounts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'auth-token': metaApiKey,
-      },
-      body: JSON.stringify({
-        name: `TNM-MT5-${login}`,
-        type: 'cloud',
-        login: login,
-        password: password,
-        server: server,
-        platform: 'mt5',
-        magic: 0,
-        quoteStreamingIntervalInSeconds: 2.5,
-        reliability: 'regular'
-      })
-    });
+    // Call Python MT5 service to test connection
+    let mt5Response: MT5ServiceResponse;
+    let lastError: Error | null = null;
+    const maxRetries = 1; // Single retry on timeout as per AC
 
-    if (!createAccountResponse.ok) {
-      const errorData = await createAccountResponse.json();
-      // Log full error server-side for debugging
-      console.error('MetaAPI MT5 account creation failed:', errorData);
-      // Throw generic error that will be sanitized
-      throw new Error(errorData.message || 'Connection failed');
-    }
-
-    const accountData = await createAccountResponse.json();
-    console.log('MetaAPI MT5 account created:', accountData.id);
-
-    // Step 2: Deploy the account
-    const deployResponse = await fetch(`https://mt-provisioning-api-v1.agiliumtrade.agiliumtrade.ai/users/current/accounts/${accountData.id}/deploy`, {
-      method: 'POST',
-      headers: {
-        'auth-token': metaApiKey,
-      }
-    });
-
-    if (!deployResponse.ok) {
-      const errorData = await deployResponse.json();
-      // Log full error server-side for debugging
-      console.error('MetaAPI MT5 deployment failed:', errorData);
-      // Throw generic error that will be sanitized
-      throw new Error(errorData.message || 'Deployment failed');
-    }
-
-    // Step 3: Wait for connection and get account info
-    let accountInfo: MT5AccountInfo | null = null;
-    let retries = 0;
-    const maxRetries = 30; // 30 seconds max wait time
-
-    while (!accountInfo && retries < maxRetries) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        const statusResponse = await fetch(`https://mt-client-api-v1.agiliumtrade.agiliumtrade.ai/users/current/accounts/${accountData.id}/account-information`, {
+        secureLog(`MT5 service connection attempt ${attempt + 1}/${maxRetries + 1}`, { requestId });
+        
+        const response = await fetch(`${mt5ServiceUrl}/api/mt5/connect`, {
+          method: 'POST',
           headers: {
-            'auth-token': metaApiKey,
-          }
+            'Content-Type': 'application/json',
+            'X-API-Key': mt5ServiceApiKey,
+          },
+          body: JSON.stringify({
+            login: parseInt(login),
+            password: password,
+            server: server,
+            broker_name: broker_name
+          }),
+          signal: AbortSignal.timeout(30000) // 30 second timeout
         });
 
-        if (statusResponse.ok) {
-          const info = await statusResponse.json();
-          accountInfo = {
-            login: info.login.toString(),
-            name: info.name || 'Unknown',
-            server: info.server || server,
-            company: info.company || broker_name,
-            currency: info.currency || 'USD',
-            balance: info.balance || 0,
-            equity: info.equity || 0,
-            margin: info.margin || 0,
-            freeMargin: info.freeMargin || 0,
-            marginLevel: info.marginLevel || 0,
-            leverage: info.leverage || 1,
-            isDemo: server.toLowerCase().includes('demo')
-          };
-          break;
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+          throw new Error(errorData.detail || errorData.message || 'Connection test failed');
         }
+
+        mt5Response = await response.json();
+        secureLog('MT5 service connection successful', { 
+          requestId, 
+          account_id: mt5Response.account_id 
+        });
+        break; // Success, exit retry loop
+
       } catch (error) {
-        console.log(`Retry ${retries + 1}: Waiting for MT5 account connection...`);
+        lastError = error instanceof Error ? error : new Error('Unknown error');
+        
+        if (attempt < maxRetries) {
+          // Only retry on timeout or network errors
+          if (error instanceof Error && 
+              (error.name === 'TimeoutError' || error.message.includes('timeout') || 
+               error.message.includes('network'))) {
+            secureLog(`Retrying after error: ${error.message}`, { requestId });
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+            continue;
+          }
+        }
+        
+        throw lastError;
       }
-
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      retries++;
     }
 
-    if (!accountInfo) {
-      throw new Error('Failed to retrieve MT5 account information after connection');
+    if (!mt5Response!) {
+      throw lastError || new Error('Failed to connect to MT5 service');
     }
 
-    // Step 4: Store account in database
+    const accountInfo = mt5Response.account_info;
+
+    // Get user profile
     const { data: profile } = await supabaseClient
       .from('profiles')
       .select('user_id')
@@ -209,24 +199,41 @@ serve(async (req) => {
       throw new Error('User profile not found');
     }
 
-    const { data: dbAccount, error: dbError } = await supabaseClient
+    // Encrypt credentials before storage
+    const encryptedCreds = await encryptCredentials({
+      login: login,
+      password: password,
+      server: server,
+      broker_name: broker_name,
+      encrypted_at: new Date().toISOString()
+    });
+
+    // Create service role client for inserting sensitive data
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Insert account into database
+    const { data: dbAccount, error: dbError } = await supabaseAdmin
       .from('trading_accounts')
       .insert({
         user_id: profile.user_id,
         platform: 'MT5',
         broker_name: accountInfo.company,
         server: accountInfo.server,
-        login_number: accountInfo.login,
+        login_number: accountInfo.login.toString(),
         account_name: accountInfo.name,
         balance: accountInfo.balance,
         equity: accountInfo.equity,
         margin: accountInfo.margin,
-        free_margin: accountInfo.freeMargin,
-        margin_level: accountInfo.marginLevel,
+        free_margin: accountInfo.margin_free,
+        margin_level: accountInfo.margin_level,
         currency: accountInfo.currency,
         leverage: accountInfo.leverage,
         is_active: true,
         connection_status: 'connected',
+        mt5_service_account_id: mt5Response.account_id,
         last_sync_at: new Date().toISOString()
       })
       .select()
@@ -237,21 +244,13 @@ serve(async (req) => {
       throw new Error('Failed to save account to database');
     }
 
-    // Step 5: Encrypt and store credentials securely
-    const encryptedCreds = await encryptCredentials({
-      metaapi_account_id: accountData.id,
-      platform: 'mt5',
-      server: server,
-      login: login,
-      encrypted_at: new Date().toISOString()
-    });
-
-    const { error: metaError } = await supabaseClient
+    // Store encrypted credentials in account_integrations
+    const { error: integrationError } = await supabaseAdmin
       .from('account_integrations')
       .insert({
         account_id: dbAccount.id,
-        provider: 'metaapi',
-        external_account_id: accountData.id,
+        provider: 'mt5_direct',
+        external_account_id: mt5Response.account_id,
         encrypted_credentials: encryptedCreds.encrypted_data,
         encryption_key_id: encryptedCreds.encryption_key_id,
         credentials: {
@@ -259,18 +258,27 @@ serve(async (req) => {
         }
       });
 
-    if (metaError) {
-      secureLog('Failed to store integration data:', metaError);
-      // Don't fail the request, just log the warning
+    if (integrationError) {
+      secureLog('Failed to store integration data:', integrationError);
+      // Try to clean up the trading account
+      await supabaseAdmin
+        .from('trading_accounts')
+        .delete()
+        .eq('id', dbAccount.id);
+      throw new Error('Failed to store encrypted credentials');
     }
 
-    secureLog('Successfully connected MT5 account:', { account_id: dbAccount.id });
+    secureLog('Successfully connected MT5 account:', { 
+      requestId, 
+      account_id: dbAccount.id 
+    });
 
     // Log successful connection for security monitoring
     try {
       await supabaseClient.rpc('log_security_event', {
         _event_type: 'mt5_connection_success',
         _details: {
+          request_id: requestId,
           user_id: user.id,
           account_id: dbAccount.id,
           broker: accountInfo.company,
@@ -289,18 +297,18 @@ serve(async (req) => {
         platform: 'MT5',
         broker_name: accountInfo.company,
         server: accountInfo.server,
-        login: accountInfo.login,
+        login: accountInfo.login.toString(),
         balance: accountInfo.balance,
         equity: accountInfo.equity,
         currency: accountInfo.currency,
-        isDemo: accountInfo.isDemo
+        trade_mode: accountInfo.trade_mode
       }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Error connecting MT5 account:', error);
+    console.error('Error connecting MT5 account:', { requestId, error });
     
     // Log security event for failed connection
     try {
@@ -312,10 +320,13 @@ serve(async (req) => {
       await supabaseClient.rpc('log_security_event', {
         _event_type: 'mt5_connection_failed',
         _details: {
+          request_id: requestId,
+          user_id: userId,
           error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date().toISOString(),
           user_agent: req.headers.get('user-agent')
-        }
+        },
+        _user_id: userId
       });
     } catch (logError) {
       console.error('Failed to log security event:', logError);

@@ -1,77 +1,479 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { getCorsHeaders, sanitizeError } from '../_shared/cors.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { secureLog } from '../_shared/encryption.ts';
 
-interface MetaAPITrade {
+interface TradingAccount {
   id: string;
-  type: 'DEAL_TYPE_BUY' | 'DEAL_TYPE_SELL';
-  symbol: string;
-  volume: number;
-  openPrice: number;
-  closePrice?: number;
-  stopLoss?: number;
-  takeProfit?: number;
-  openTime: string;
-  closeTime?: string;
-  profit?: number;
-  commission: number;
-  swap: number;
-  comment?: string;
+  user_id: string;
+  mt5_service_account_id: string;
+  login_number: string;
+  broker_name: string;
+  server: string;
+  last_sync_at: string | null;
 }
 
-interface MetaAPIAccountInfo {
+interface MT5AccountInfo {
+  login: number;
+  name: string;
+  server: string;
+  company: string;
+  currency: string;
   balance: number;
   equity: number;
   margin: number;
-  freeMargin: number;
-  marginLevel: number;
+  margin_free: number;
+  margin_level: number;
+  leverage: number;
+  trade_mode: string;
 }
+
+interface MT5Position {
+  ticket: number;
+  time: number;
+  type: number;
+  symbol: string;
+  volume: number;
+  price_open: number;
+  sl: number;
+  tp: number;
+  price_current: number;
+  swap: number;
+  profit: number;
+  comment: string;
+}
+
+interface MT5HistoryDeal {
+  ticket: number;
+  order: number;
+  time: number;
+  type: number;
+  entry: number;
+  position_id: number;
+  symbol: string;
+  volume: number;
+  price: number;
+  commission: number;
+  swap: number;
+  profit: number;
+  comment: string;
+}
+
+interface SyncResult {
+  account_id: string;
+  status: 'success' | 'failed' | 'partial';
+  started_at: string;
+  completed_at: string;
+  duration_ms: number;
+  trades_synced: number;
+  error_message?: string;
+}
+
+const BATCH_SIZE = 10;
+const REQUEST_TIMEOUT = 30000; // 30 seconds
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
+  const executionId = crypto.randomUUID();
+  const startTime = Date.now();
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('⚠️ MetaAPI Integration Disabled: sync-trading-data function called but integration is disabled');
+    secureLog('Starting sync-trading-data execution', { executionId });
 
-    // Return success with info message - this prevents frontend errors
+    // Get MT5 service configuration
+    const mt5ServiceUrl = Deno.env.get('MT5_SERVICE_URL');
+    const mt5ServiceApiKey = Deno.env.get('MT5_SERVICE_API_KEY');
+    
+    if (!mt5ServiceUrl || !mt5ServiceApiKey) {
+      throw new Error('MT5 service configuration not found');
+    }
+
+    // Create Supabase admin client
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Load all active trading accounts
+    const { data: accounts, error: accountsError } = await supabaseAdmin
+      .from('trading_accounts')
+      .select('id, user_id, mt5_service_account_id, login_number, broker_name, server, last_sync_at')
+      .eq('is_active', true)
+      .not('mt5_service_account_id', 'is', null);
+
+    if (accountsError) {
+      throw new Error(`Failed to load accounts: ${accountsError.message}`);
+    }
+
+    if (!accounts || accounts.length === 0) {
+      secureLog('No active accounts to sync', { executionId });
+      return new Response(JSON.stringify({
+        success: true,
+        message: 'No active accounts to sync',
+        totalAccounts: 0,
+        syncResults: [],
+        executionId,
+        duration_ms: Date.now() - startTime
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    secureLog(`Found ${accounts.length} active accounts to sync`, { executionId });
+
+    // Process accounts in batches
+    const syncResults: SyncResult[] = [];
+    const batchCount = Math.ceil(accounts.length / BATCH_SIZE);
+
+    for (let i = 0; i < batchCount; i++) {
+      const batchStart = i * BATCH_SIZE;
+      const batchEnd = Math.min(batchStart + BATCH_SIZE, accounts.length);
+      const batch = accounts.slice(batchStart, batchEnd);
+
+      secureLog(`Processing batch ${i + 1}/${batchCount} (${batch.length} accounts)`, { executionId });
+
+      const batchResults = await Promise.allSettled(
+        batch.map(account => syncAccount(account, mt5ServiceUrl, mt5ServiceApiKey, supabaseAdmin))
+      );
+
+      // Collect results
+      batchResults.forEach((result, idx) => {
+        if (result.status === 'fulfilled') {
+          syncResults.push(result.value);
+        } else {
+          // Handle rejected promise
+          const account = batch[idx];
+          const errorResult: SyncResult = {
+            account_id: account.id,
+            status: 'failed',
+            started_at: new Date().toISOString(),
+            completed_at: new Date().toISOString(),
+            duration_ms: 0,
+            trades_synced: 0,
+            error_message: result.reason?.message || 'Unknown error'
+          };
+          syncResults.push(errorResult);
+        }
+      });
+
+      // Small delay between batches to avoid overwhelming the service
+      if (i < batchCount - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+
+    // Log all sync results to sync_logs table
+    if (syncResults.length > 0) {
+      await supabaseAdmin
+        .from('sync_logs')
+        .insert(
+          syncResults.map(result => ({
+            account_id: result.account_id,
+            sync_type: 'scheduled',
+            started_at: result.started_at,
+            completed_at: result.completed_at,
+            status: result.status,
+            trades_synced: result.trades_synced,
+            error_message: result.error_message,
+            duration_ms: result.duration_ms
+          }))
+        );
+    }
+
+    const successCount = syncResults.filter(r => r.status === 'success').length;
+    const failureCount = syncResults.filter(r => r.status === 'failed').length;
+    const partialCount = syncResults.filter(r => r.status === 'partial').length;
+
+    secureLog('Sync execution completed', {
+      executionId,
+      totalAccounts: accounts.length,
+      successCount,
+      failureCount,
+      partialCount,
+      duration_ms: Date.now() - startTime
+    });
+
     return new Response(JSON.stringify({
       success: true,
-      message: 'Trading data sync is temporarily unavailable. New integration coming soon.',
-      syncResults: [],
-      totalAccounts: 0,
-      integration_disabled: true
+      executionId,
+      totalAccounts: accounts.length,
+      successCount,
+      failureCount,
+      partialCount,
+      syncResults,
+      duration_ms: Date.now() - startTime
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Error in sync-trading-data (disabled):', error);
+    console.error('Error in sync-trading-data:', { executionId, error });
     return new Response(JSON.stringify({ 
-      success: false, 
-      error: 'Trading data sync is temporarily unavailable',
-      integration_disabled: true
+      success: false,
+      executionId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      duration_ms: Date.now() - startTime
     }), {
-      status: 503,
+      status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });
 
-// Helper function to group deals into trades
-function groupDealsIntoTrades(deals: MetaAPITrade[]): MetaAPITrade[] {
-  // For simplicity, treating each deal as a separate trade
-  // In a more sophisticated implementation, you would group
-  // related deals (entry/exit) into single trade records
-  return deals.map(deal => ({
-    ...deal,
-    openPrice: deal.openPrice,
-    closePrice: deal.closePrice,
-    openTime: deal.openTime,
-    closeTime: deal.closeTime
-  }));
+async function syncAccount(
+  account: TradingAccount,
+  mt5ServiceUrl: string,
+  mt5ServiceApiKey: string,
+  supabaseAdmin: any
+): Promise<SyncResult> {
+  const started_at = new Date().toISOString();
+  const startTime = Date.now();
+  let trades_synced = 0;
+  let status: 'success' | 'failed' | 'partial' = 'success';
+  let error_message: string | undefined;
+
+  try {
+    secureLog(`Syncing account ${account.id}`, { 
+      login: account.login_number,
+      broker: account.broker_name 
+    });
+
+    // Fetch account info
+    let accountInfo: MT5AccountInfo | null = null;
+    try {
+      accountInfo = await fetchAccountInfo(account.mt5_service_account_id, mt5ServiceUrl, mt5ServiceApiKey);
+    } catch (error) {
+      error_message = `Failed to fetch account info: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      status = 'partial';
+    }
+
+    // Fetch positions
+    let positions: MT5Position[] = [];
+    try {
+      positions = await fetchPositions(account.mt5_service_account_id, mt5ServiceUrl, mt5ServiceApiKey);
+    } catch (error) {
+      error_message = error_message 
+        ? `${error_message}; Failed to fetch positions` 
+        : `Failed to fetch positions: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      status = 'partial';
+    }
+
+    // Fetch history since last sync
+    let historyDeals: MT5HistoryDeal[] = [];
+    try {
+      const fromDate = account.last_sync_at 
+        ? new Date(account.last_sync_at).toISOString().split('T')[0]
+        : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // Last 30 days
+      
+      historyDeals = await fetchHistory(account.mt5_service_account_id, fromDate, mt5ServiceUrl, mt5ServiceApiKey);
+    } catch (error) {
+      error_message = error_message 
+        ? `${error_message}; Failed to fetch history` 
+        : `Failed to fetch history: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      status = 'partial';
+    }
+
+    // Update trading_accounts if we have account info
+    if (accountInfo) {
+      await supabaseAdmin
+        .from('trading_accounts')
+        .update({
+          balance: accountInfo.balance,
+          equity: accountInfo.equity,
+          margin: accountInfo.margin,
+          free_margin: accountInfo.margin_free,
+          margin_level: accountInfo.margin_level,
+          last_sync_at: new Date().toISOString(),
+          last_successful_sync_at: new Date().toISOString(),
+          sync_failure_count: 0,
+          last_connection_error: null
+        })
+        .eq('id', account.id);
+    }
+
+    // Upsert positions into trades table
+    if (positions.length > 0) {
+      const positionTrades = positions.map(pos => ({
+        account_id: account.id,
+        ticket: pos.ticket.toString(),
+        symbol: pos.symbol,
+        type: pos.type === 0 ? 'buy' : 'sell',
+        volume: pos.volume,
+        open_price: pos.price_open,
+        open_time: new Date(pos.time * 1000).toISOString(),
+        stop_loss: pos.sl || null,
+        take_profit: pos.tp || null,
+        current_price: pos.price_current,
+        profit: pos.profit,
+        swap: pos.swap,
+        commission: 0, // Not available in positions
+        status: 'open',
+        comment: pos.comment || null
+      }));
+
+      await supabaseAdmin
+        .from('trades')
+        .upsert(positionTrades, { onConflict: 'ticket' });
+
+      trades_synced += positions.length;
+    }
+
+    // Insert new history deals
+    if (historyDeals.length > 0) {
+      const historyTrades = historyDeals
+        .filter(deal => deal.entry === 1) // Only entry deals (closed positions)
+        .map(deal => ({
+          account_id: account.id,
+          ticket: deal.ticket.toString(),
+          symbol: deal.symbol,
+          type: deal.type === 0 ? 'buy' : 'sell',
+          volume: deal.volume,
+          open_price: deal.price,
+          open_time: new Date(deal.time * 1000).toISOString(),
+          close_price: deal.price,
+          close_time: new Date(deal.time * 1000).toISOString(),
+          profit: deal.profit,
+          swap: deal.swap,
+          commission: deal.commission,
+          status: 'closed',
+          comment: deal.comment || null
+        }));
+
+      if (historyTrades.length > 0) {
+        await supabaseAdmin
+          .from('trades')
+          .upsert(historyTrades, { onConflict: 'ticket' });
+
+        trades_synced += historyTrades.length;
+      }
+    }
+
+    // If nothing succeeded, mark as failed
+    if (!accountInfo && positions.length === 0 && historyDeals.length === 0) {
+      status = 'failed';
+      if (!error_message) {
+        error_message = 'All sync operations failed';
+      }
+    }
+
+    // Update failure count on error
+    if (status !== 'success') {
+      await supabaseAdmin
+        .from('trading_accounts')
+        .update({
+          sync_failure_count: supabaseAdmin.raw('sync_failure_count + 1'),
+          last_connection_error: error_message
+        })
+        .eq('id', account.id);
+    }
+
+    return {
+      account_id: account.id,
+      status,
+      started_at,
+      completed_at: new Date().toISOString(),
+      duration_ms: Date.now() - startTime,
+      trades_synced,
+      error_message
+    };
+
+  } catch (error) {
+    // Complete failure
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    
+    // Update failure count
+    await supabaseAdmin
+      .from('trading_accounts')
+      .update({
+        sync_failure_count: supabaseAdmin.raw('sync_failure_count + 1'),
+        last_connection_error: errorMsg
+      })
+      .eq('id', account.id);
+
+    return {
+      account_id: account.id,
+      status: 'failed',
+      started_at,
+      completed_at: new Date().toISOString(),
+      duration_ms: Date.now() - startTime,
+      trades_synced: 0,
+      error_message: errorMsg
+    };
+  }
+}
+
+async function fetchAccountInfo(
+  accountId: string,
+  mt5ServiceUrl: string,
+  mt5ServiceApiKey: string
+): Promise<MT5AccountInfo> {
+  const response = await fetch(`${mt5ServiceUrl}/api/mt5/account/${accountId}/info`, {
+    method: 'GET',
+    headers: {
+      'X-API-Key': mt5ServiceApiKey,
+    },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+    throw new Error(errorData.detail || errorData.message || 'Failed to fetch account info');
+  }
+
+  const data = await response.json();
+  return data.account_info;
+}
+
+async function fetchPositions(
+  accountId: string,
+  mt5ServiceUrl: string,
+  mt5ServiceApiKey: string
+): Promise<MT5Position[]> {
+  const response = await fetch(`${mt5ServiceUrl}/api/mt5/account/${accountId}/positions`, {
+    method: 'GET',
+    headers: {
+      'X-API-Key': mt5ServiceApiKey,
+    },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+    throw new Error(errorData.detail || errorData.message || 'Failed to fetch positions');
+  }
+
+  const data = await response.json();
+  return data.positions || [];
+}
+
+async function fetchHistory(
+  accountId: string,
+  fromDate: string,
+  mt5ServiceUrl: string,
+  mt5ServiceApiKey: string
+): Promise<MT5HistoryDeal[]> {
+  const response = await fetch(
+    `${mt5ServiceUrl}/api/mt5/account/${accountId}/history?from_date=${fromDate}`,
+    {
+      method: 'GET',
+      headers: {
+        'X-API-Key': mt5ServiceApiKey,
+      },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT)
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+    throw new Error(errorData.detail || errorData.message || 'Failed to fetch history');
+  }
+
+  const data = await response.json();
+  return data.deals || [];
 }
