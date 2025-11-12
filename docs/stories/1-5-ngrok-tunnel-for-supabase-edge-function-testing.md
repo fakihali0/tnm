@@ -20,7 +20,7 @@ So that **Supabase edge functions (running on cloud) can call my local developme
 | # | Criterion | Verification |
 |---|-----------|--------------|
 | 1 | ngrok installed on Mac or Windows | `ngrok version` returns version number |
-| 2 | ngrok tunnel created to Windows service (192.168.1.100:8000) | `ngrok http 192.168.1.100:8000` returns public HTTPS URL |
+| 2 | ngrok tunnel created to Windows service (vms.tnm.local:8000) | `ngrok http vms.tnm.local:8000` returns public HTTPS URL |
 | 3 | Public ngrok URL accessible from internet | `curl https://abc123.ngrok.io/health` from external network succeeds |
 | 4 | Supabase edge function configured with ngrok URL | Edge function environment variable `MT5_SERVICE_URL` set to ngrok URL |
 | 5 | Edge function successfully calls local service through tunnel | Test edge function invocation returns data from local Windows service |
@@ -52,15 +52,15 @@ So that **Supabase edge functions (running on cloud) can call my local developme
   ```
 
 ### Task 2: Create Tunnel to Local Windows Service
-- [ ] **2.1** Ensure FastAPI service is running on Windows (192.168.1.100:8000)
+- [ ] **2.1** Ensure FastAPI service is running on Windows (vms.tnm.local:8000)
 - [ ] **2.2** Start ngrok tunnel from Mac or Windows:
   ```bash
   # Can run from either Mac or Windows on same network
-  ngrok http 192.168.1.100:8000
+  ngrok http vms.tnm.local:8000
   ```
 - [ ] **2.3** Note the public HTTPS URL from output:
   ```
-  Forwarding: https://abc123-xyz.ngrok-free.app -> http://192.168.1.100:8000
+  Forwarding: https://abc123-xyz.ngrok-free.app -> http://vms.tnm.local:8000
   ```
 - [ ] **2.4** Document the ngrok URL in `.env` file or notes (it changes on restart!)
 - [ ] **2.5** Keep ngrok terminal window open (tunnel stays active while running)
@@ -101,7 +101,7 @@ So that **Supabase edge functions (running on cloud) can call my local developme
 ### Task 5: Alternative Approach - Mock Edge Functions (Optional)
 - [ ] **5.1** If ngrok is not needed, document mock approach:
   - Create mock responses in frontend for edge function calls
-  - Test frontend → Windows service directly (192.168.1.100:8000)
+  - Test frontend → Windows service directly (vms.tnm.local:8000)
   - Skip Supabase integration testing until VPS deployment
 - [ ] **5.2** Add mock data files to `src/mocks/` directory
 - [ ] **5.3** Update frontend to use mock data when `VITE_USE_MOCKS=true`
@@ -130,7 +130,7 @@ So that **Supabase edge functions (running on cloud) can call my local developme
 - Testing OAuth flows that require public callback URLs
 
 **Skip ngrok IF:**
-- Only testing frontend → Windows service communication (use 192.168.1.100:8000 directly)
+- Only testing frontend → Windows service communication (use vms.tnm.local:8000 directly)
 - Not integrating with Supabase edge functions yet
 - Working on Epic 1-3 stories (foundation and core MT5 logic)
 
@@ -173,7 +173,7 @@ So that **Supabase edge functions (running on cloud) can call my local developme
            ▼
 ┌─────────────────────┐         ┌──────────────────┐
 │  Mac/Windows        │         │  Windows PC      │
-│  (ngrok client)     │────────▶│  192.168.1.100   │
+│  (ngrok client)     │────────▶│  vms.tnm.local   │
 │  localhost:4040     │  HTTP   │  :8000           │
 └─────────────────────┘         └──────────────────┘
 ```

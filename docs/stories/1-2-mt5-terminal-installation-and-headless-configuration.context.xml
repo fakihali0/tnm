@@ -136,7 +136,7 @@
         <name>Windows 10/11 with Network Access</name>
         <version>From Story 1.1</version>
         <purpose>Operating system and network configuration for MT5 installation</purpose>
-        <installation>Completed in Story 1.1 - static IP 192.168.1.100</installation>
+        <installation>Completed in Story 1.1 - static IP vms.tnm.local</installation>
       </dependency>
       
       <dependency>

@@ -36,7 +36,7 @@ so that **sensitive data stays out of version control and both backend and front
 - **Security posture:** Service credentials must never be committed—`pydantic-settings` validation helps enforce this by halting boot with clear error messages, satisfying the PRD’s “fail fast on missing secrets” requirement. [Source: docs/PRD-MT5-Integration-Service.md#Security]
 - **BaseSettings configuration:** Follow the official `pydantic-settings` guidance for `model_config` (e.g., `env_file`, `env_prefix`) and field aliases so settings automatically pull from `.env`. [Source: context7:/pydantic/pydantic-settings]
 - **Key generation guidance:** Include `openssl rand -base64 32` snippets in documentation for JWT/encryption keys and remind developers to rotate production secrets separately from local values. [Source: docs/epics.md#Story-1.7]
-- **CORS + frontend alignment:** Ensure CORS origins and `VITE_MT5_SERVICE_URL` reference the Windows LAN IP (`http://192.168.1.100:8000`) so the Mac-based frontend can communicate without browser errors. [Source: docs/epics.md#Story-1.7]
+- **CORS + frontend alignment:** Ensure CORS origins and `VITE_MT5_SERVICE_URL` reference the Windows LAN IP (`http://vms.tnm.local:8000`) so the Mac-based frontend can communicate without browser errors. [Source: docs/epics.md#Story-1.7]
 
 ### Learnings from Previous Story
 

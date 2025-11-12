@@ -36,7 +36,7 @@
     <criterion id="3" verification="type app\config.py shows Settings class with BaseSettings">
       config.py contains pydantic-settings configuration management
     </criterion>
-    <criterion id="4" verification="curl http://192.168.1.100:8000/health returns JSON response">
+    <criterion id="4" verification="curl http://vms.tnm.local:8000/health returns JSON response">
       /health endpoint implemented and accessible
     </criterion>
     <criterion id="5" verification="Browser console fetch from localhost:5173 succeeds without CORS error">
@@ -45,7 +45,7 @@
     <criterion id="6" verification="uvicorn app.main:app runs without errors">
       Service starts successfully on 0.0.0.0:8000
     </criterion>
-    <criterion id="7" verification="ping 192.168.1.100 and curl 192.168.1.100:8000/health from Mac both succeed">
+    <criterion id="7" verification="ping vms.tnm.local and curl vms.tnm.local:8000/health from Mac both succeed">
       Service is accessible from Mac development machine
     </criterion>
     <criterion id="8" verification="README.md contains project structure documentation">
@@ -66,8 +66,8 @@
           - Implement app/config.py with pydantic-settings BaseSettings
           - Configure CORS for Mac frontend: allow_origins=["http://localhost:5173"]
           - Start service: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-          - Test from Mac: curl http://192.168.1.100:8000/health
-          - Test CORS: Browser console fetch("http://192.168.1.100:8000/health")
+          - Test from Mac: curl http://vms.tnm.local:8000/health
+          - Test CORS: Browser console fetch("http://vms.tnm.local:8000/health")
         </snippet>
         <relevance>Complete FastAPI project setup procedures</relevance>
       </doc>
@@ -81,7 +81,7 @@
           - Framework: FastAPI (async REST API framework)
           - Server: uvicorn (ASGI server)
           - Config: pydantic-settings for environment management
-          - CORS: Required for Mac frontend (localhost:5173) → Windows backend (192.168.1.100:8000)
+          - CORS: Required for Mac frontend (localhost:5173) → Windows backend (vms.tnm.local:8000)
           - Structure: Modular design with app/api/routes/, app/core/, app/models/
           - Monitoring: /health endpoint for uptime checks
         </snippet>
@@ -296,7 +296,7 @@
       <dependency>
         <name>Windows Network Configuration</name>
         <version>From Story 1.1</version>
-        <purpose>Static IP 192.168.1.100 and port 8000 firewall rule</purpose>
+        <purpose>Static IP vms.tnm.local and port 8000 firewall rule</purpose>
         <installation>Already completed in Story 1.1</installation>
       </dependency>
       
@@ -325,7 +325,7 @@
 
   <constraints>
     <constraint type="cors-critical">
-      <description>CORS middleware is CRITICAL for Mac (localhost:5173) → Windows (192.168.1.100:8000) communication</description>
+      <description>CORS middleware is CRITICAL for Mac (localhost:5173) → Windows (vms.tnm.local:8000) communication</description>
       <rationale>Frontend on Mac must send API requests to Windows backend - browser enforces CORS policy</rationale>
       <configuration>
         allow_origins=["http://localhost:5173"]
@@ -445,7 +445,7 @@
       <standard>FastAPI service must start without errors</standard>
       <standard>/health endpoint must return valid JSON</standard>
       <standard>CORS must allow requests from http://localhost:5173</standard>
-      <standard>Service must be accessible from Mac (192.168.1.100:8000)</standard>
+      <standard>Service must be accessible from Mac (vms.tnm.local:8000)</standard>
       <standard>All placeholder files must have docstrings explaining future implementation</standard>
     </standards>
     
@@ -481,7 +481,7 @@
       
       <test>
         <name>Health Endpoint Test (Mac)</name>
-        <command>curl http://192.168.1.100:8000/health</command>
+        <command>curl http://vms.tnm.local:8000/health</command>
         <expected>{"status":"healthy","service":"mt5-integration","version":"1.0.0"}</expected>
       </test>
       
@@ -489,7 +489,7 @@
         <name>CORS Preflight Test (Mac Browser)</name>
         <command>
           // In Mac browser console (http://localhost:5173)
-          fetch("http://192.168.1.100:8000/health")
+          fetch("http://vms.tnm.local:8000/health")
             .then(r => r.json())
             .then(console.log);
         </command>
@@ -498,7 +498,7 @@
       
       <test>
         <name>CORS Headers Verification</name>
-        <command>curl -I -X OPTIONS http://192.168.1.100:8000/health -H "Origin: http://localhost:5173"</command>
+        <command>curl -I -X OPTIONS http://vms.tnm.local:8000/health -H "Origin: http://localhost:5173"</command>
         <expected>Access-Control-Allow-Origin: http://localhost:5173 header present</expected>
       </test>
       
@@ -510,7 +510,7 @@
       
       <test>
         <name>FastAPI Docs Accessible</name>
-        <command>curl http://192.168.1.100:8000/docs</command>
+        <command>curl http://vms.tnm.local:8000/docs</command>
         <expected>HTML page with Swagger UI (FastAPI interactive docs)</expected>
       </test>
       
@@ -532,7 +532,7 @@
     <enhancement type="sequential-thinking" applied="yes">
       Used sequential-thinking MCP to analyze FastAPI project requirements:
       - Thought 1: FastAPI best practices - app/ folder structure with api/routes/, core/, models/ separation
-      - Thought 2: CORS CRITICAL for Mac (localhost:5173) → Windows (192.168.1.100:8000) - browser security policy
+      - Thought 2: CORS CRITICAL for Mac (localhost:5173) → Windows (vms.tnm.local:8000) - browser security policy
       - Thought 3: pydantic-settings v2 config management - BaseSettings with SettingsConfigDict for .env loading
       - Thought 4: Health endpoint essential for monitoring (Stories 3.7, 8.2-8.5 UptimeRobot integration)
       - Thought 5: Placeholder files (mt5_manager.py, security.py, logger.py) prepare structure for future stories

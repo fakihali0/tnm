@@ -18,16 +18,14 @@ So that **I can test the full integration locally before spending money on VPS h
 ## Acceptance Criteria
 
 | # | Criterion | Verification |
-|---|-----------|--------------|
+|---|-----------|--------------|  
 | 1 | Windows machine is updated to latest version | `winver` shows Windows 10/11 with latest build |
-| 2 | Static IP address assigned and documented (e.g., 192.168.1.100) | `ipconfig` shows static IP, IP documented in `.env` file |
+| 2 | Static IP address assigned and documented (10.4.0.180 → vms.tnm.local) | `ipconfig` shows static IP, hostname in hosts file |
 | 3 | PowerShell execution policy allows scripts | `Get-ExecutionPolicy` returns `RemoteSigned` or `Unrestricted` |
 | 4 | Windows Defender firewall rule created for port 8000 | `Get-NetFirewallRule -DisplayName "MT5 FastAPI Local Dev"` succeeds |
 | 5 | Chocolatey package manager installed | `choco --version` returns version number |
-| 6 | Mac can ping Windows IP address | `ping 192.168.1.100` from Mac terminal receives responses |
-| 7 | (Optional) Remote Desktop enabled for Mac access | Can connect via RDP from Mac using Microsoft Remote Desktop |
-
----
+| 6 | Mac can ping Windows hostname | `ping vms.tnm.local` from Mac terminal receives responses |
+| 7 | (Optional) Remote Desktop enabled for Mac access | Can connect via RDP from Mac using Microsoft Remote Desktop |---
 
 ## Tasks / Subtasks
 
@@ -48,18 +46,18 @@ So that **I can test the full integration locally before spending money on VPS h
   ```
 - [ ] **2.2** Identify active network adapter:
   - Look for adapter with IPv4 address (e.g., "Wi-Fi" or "Ethernet")
-  - Note current IP (e.g., 192.168.1.100)
-  - Note subnet (typically 192.168.1.x or 192.168.0.x)
-  - Note gateway IP (typically 192.168.1.1 or 192.168.0.1)
+  - Note current IP (actual: 10.4.0.180)
+  - Note subnet (10.4.0.x)
+  - Note gateway IP (10.4.0.1)
 - [ ] **2.3** Assign static IP address:
   - **Method 1 (GUI):**
     - Settings → Network & Internet → Properties (of active adapter)
     - Under "IP assignment" click "Edit"
     - Choose "Manual" and enable IPv4
     - Enter:
-      - IP address: `192.168.1.100` (or chosen IP)
+      - IP address: `10.4.0.180`
       - Subnet prefix length: `24` (255.255.255.0)
-      - Gateway: `192.168.1.1` (your router IP)
+      - Gateway: `10.4.0.1`
       - Preferred DNS: `8.8.8.8`
       - Alternate DNS: `8.8.4.4`
     - Save and verify connection still works
@@ -69,13 +67,13 @@ So that **I can test the full integration locally before spending money on VPS h
     Get-NetAdapter | Where-Object {$_.Status -eq "Up"}
     
     # Set static IP (replace InterfaceAlias with your adapter name)
-    New-NetIPAddress -InterfaceAlias "Wi-Fi" -IPAddress 192.168.1.100 -PrefixLength 24 -DefaultGateway 192.168.1.1
+    New-NetIPAddress -InterfaceAlias "Wi-Fi" -IPAddress 10.4.0.180 -PrefixLength 24 -DefaultGateway 10.4.0.1
     Set-DnsClientServerAddress -InterfaceAlias "Wi-Fi" -ServerAddresses ("8.8.8.8","8.8.4.4")
     ```
 - [ ] **2.4** Verify static IP assignment:
   ```powershell
   ipconfig
-  # Should show 192.168.1.100 (or your chosen IP)
+  # Should show 10.4.0.180
   ```
 - [ ] **2.5** Test internet connectivity after static IP:
   ```powershell
@@ -88,10 +86,10 @@ So that **I can test the full integration locally before spending money on VPS h
     ```markdown
     # Development IP Addresses
     
-    **Windows Machine (MT5 Service):** 192.168.1.100
+    **Windows Machine (MT5 Service):** 10.4.0.180 → vms.tnm.local
     **Mac Machine (Frontend):** [Auto-assigned by DHCP]
     
-    **Router Gateway:** 192.168.1.1
+    **Router Gateway:** 10.4.0.1
     **DNS Servers:** 8.8.8.8, 8.8.4.4
     
     Last updated: [Current Date]
@@ -136,7 +134,7 @@ So that **I can test the full integration locally before spending money on VPS h
   
   # Test port listening
   nc -l -p 8000
-  # Then from Mac: curl http://192.168.1.100:8000
+  # Then from Mac: curl http://vms.tnm.local:8000
   ```
 
 ### Task 5: Chocolatey Package Manager Installation (AC: 5)
@@ -166,13 +164,13 @@ So that **I can test the full integration locally before spending money on VPS h
 ### Task 6: Connectivity Testing from Mac (AC: 6)
 - [ ] **6.1** Test basic connectivity from Mac terminal:
   ```bash
-  ping 192.168.1.100
+  ping vms.tnm.local
   ```
-  - Expected: `64 bytes from 192.168.1.100: icmp_seq=0 ttl=128 time=X.XXX ms`
+  - Expected: `64 bytes from 10.4.0.180: icmp_seq=0 ttl=128 time=X.XXX ms`
   - Stop with Ctrl+C after 5-10 successful pings
 - [ ] **6.2** Test network route from Mac:
   ```bash
-  traceroute 192.168.1.100
+  traceroute vms.tnm.local
   ```
   - Should show 1-2 hops (Mac → Router → Windows)
 - [ ] **6.3** Document successful connectivity in project notes:
@@ -196,7 +194,7 @@ So that **I can test the full integration locally before spending money on VPS h
 - [ ] **7.4** Test RDP connection from Mac:
   - Open Microsoft Remote Desktop
   - Click "+" → Add PC
-  - PC name: `192.168.1.100`
+  - PC name: `vms.tnm.local` (or 10.4.0.180)
   - User account: Add Windows username/password
   - Connect and verify desktop appears
 
@@ -251,7 +249,7 @@ By using local Windows hardware instead of VPS:
 ```
 ┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
 │  Mac (Frontend) │────────▶│ Windows Computer │────────▶│  MT5 Terminal   │
-│  localhost:5173 │  HTTP   │  192.168.1.100   │  Python │  (Demo Broker)  │
+│  localhost:5173 │  HTTP   │ vms.tnm.local    │  Python │  (Demo Broker)  │
 │                 │         │  :8000           │  API    │                 │
 └─────────────────┘         └──────────────────┘         └─────────────────┘
 ```
@@ -288,11 +286,12 @@ These files will be referenced by subsequent stories (1.2-1.8) for IP configurat
 
 ### Future Migration Path
 When migrating to VPS (Story 4.x in Epic 1 - Phase 2):
-1. Same setup applies with public IP instead of 192.168.1.100
-2. Firewall rule will need Public profile added
-3. Nginx will be added as reverse proxy
-4. SSL/TLS certificate will be configured
-5. Windows Service (NSSM) will replace manual startup
+1. Same setup applies with public IP instead of 10.4.0.180
+2. Update vms.tnm.local in hosts files to point to VPS public IP
+3. Firewall rule will need Public profile added
+4. Nginx will be added as reverse proxy
+5. SSL/TLS certificate will be configured
+6. Windows Service (NSSM) will replace manual startup
 
 ---
 

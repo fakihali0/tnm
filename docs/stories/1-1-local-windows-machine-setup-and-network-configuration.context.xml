@@ -16,7 +16,7 @@
     <soThat>I can test the full integration locally before spending money on VPS hosting</soThat>
     <tasks>
       - Windows System Updates and Prerequisites
-      - Network Configuration and Static IP Assignment (192.168.1.100)
+      - Network Configuration and Static IP Assignment (vms.tnm.local)
       - PowerShell Configuration (RemoteSigned execution policy)
       - Windows Defender Firewall Configuration (port 8000 inbound)
       - Chocolatey Package Manager Installation
@@ -31,7 +31,7 @@
       Windows machine is updated to latest version
     </criterion>
     <criterion id="2" verification="ipconfig shows static IP, IP documented in .env file">
-      Static IP address assigned and documented (e.g., 192.168.1.100)
+      Static IP address assigned and documented (e.g., vms.tnm.local)
     </criterion>
     <criterion id="3" verification="Get-ExecutionPolicy returns RemoteSigned or Unrestricted">
       PowerShell execution policy allows scripts
@@ -42,7 +42,7 @@
     <criterion id="5" verification="choco --version returns version number">
       Chocolatey package manager installed
     </criterion>
-    <criterion id="6" verification="ping 192.168.1.100 from Mac terminal receives responses">
+    <criterion id="6" verification="ping vms.tnm.local from Mac terminal receives responses">
       Mac can ping Windows IP address
     </criterion>
     <criterion id="7" verification="Can connect via RDP from Mac using Microsoft Remote Desktop">
@@ -62,7 +62,7 @@
           - Setting static IP via Settings GUI or PowerShell (New-NetIPAddress)
           - Configuring Windows Firewall with New-NetFirewallRule
           - Testing connectivity from Mac with ping/traceroute
-          - Recommended IP: 192.168.1.100 with subnet 255.255.255.0, gateway 192.168.1.1, DNS 8.8.8.8
+          - Recommended IP: vms.tnm.local with subnet 255.255.255.0, gateway 10.4.0.1, DNS 8.8.8.8
         </snippet>
         <relevance>Primary implementation guide for this story - contains exact PowerShell commands</relevance>
       </doc>
@@ -169,7 +169,7 @@
     <constraint type="ip-addressing">
       <description>Static IP must be in same subnet as router and not conflict with DHCP range</description>
       <rationale>Dynamic IP changes would break configuration references in subsequent stories</rationale>
-      <recommendation>Use 192.168.1.100 or 192.168.0.100 depending on router configuration</recommendation>
+      <recommendation>Use vms.tnm.local or 192.168.0.100 depending on router configuration</recommendation>
     </constraint>
     
     <constraint type="documentation">
@@ -189,7 +189,7 @@
       <kind>system-interface</kind>
       <signature>
         Get-NetAdapter | Where-Object {$_.Status -eq "Up"}
-        New-NetIPAddress -InterfaceAlias "Wi-Fi" -IPAddress 192.168.1.100 -PrefixLength 24 -DefaultGateway 192.168.1.1
+        New-NetIPAddress -InterfaceAlias "Wi-Fi" -IPAddress vms.tnm.local -PrefixLength 24 -DefaultGateway 10.4.0.1
         Set-DnsClientServerAddress -InterfaceAlias "Wi-Fi" -ServerAddresses ("8.8.8.8","8.8.4.4")
       </signature>
       <path>Windows PowerShell System Commands</path>
@@ -251,7 +251,7 @@
       <test>
         <name>Static IP Verification</name>
         <command>ipconfig | findstr IPv4</command>
-        <expected>IPv4 Address . . . . . . . . . . . : 192.168.1.100</expected>
+        <expected>IPv4 Address . . . . . . . . . . . : vms.tnm.local</expected>
       </test>
       
       <test>
@@ -274,13 +274,13 @@
       
       <test>
         <name>Mac to Windows Connectivity</name>
-        <command>ping 192.168.1.100 (from Mac terminal)</command>
-        <expected>64 bytes from 192.168.1.100: icmp_seq=0 ttl=128 time=X.XXX ms</expected>
+        <command>ping vms.tnm.local (from Mac terminal)</command>
+        <expected>64 bytes from vms.tnm.local: icmp_seq=0 ttl=128 time=X.XXX ms</expected>
       </test>
       
       <test>
         <name>Network Route Verification</name>
-        <command>traceroute 192.168.1.100 (from Mac terminal)</command>
+        <command>traceroute vms.tnm.local (from Mac terminal)</command>
         <expected>1-2 hops (Mac → Router → Windows)</expected>
       </test>
       

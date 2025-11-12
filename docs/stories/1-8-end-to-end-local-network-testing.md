@@ -17,7 +17,7 @@ so that **I know the entire local environment works before starting MT5 core imp
 ## Tasks / Subtasks
 
 - [ ] **Task 1 (AC:1)** – Execute the five prescribed tests and capture expected outputs:
-  - [ ] Run `curl http://192.168.1.100:8000/health` from the Mac terminal and record the healthy response snippet. [Source: docs/epics.md#Story-1.8]
+  - [ ] Run `curl http://vms.tnm.local:8000/health` from the Mac terminal and record the healthy response snippet. [Source: docs/epics.md#Story-1.8]
   - [ ] From the Mac browser console (`http://localhost:5173`), run the `fetch` call and confirm no CORS errors. [Source: docs/epics.md#Story-1.8]
   - [ ] Launch the Vite dev server (`npm run dev`) and ensure it serves on `http://localhost:5173`. [Source: docs/epics.md#Story-1.8]
   - [ ] On Windows, import `settings` from `app.config` and print a value to confirm `.env` loading. [Source: docs/epics.md#Story-1.8]

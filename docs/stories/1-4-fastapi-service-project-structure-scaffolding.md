@@ -88,7 +88,7 @@ MCP-enhanced context includes:
 - Sequential-thinking analysis of FastAPI project structure and CORS requirements
 - FastAPI patterns from context7: CORSMiddleware configuration, Settings with pydantic-settings
 - Project structure best practices (app/ folder, routers, models)
-- Critical CORS setup for Mac (localhost:5173) → Windows (192.168.1.100:8000) communication
+- Critical CORS setup for Mac (localhost:5173) → Windows (vms.tnm.local:8000) communication
 
 ### Agent Model Used
 _To be filled by Dev Agent during implementation_
