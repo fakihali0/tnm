@@ -1,0 +1,122 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>6</storyId>
+    <title>Manual Service Startup (Local Development)</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/1-6-manual-service-startup-local-development.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>a simple way to start and stop the FastAPI MT5 service manually during development</iWant>
+    <soThat>I can control restarts, view logs, and debug locally before investing in VPS automation</soThat>
+    <tasks><![CDATA[
+- Task 1: Expand the Local Development Guide with exact PowerShell commands for activating the venv, running `python run.py`/`uvicorn ... --reload`, and documenting Ctrl+C/log-watching troubleshooting (covers AC1 & AC2).
+- Task 2: Author the `start-dev.ps1` helper under C:\mt5-service that activates the venv, prints the service URL, and launches Uvicorn with reload plus usage documentation (AC3).
+- Task 3: Refresh documentation to highlight log tailing options, manual-only scope, and pointers to the future NSSM automation section in the Windows Deployment Guide (AC4).
+    ]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[
+1. Developers can launch the FastAPI service from `C:\mt5-service` via either `python run.py` or `uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload` using the documented workflow.
+2. The manual start instructions surface streaming logs in the same PowerShell session and describe clean shutdown via Ctrl+C.
+3. A reusable `start-dev.ps1` script activates the virtual environment, prints the service URL, and runs Uvicorn with reload enabled.
+4. Local documentation explains start/stop/logging/troubleshooting steps and clarifies that NSSM/VPS automation is deferred to later stories.
+  ]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 1.6 Manual Service Startup</title>
+        <section>Story 1.6</section>
+        <snippet><![CDATA[The epic spells out the need to start/stop the FastAPI MT5 service directly from `C:\mt5-service`, expose inline logs, and ship a documented `start-dev.ps1` helper while deferring NSSM automation to later work.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Development Guide</title>
+        <section>Development Workflow</section>
+        <snippet><![CDATA[Daily workflow instructions already reference running `.\start-dev.ps1` in Terminal 1 while macOS terminals handle the frontend and testing steps, so the guide needs precise script behavior and reload expectations.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Development Guide</title>
+        <section>Quick Reference</section>
+        <snippet><![CDATA[Quick Reference lists the exact PowerShell commands for stopping the service with Ctrl+C, tailing `logs\app.log`, and running curl health checks, providing the anchor for troubleshooting content.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/technical/WINDOWS-DEPLOYMENT-GUIDE.md</path>
+        <title>Windows Deployment Guide</title>
+        <section>6.1 Install NSSM</section>
+        <snippet><![CDATA[Section 6 details how NSSM installs the MT5 Windows service, reinforcing that this story must clearly describe the manual-only workflow and reference when developers should graduate to NSSM automation.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>docs/scripts/start-dev.ps1</path>
+        <kind>powershell-script</kind>
+        <symbol>start-dev.ps1</symbol>
+        <lines>new file</lines>
+        <reason>Canonical PowerShell helper the Windows terminal will run; keeps activation banner, URL echo, and Uvicorn launch logic in source control for easy distribution.</reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/package.json</path>
+        <kind>node-manifest</kind>
+        <symbol>scripts.dev</symbol>
+        <lines>"scripts" block</lines>
+        <reason>Terminal 2 instructions rely on the existing `npm run dev` script provided by Vite, so the guide must align with the configured command.</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>node</ecosystem>
+        <name>vite</name>
+        <version>^5.4.19</version>
+        <notes>Frontend dev server invoked in Terminal 2; documentation should reference this command exactly.</notes>
+      </dependency>
+      <dependency>
+        <ecosystem>node</ecosystem>
+        <name>react</name>
+        <version>^18.3.1</version>
+        <notes>React HMR experience on the Mac depends on the manual backend workflow staying stable.</notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>uvicorn</name>
+        <version>referenced in docs</version>
+        <notes>The manual script launches `uvicorn app.main:app` and must remain in sync with backend dependencies documented in the Windows guide.</notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Manual-only workflow: do not introduce NSSM/service automation; clearly state that automation happens later in the Windows Deployment Guide.
+- Script must run inside `C:\mt5-service` with no additional Python dependencies beyond the existing virtualenv; avoid hard-coding credentials.
+- Documentation needs to reinforce log-tail locations (`logs\app.log`) and require operators to keep the PowerShell session open for live reloads.
+- Maintain cross-platform clarity: Windows terminal handles backend, macOS terminals handle frontend/testing as outlined in the Local Development Guide.
+  ]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>start-dev.ps1 CLI</name>
+      <kind>PowerShell command</kind>
+      <signature>.\start-dev.ps1</signature>
+      <path>docs/scripts/start-dev.ps1</path>
+      <notes>Activates `venv\Scripts\activate`, prints the service URL, and starts `uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`; returns control to operator for Ctrl+C shutdown.</notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[This story relies on manual verification documented in Local Development Guide: run the PowerShell script, observe streaming logs, and confirm graceful shutdown/log tailing. No automated tests exist, so record terminal transcripts when validating.]]></standards>
+    <locations><![CDATA[docs/LOCAL-DEVELOPMENT-GUIDE.md (manual steps), C:\mt5-service\logs\*.log for ensuring logging guidance is accurate.]]></locations>
+    <ideas><![CDATA[
+- [AC1] Follow the documented python/uvicorn commands and confirm the service responds on http://vms.tnm.local:8000.
+- [AC2] Start via PowerShell, issue Ctrl+C, and verify both console and `logs\app.log` show the shutdown sequence.
+- [AC3] Execute `.\start-dev.ps1` to ensure it activates the venv, prints the banner, and reloads on file changes.
+- [AC4] Proofread the updated Local Development Guide for explicit troubleshooting steps and a pointer to the NSSM section of the Windows Deployment Guide.
+    ]]></ideas>
+  </tests>
+</story-context>

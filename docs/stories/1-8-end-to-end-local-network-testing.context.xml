@@ -1,0 +1,124 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>8</storyId>
+    <title>End-to-End Local Network Testing</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/1-8-end-to-end-local-network-testing.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>full-stack developer</asA>
+    <iWant>to verify complete connectivity between the Mac frontend, Supabase, and the Windows MT5 service</iWant>
+    <soThat>I know the entire local environment works before starting MT5 core implementation</soThat>
+    <tasks><![CDATA[
+- Task 1: Execute the five prescribed connectivity tests (Mac curl health check, browser CORS fetch, `npm run dev`, Python `settings` load, `MetaTrader5.initialize()` validation) and capture their outputs for documentation.
+- Task 2: Update `docs/LOCAL-DEVELOPMENT-GUIDE.md` with an "End-to-End Validation Checklist", test results, IP/port references, and troubleshooting guidance (firewall, CORS, MT5 auth) including go/no-go criteria for entering Epic 2.
+    ]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[
+1. All five connectivity tests from the epic succeed with the documented commands and expected outputs.
+2. Results plus troubleshooting steps are recorded in `docs/LOCAL-DEVELOPMENT-GUIDE.md`, including IP/port references and common failure modes.
+3. Any failures provide clear remediation guidance so other developers can repeat the validation without guesswork.
+  ]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 1.8</title>
+        <section>Story 1.8</section>
+        <snippet><![CDATA[Defines the five validation steps (Mac curl, browser fetch, Vite dev server, Python settings check, MT5 initialize) that must pass before declaring the local environment ready for Epic 2.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Development Workflow</title>
+        <section>Daily Development Routine</section>
+        <snippet><![CDATA[Specifies the dual-machine workflow (Windows terminal running `.\start-dev.ps1`, Mac terminals for frontend/testing) that this story must verify end-to-end.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Mac Validation Steps</title>
+        <section>Step 7: Test from Mac</section>
+        <snippet><![CDATA[Documents the `.env.local` entries (VITE_MT5_SERVICE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY), curl health checks, and browser fetch commands necessary for cross-network testing.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Troubleshooting</title>
+        <section>CORS / Connectivity Issues</section>
+        <snippet><![CDATA[Provides remediation steps for firewall rules, IP verification, ping tests, and CORS middleware updates when the validation checklist surfaces failures.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/technical/WINDOWS-DEPLOYMENT-GUIDE.md</path>
+        <title>Windows Deployment Guide</title>
+        <section>6. Service Management</section>
+        <snippet><![CDATA[Explains the eventual NSSM automation path so the validation story can clearly state that current testing happens before migrating to Windows services.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/package.json</path>
+        <kind>script</kind>
+        <symbol>npm run dev</symbol>
+        <lines>"scripts" block</lines>
+        <reason>The validation checklist depends on the existing `npm run dev` script to launch the frontend on http://localhost:5173.</reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/.env</path>
+        <kind>env-file</kind>
+        <symbol>Supabase vars</symbol>
+        <lines>1-4</lines>
+        <reason>Contains the current Supabase URL and keys that must align with the documented `.env.local` / backend `.env` instructions for cross-network tests.</reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/integrations/supabase/client.ts</path>
+        <kind>frontend-service</kind>
+        <symbol>supabase client</symbol>
+        <lines>1-21</lines>
+        <reason>This client throws if `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` are missing; validates why the checklist must confirm `.env.local` is populated.</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>node</ecosystem>
+        <name>@supabase/supabase-js</name>
+        <version>^2.57.4</version>
+        <notes>Frontend Supabase calls rely on the `.env.local` values verified by the checklist.</notes>
+      </dependency>
+      <dependency>
+        <ecosystem>node</ecosystem>
+        <name>vite</name>
+        <version>^5.4.19</version>
+        <notes>The Vite dev server powers the Mac-side validation flow when running `npm run dev`.</notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- No new automation or infrastructure—this story merely validates and documents the existing local setup before Epic 2 work.
+- Documentation updates must live inside `docs/LOCAL-DEVELOPMENT-GUIDE.md` to keep a single source of truth.
+- Tests must use the documented hostnames/IPs (`vms.tnm.local`, `localhost:5173`) and respect the manual setup captured in prior stories.
+  ]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>GET /health</name>
+      <kind>HTTP endpoint</kind>
+      <signature>GET http://vms.tnm.local:8000/health</signature>
+      <path>docs/LOCAL-DEVELOPMENT-GUIDE.md#Step-7-Test-from-Mac</path>
+      <notes>Primary health check used for both curl and browser validation steps; failures feed into CORS/firewall troubleshooting guidance.</notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Manual validation only: follow the Local Development Guide checklist, capture outputs (curl JSON, browser console fetch, MT5 initialize result), and log any remediation steps taken.]]></standards>
+    <locations><![CDATA[docs/LOCAL-DEVELOPMENT-GUIDE.md (End-to-End Validation Checklist section to be added).]]></locations>
+    <ideas><![CDATA[
+- [AC1] Record the outputs of each of the five required tests (curl health JSON, browser fetch result, Vite dev server banner, Python settings print, MT5 initialize boolean).
+- [AC2] Append the observed commands/results plus IP/port references into the new checklist, ensuring each failure scenario links to the Troubleshooting section.
+- [AC3] For any failed test, document the remediation steps taken (firewall rule, CORS change, MT5 restart) so future developers can reproduce the fix.]]></ideas>
+  </tests>
+</story-context>

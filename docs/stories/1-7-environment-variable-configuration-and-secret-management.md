@@ -1,6 +1,6 @@
 # Story 1.7: Environment Variable Configuration and Secret Management
 
-Status: drafted
+Status: ready-for-dev
 
 ## Story
 
@@ -60,7 +60,7 @@ so that **sensitive data stays out of version control and both backend and front
 
 ### Context Reference
 
-<!-- Story context XML will be added once story-context workflow runs -->
+- `.bmad-ephemeral/stories/1-7-environment-variable-configuration-and-secret-management.context.xml`
 
 ### Agent Model Used
 

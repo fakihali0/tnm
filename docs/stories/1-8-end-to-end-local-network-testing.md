@@ -1,6 +1,6 @@
 # Story 1.8: End-to-End Local Network Testing
 
-Status: drafted
+Status: ready-for-dev
 
 ## Story
 
@@ -48,7 +48,7 @@ so that **I know the entire local environment works before starting MT5 core imp
 
 ### Context Reference
 
-<!-- Story context XML will be added by story-context workflow -->
+- `.bmad-ephemeral/stories/1-8-end-to-end-local-network-testing.context.xml`
 
 ### Agent Model Used
 
