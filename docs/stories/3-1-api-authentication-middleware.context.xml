@@ -1,0 +1,136 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>1</storyId>
+    <title>API Authentication Middleware</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T12:19:21Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-1-api-authentication-middleware.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>API key + JWT authentication middleware with Supabase ownership checks and rate limiting</iWant>
+    <soThat>only authorized services/users can call MT5 endpoints and requests are throttled per PRD security rules</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1-3)** – Implement API key & JWT dependencies:
+  - [ ] Add `verify_api_key` Security dependency (using `APIKeyHeader`) that compares header to env var and logs/raises 401 on mismatch. [Source: docs/epics.md#Story-3.1; context7:/fastapi/fastapi]
+  - [ ] Add `verify_jwt_token` that parses `Authorization: Bearer` tokens via `python-jose`, validates signature/expiry, and returns `user_id`. [Source: docs/PRD-MT5-Integration-Service.md#5.4]
+- [ ] **Task 2 (AC:4-5)** – Ownership + dependency wiring:
+  - [ ] Implement `verify_account_ownership(user_id, account_id)` calling Supabase (service key) to confirm ownership. [Source: docs/epics.md#Story-3.1]
+  - [ ] Update routers (except `/health`) to require `verify_api_key`; user-targeted routes chain JWT + ownership dependencies.
+- [ ] **Task 3 (AC:6)** – Rate limiting:
+  - [ ] Integrate `slowapi`/`fastapi-limiter` configured with Redis connection, using API key hash or JWT subject as limiter key; set policy 100 requests/min. [Source: docs/epics.md#Story-3.1]
+  - [ ] Ensure limit headers (`X-RateLimit-*`, `Retry-After`) returned on throttled responses.
+- [ ] **Task 4 (AC:7)** – Logging & monitoring:
+  - [ ] Instrument failed auth attempts with IP, timestamp, error code; expose counters for observability.
+  - [ ] Add doc snippet describing required headers and example responses (401/403/429) per PRD.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `app/core/security.py` (or equivalent) exposes dependencies: `verify_api_key`, `verify_jwt_token`, and `verify_account_ownership`, wired via FastAPI `Depends`/`Security`. [Source: docs/epics.md#Story-3.1; context7:/fastapi/fastapi]
+2. `verify_api_key` validates `X-API-Key` header against `MT5_SERVICE_API_KEY` env var, logs failures, and returns 401 when missing/invalid. [Source: docs/epics.md#Story-3.1]
+3. `verify_jwt_token` validates Supabase JWT signatures (using `python-jose`), extracts `user_id` (`sub`), handles expiry, and raises 401 on failure. [Source: docs/epics.md#Story-3.1; docs/PRD-MT5-Integration-Service.md#5.4]
+4. `verify_account_ownership` queries Supabase `trading_accounts` ensuring the authenticated user owns `account_id`; returns 403 otherwise. [Source: docs/epics.md#Story-3.1]
+5. All API routes (except `/health`) enforce `X-API-Key`; user-specific endpoints also require JWT + ownership check. [Source: docs/epics.md#Story-3.1]
+6. Rate limiting (100 req/min per API key) implemented via `slowapi`/`fastapi-limiter` (Redis) using the API key/JWT subject as the limiter key; violations return HTTP 429 with retry headers. [Source: docs/epics.md#Story-3.1; docs/PRD-MT5-Integration-Service.md#5.4]
+7. Failed auth attempts log timestamp, IP, and reason; metrics surfaced for monitoring. [Source: docs/epics.md#Story-3.1]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 3.1</title>
+        <section>Story 3.1</section>
+        <snippet><![CDATA[Defines the API key + JWT middleware, Supabase ownership checks, and rate limiting requirements for the MT5 API.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.4 Authentication & Authorization</title>
+        <section>5.4</section>
+        <snippet><![CDATA[Outlines the authentication flow (API key → JWT → ownership) and rate limiting goals that the middleware must enforce.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-7-environment-variable-configuration-and-secret-management.context.xml</path>
+        <title>Story 1.7 Context</title>
+        <section>Constraints</section>
+        <snippet><![CDATA[Documents the environment variables (MT5_SERVICE_API_KEY, Supabase secrets, rate-limit settings) the middleware will read.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Dev Guide</title>
+        <section>Mac Validation</section>
+        <snippet><![CDATA[Specifies the X-API-Key usage in curl examples, aligning documentation with the new middleware.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/core/security.py</path>
+        <kind>module</kind>
+        <symbol>verify_api_key/verify_jwt_token</symbol>
+        <lines>-</lines>
+        <reason>Primary implementation file for the authentication dependencies.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/main.py</path>
+        <kind>fastapi-bootstrap</kind>
+        <symbol>rate limiter setup</symbol>
+        <lines>-</lines>
+        <reason>Likely location for wiring rate limiter middleware and dependency injection globally.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/api/routes</path>
+        <kind>router</kind>
+        <symbol>endpoint dependencies</symbol>
+        <lines>-</lines>
+        <reason>MT5 API routes must import the new dependencies to enforce API key + JWT + ownership checks.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>python-jose</name>
+        <version>referenced</version>
+        <notes>Used to validate Supabase JWT signatures and expiry.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>slowapi / fastapi-limiter</name>
+        <version>referenced</version>
+        <notes>Provides Redis-backed rate limiting enforcing 100 requests/min per API key.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Middleware must not introduce latency beyond rate-limiter requirements.
+- Sensitive secrets read via Story 1.7 env vars—never hardcode credentials.
+- All endpoints except `/health` require API key; user-specific routes require both JWT and ownership checks.
+- Rate limiter should key on API key/JWT subject and emit `Retry-After` headers per PRD.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>verify_api_key</name>
+      <kind>FastAPI dependency</kind>
+      <signature>verify_api_key(api_key: str = Security(APIKeyHeader(name="X-API-Key")))</signature>
+      <path>app/core/security.py</path>
+      <notes>Validates the service API key before allowing any request to proceed.]]></notes>
+    </interface>
+    <interface>
+      <name>verify_jwt_token</name>
+      <kind>FastAPI dependency</kind>
+      <signature>verify_jwt_token(authorization: str = Security(HTTPBearer())) -> str</signature>
+      <path>app/core/security.py</path>
+      <notes>Extracts and validates Supabase JWT, returning user_id for downstream ownership checks.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Authentication tests should mock API key/JWT validation paths, verify 401/403/429 responses, and ensure rate limiter headers appear.]]></standards>
+    <locations><![CDATA[tests/test_security.py (new)]]></locations>
+    <ideas><![CDATA[
+- Unit test `verify_api_key` with valid/invalid headers and ensure logs fire.
+- Mock `python-jose` to validate expired/invalid JWT scenarios.
+- Stub Supabase queries to confirm ownership check enforces 403 when mismatched.
+- Integration-style test verifying rate limit responses (429 + Retry-After).]]></ideas>
+  </tests>
+</story-context>

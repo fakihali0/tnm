@@ -1,0 +1,124 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>2</storyId>
+    <title>POST /api/mt5/connect - Account Connection Endpoint</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T12:56:36Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-2-post-api-mt5-connect-account-connection-endpoint.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>an endpoint that tests MT5 account credentials before persisting them</iWant>
+    <soThat>users can verify credentials and receive immediate feedback without affecting stored data</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1,2)** – Request/response schema + auth wiring:
+  - [ ] Define Pydantic models for request and success/error responses aligned with PRD 5.2.1.
+  - [ ] Apply `verify_api_key`, `verify_jwt_token`, and `verify_account_ownership` dependencies to the route.
+- [ ] **Task 2 (AC:3)** – Connection attempt + success response:
+  - [ ] Invoke `MT5ConnectionManager.login` and `get_account_info`, generate `connection_id`, and return JSON with account metrics and broker metadata.
+  - [ ] Ensure connection test does not mutate persistent state.
+- [ ] **Task 3 (AC:4,5)** – Error handling + timeout/logging:
+  - [ ] Add timeout wrapper (asyncio wait or background task) to enforce 10-second limit.
+  - [ ] Map MT5 errors to PRD error codes, log details, and return standardized error response without storing credentials.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. Endpoint `POST /api/mt5/connect` (in `app/api/routes/mt5.py`) validates request body fields (login positive integer, password ≥ 6 chars, non-empty server/broker_name, user_id UUID) using Pydantic schemas. [Source: docs/epics.md#Story-3.2]
+2. Endpoint requires `X-API-Key` and JWT authentication/ownership dependencies from Story 3.1 before execution. [Source: docs/epics.md#Story-3.2]
+3. On success, calls `MT5ConnectionManager.login(login, password, server)`, fetches account info (`get_account_info`), and returns PRD-compliant JSON including balance/equity/margin/leverage plus generated `connection_id`. [Source: docs/epics.md#Story-3.2; docs/PRD-MT5-Integration-Service.md#5.2.1]
+4. On failure (invalid credentials/broker unreachable), returns standardized error payload with `error_code`, message, MT5 error details, and does not persist credentials. [Source: docs/epics.md#Story-3.2; docs/PRD-MT5-Integration-Service.md#5.5]
+5. Connection test times out after 10 seconds; errors are logged and forwarded to observability pipeline. [Source: docs/epics.md#Story-3.2]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 3.2</title>
+        <section>Story 3.2</section>
+        <snippet><![CDATA[Defines the credential test workflow, request/response schema, and timeout requirements for POST /api/mt5/connect.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.2.1 Account Connection</title>
+        <section>5.2.1</section>
+        <snippet><![CDATA[Provides the canonical request/response formats and validation rules for testing MT5 credentials.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/3-1-api-authentication-middleware.context.xml</path>
+        <title>Story 3.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents the API key/JWT/ownership dependencies this endpoint must reuse.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-1-mt5-connection-manager-with-connection-pooling.context.xml</path>
+        <title>Story 2.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Describes `MT5ConnectionManager` methods (login, get_account_info) invoked by the connection test.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/api/routes/mt5.py</path>
+        <kind>router</kind>
+        <symbol>POST /api/mt5/connect</symbol>
+        <lines>-</lines>
+        <reason>New endpoint implementation site using FastAPI.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/api/schemas/mt5.py</path>
+        <kind>schema-module</kind>
+        <symbol>Connection request/response models</symbol>
+        <lines>-</lines>
+        <reason>Pydantic models for request validation and standardized responses.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/core/security.py</path>
+        <kind>dependency</kind>
+        <symbol>verify_api_key/verify_jwt_token</symbol>
+        <lines>-</lines>
+        <reason>Provides the authentication dependencies applied to this endpoint.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>FastAPI</name>
+        <version>referenced</version>
+        <notes>Framework used to define the route, dependencies, and response models.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>python-jose</name>
+        <version>referenced</version>
+        <notes>Used for Supabase JWT validation (via Story 3.1 dependencies).]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Endpoint must remain stateless—credentials are never stored.
+- Timeout 10s enforced; connection test should not block other requests.
+- Error payloads align with PRD §5.5 structure.
+  ]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>POST /api/mt5/connect</name>
+      <kind>REST endpoint</kind>
+      <signature>POST /api/mt5/connect (body: {{ user_id, login, password, server, broker_name }})</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes>Returns connection status, account info, and `connection_id` for temporary use.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Endpoint tests should mock MT5/Supabase calls, verifying success, invalid credentials, missing fields, and timeout behavior.]]></standards>
+    <locations><![CDATA[tests/api/test_mt5.py]]></locations>
+    <ideas><![CDATA[
+- Valid request returns 200 with account info payload.
+- Invalid credentials yields 401/PRD error structure.
+- Missing fields return 422 via Pydantic validation.
+- Simulate slow MT5 login to confirm timeout path returns error and logs event.]]></ideas>
+  </tests>
+</story-context>

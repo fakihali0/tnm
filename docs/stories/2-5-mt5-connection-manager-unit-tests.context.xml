@@ -1,0 +1,128 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>2</epicId>
+    <storyId>5</storyId>
+    <title>MT5 Connection Manager Unit Tests</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T12:17:13Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/2-5-mt5-connection-manager-unit-tests.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>comprehensive pytest coverage for MT5 connection, data retrieval, and transformation layers</iWant>
+    <soThat>regressions are caught early and the MT5 stack can evolve safely</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1,2)** – Test scaffolding & fixtures:
+  - [ ] Create pytest fixtures for mocked MT5 responses (account info, positions, deals) using `monkeypatch` to intercept `MetaTrader5` functions. [Source: context7:/pytest-dev/pytest]
+  - [ ] Add helper factories for fake MT5 objects to keep tests readable.
+- [ ] **Task 2 (AC:1,3,4)** – Connection manager tests:
+  - [ ] Write tests covering initialize/login success, failure, invalid credentials, pooling enforcement, idle timeout, retry/backoff, and circuit-breaker state transitions. [Source: docs/epics.md#Story-2.5; docs/stories/2-4-connection-state-management-and-error-handling.md]
+  - [ ] Assert state enum values and log outputs when possible (use caplog fixture).
+- [ ] **Task 3 (AC:1,5)** – Data retrieval + transformation tests:
+  - [ ] Validate account/position/history functions return expected dicts for populated data, empty responses, and MT5 errors. [Source: docs/stories/2-2-mt5-data-retrieval-functions.md]
+  - [ ] Cover transformation utilities (account, position, deal, history-to-trades), including timezone conversion to UTC and None handling. [Source: docs/stories/2-3-mt5-data-transformation-layer.md; docs/PRD-MT5-Integration-Service.md#5.2]
+- [ ] **Task 4 (AC:3,6)** – Coverage & CI wiring:
+  - [ ] Configure pytest/coverage (e.g., `pytest --cov=app/core/mt5_manager.py --cov=app/utils/transformers.py`) ensuring >85% coverage for the manager module.
+  - [ ] Document test commands in README or CONTRIBUTING and ensure tooling integrates with existing CI scripts.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `tests/test_mt5_manager.py` (and related files) include unit tests covering the scenarios listed in the epic: initialization/login success, failure paths, retry/backoff, pooling limits, idle timeout cleanup, data retrieval success/empty/error, transformation outputs, timezone conversion, and None handling. [Source: docs/epics.md#Story-2.5]
+2. MT5 SDK calls are mocked (no live terminal) using `monkeypatch`/fixtures per pytest best practices. [Source: docs/epics.md#Story-2.5; context7:/pytest-dev/pytest]
+3. Coverage for `app/core/mt5_manager.py` exceeds 85% (config via pytest-cov or coverage.py) and test suite runs via `pytest`. [Source: docs/epics.md#Story-2.5]
+4. Tests validate exponential backoff timing, connection state transitions, and circuit-breaker behavior introduced in Story 2.4. [Source: docs/stories/2-4-connection-state-management-and-error-handling.md]
+5. Transformation tests confirm JSON output matches PRD 5.2 schema expectations (fields present, UTC timestamps, symbol normalization). [Source: docs/PRD-MT5-Integration-Service.md#5.2; docs/stories/2-3-mt5-data-transformation-layer.md]
+6. CI-ready command documented (`pytest --maxfail=1 --disable-warnings -q` or similar) and integrated into project README/build notes.]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 2.5</title>
+        <section>Story 2.5</section>
+        <snippet><![CDATA[Lists the required test cases across connection manager, data retrieval, and transformation layers, including retry/backoff behavior and coverage targets.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.5 Error Handling</title>
+        <section>5.5</section>
+        <snippet><![CDATA[Provides the error categories and response format the tests must validate (retry-after headers, standardized error codes).]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-4-connection-state-management-and-error-handling.context.xml</path>
+        <title>Story 2.4 Context</title>
+        <section>Constraints</section>
+        <snippet><![CDATA[Details the state machine and circuit-breaker behavior that tests must cover (state transitions, health checks).]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-3-mt5-data-transformation-layer.context.xml</path>
+        <title>Story 2.3 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Defines the transformation functions (e.g., `transform_position`, `transform_history_to_trades`) that require unit tests for timezone conversion and schema alignment.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/core/mt5_manager.py</path>
+        <kind>service-module</kind>
+        <symbol>MT5ConnectionManager</symbol>
+        <lines>-</lines>
+        <reason>Primary module where initialization/pooling/circuit breaker logic lives; tests will mock MT5 and validate behavior.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/utils/transformers.py</path>
+        <kind>utility-module</kind>
+        <symbol>transform_* functions</symbol>
+        <lines>-</lines>
+        <reason>Transformation helpers require unit coverage for formatting, timezone conversion, and symbol normalization.]]></reason>
+      </artifact>
+      <artifact>
+        <path>docs/stories/2-1-mt5-connection-manager-with-connection-pooling.context.xml</path>
+        <kind>story-context</kind>
+        <symbol>Story 2.1 Context</symbol>
+        <lines>-</lines>
+        <reason>Provides the canonical interface definitions for the connection manager under test.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>pytest</name>
+        <version>referenced</version>
+        <notes>Primary testing framework; tests will use fixtures, monkeypatching, and coverage reporting.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>pytest-cov</name>
+        <version>optional</version>
+        <notes>Used to enforce the >85% coverage requirement for `app/core/mt5_manager.py`.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Tests must run without a live MT5 terminal; all MT5 interactions are mocked.
+- Coverage for `app/core/mt5_manager.py` must exceed 85% with documented CLI command.
+- Include scenarios for retry backoff timing, circuit breaker states, data transformation accuracy, and None handling.
+  ]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>pytest CLI</name>
+      <kind>command</kind>
+      <signature>pytest --maxfail=1 --disable-warnings -q</signature>
+      <path>README or CONTRIBUTING (to be updated)</path>
+      <notes>Standard test command to document and integrate into CI, ensuring consistent local runs.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Follow pytest best practices with fixtures/monkeypatch; ensure deterministic tests by mocking time/backoff delays.]]></standards>
+    <locations><![CDATA[tests/test_mt5_manager.py, tests/test_transformers.py (new files).]]></locations>
+    <ideas><![CDATA[
+- Mock MetaTrader5 API to validate pool limit, idle timeout, and retry transitions.
+- Use fake MT5 position/history data to test transformation outputs (UTC timestamps, type_str, pips) via existing helpers.
+- Simulate circuit-breaker conditions to confirm cached responses or error payloads align with PRD structure.
+- Assert coverage threshold by running pytest-cov and checking the report.]]></ideas>
+  </tests>
+</story-context>

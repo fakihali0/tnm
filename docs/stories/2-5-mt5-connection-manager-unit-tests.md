@@ -1,6 +1,6 @@
 # Story 2.5: MT5 Connection Manager Unit Tests
 
-Status: drafted
+Status: ready-for-dev
 
 ## Story
 
@@ -59,7 +59,7 @@ so that **regressions are caught early and the MT5 stack can evolve safely**. [S
 
 ### Context Reference
 
-_To be captured by story-context workflow._
+- `docs/stories/2-5-mt5-connection-manager-unit-tests.context.xml`
 
 ### Agent Model Used
 

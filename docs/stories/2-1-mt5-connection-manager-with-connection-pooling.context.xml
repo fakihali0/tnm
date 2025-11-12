@@ -1,0 +1,119 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>2</epicId>
+    <storyId>1</storyId>
+    <title>MT5 Connection Manager with Connection Pooling</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T12:08:59Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/2-1-mt5-connection-manager-with-connection-pooling.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>a reusable MT5 connection manager that initializes once, manages a logical pool, and exposes a stable API</iWant>
+    <soThat>multiple users can query accounts efficiently without reinitializing MT5 each time</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Implement the manager skeleton:
+  - [ ] Create `MT5ConnectionManager` with the required public methods and underlying MT5 calls.
+  - [ ] Add initialization state tracking plus centralized logging for each API wrapper.
+- [ ] **Task 2 (AC:2)** – Add logical pooling & idle eviction:
+  - [ ] Track session metadata (login, server, last_used) and reuse them via account switching.
+  - [ ] Implement idle cleanup (5 minutes default) and expose pooled session metrics; make pool size/timeout configurable via Story 1.7 settings (`MT5_CONNECTION_POOL_SIZE`, `MT5_CONNECTION_IDLE_TIMEOUT`).
+- [ ] **Task 3 (AC:3)** – Reliability & error handling:
+  - [ ] Implement exponential backoff for initialize/login with configurable max attempts and log `mt5.last_error()` tuples.
+  - [ ] Emit telemetry hooks (e.g., retries count, last failure timestamp) for future monitoring work.
+- [ ] **Task 4 (AC:4)** – Concurrency guard:
+  - [ ] Introduce a CapacityLimiter/mutex abstraction so callers `await` access to MT5 state and avoid concurrent login/initialize calls.
+  - [ ] Document usage pattern for upcoming API endpoints (Story 3.x) to acquire the limiter before invoking MT5 operations.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `MT5ConnectionManager` in `app/core/mt5_manager.py` implements `initialize`, `shutdown`, `login`, `is_connected`, `get_account_info`, and `get_last_error`, wrapping the MetaTrader5 SDK and emitting structured logs on every call. [Source: docs/epics.md#Story-2.1]
+2. Manager maintains a configurable logical pool (default 20 sessions) by reusing credentials via `mt5.login`, tracking last-used timestamps, and logging out sessions idle for 5 minutes while keeping MT5 initialized. [Source: docs/epics.md#Story-2.1]
+3. Initialize/login failures undergo up to 3 retries with exponential backoff (e.g., 1s/2s/4s) and capture `mt5.last_error()` details for observability per PRD reliability targets. [Source: docs/epics.md#Story-2.1; docs/PRD-MT5-Integration-Service.md#5.5]
+4. Access to MT5 state is synchronized via a CapacityLimiter or mutex so state transitions execute one at a time, ensuring queued callers are served fairly and preventing race conditions. [Source: docs/epics.md#Story-2.1; context7:/agronholm/anyio]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 2.1 Breakdown</title>
+        <section>Story 2.1</section>
+        <snippet><![CDATA[Defines the MT5ConnectionManager requirements: initialize/shutdown wrappers, login switching, logical pool (max 20), idle cleanup, and retry expectations.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD Reliability Requirements</title>
+        <section>5.5 Error Handling Strategy</section>
+        <snippet><![CDATA[Specifies that MT5 failures must retry up to 3 times with exponential backoff and log standardized error codes for observability.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-7-environment-variable-configuration-and-secret-management.md</path>
+        <title>Env Configuration Story</title>
+        <section>Dev Notes</section>
+        <snippet><![CDATA[Introduces configuration keys (e.g., MT5 pool size, timeouts) that the connection manager should consume instead of hardcoding values.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Backend Workflow</title>
+        <section>Daily Development Routine</section>
+        <snippet><![CDATA[Describes the MT5 service startup pattern on Windows, reinforcing the need for a single initialized manager that other features can rely on.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/core/mt5_manager.py</path>
+        <kind>service-module</kind>
+        <symbol>MT5ConnectionManager</symbol>
+        <lines>new file</lines>
+        <reason>Primary implementation target where initialization, pooling, and retry logic will live.]]></reason>
+      </artifact>
+      <artifact>
+        <path>docs/stories/1-7-environment-variable-configuration-and-secret-management.context.xml</path>
+        <kind>story-context</kind>
+        <symbol>Env settings</symbol>
+        <lines>-</lines>
+        <reason>Details the environment variables (`MT5_CONNECTION_POOL_SIZE`, etc.) that this manager must read.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>MetaTrader5</name>
+        <version>referenced</version>
+        <notes>Underlying SDK providing `mt5.initialize/login/last_error`; manager wraps these APIs.</notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>anyio</name>
+        <version>referenced</version>
+        <notes>Provides `CapacityLimiter` used to serialize MT5 state changes. (Context from context7:/agronholm/anyio)</notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Manager must reuse a single MT5 initialization across requests; no per-request bootstrapping.
+- Pool sizing, idle timeout, and retry attempts must be configurable via environment settings (Story 1.7).
+- Logging must capture MT5 error codes and retries for future monitoring (PRD §5.5).
+- Concurrency guard required so only one MT5 state mutation occurs at a time.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>MT5ConnectionManager</name>
+      <kind>class</kind>
+      <signature>initialize(), shutdown(), login(login, password, server), is_connected(), get_account_info(), get_last_error()</signature>
+      <path>app/core/mt5_manager.py</path>
+      <notes>Primary API called by future stories (data retrieval, REST endpoints); must remain stable and thread-safe.</notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Unit tests should mock MetaTrader5 to cover initialization success/failure, retry timing, pooling behavior, and concurrency guard interactions.]]></standards>
+    <locations><![CDATA[tests/test_mt5_manager.py (to be created in Story 2.5).]]></locations>
+    <ideas><![CDATA[
+- Verify successful initialize/login path sets state and logs success.
+- Simulate MT5 failure to confirm retry/backoff logic and error logging.
+- Exercise idle eviction by advancing timestamps and ensuring sessions are logged out after 5 minutes.
+- Test CapacityLimiter by simulating concurrent calls and asserting serialized execution order.]]></ideas>
+  </tests>
+</story-context>

@@ -1,6 +1,6 @@
 # Story 2.2: MT5 Data Retrieval Functions
 
-Status: drafted
+Status: ready-for-dev
 
 ## Story
 
@@ -51,7 +51,7 @@ so that **API endpoints can serve real trading data sourced from the terminal**.
 
 ### Context Reference
 
-<!-- To be filled by story-context workflow -->
+- `docs/stories/2-2-mt5-data-retrieval-functions.context.xml`
 
 ### Agent Model Used
 

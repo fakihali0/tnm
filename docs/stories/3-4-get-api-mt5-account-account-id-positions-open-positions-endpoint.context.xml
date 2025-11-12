@@ -1,0 +1,133 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>4</storyId>
+    <title>GET /api/mt5/account/{account_id}/positions - Open Positions Endpoint</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T12:59:47Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-4-get-api-mt5-account-account-id-positions-open-positions-endpoint.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>an authenticated endpoint that returns active MT5 positions for a given account with optional filters</iWant>
+    <soThat>users can view their open trades and profit in real time</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Endpoint + dependencies:
+  - [ ] Define FastAPI route, apply `verify_api_key`, `verify_jwt_token`, and `verify_account_ownership` dependencies.
+  - [ ] Validate `account_id` UUID, parse query params (`symbols`, `type`).
+- [ ] **Task 2 (AC:2,3)** – MT5 data fetch + transformation:
+  - [ ] Retrieve Supabase credentials, decrypt password (Story 7.1 helper), login via `MT5ConnectionManager`, call `get_positions_raw` with symbol filter.
+  - [ ] Apply optional type filter and map through `transform_position`.
+- [ ] **Task 3 (AC:4,5)** – Caching + response formatting:
+  - [ ] Implement 5-second TTL cache keyed by `account_id` + filters; include `cached` boolean and `cache_age_seconds`.
+  - [ ] Compute `total_positions` and `total_profit`, ensure empty list returns success response.
+- [ ] **Task 4 (AC:5)** – Error handling & logging:
+  - [ ] Map MT5/Supabase errors to PRD error codes/status (401/403/500) with standardized payload; log failures.
+  - [ ] Add tests or manual verification scenarios covering filters, cache hits, and MT5 failures.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `GET /api/mt5/account/{account_id}/positions` (in `app/api/routes/mt5.py`) requires API key + JWT + ownership validation identical to Story 3.3. [Source: docs/epics.md#Story-3.4]
+2. Endpoint accepts optional query params `symbols` (comma-separated) and `type` ("buy"/"sell"), applies filters after data retrieval. [Source: docs/epics.md#Story-3.4]
+3. Fetches account credentials from Supabase, decrypts password, logs into MT5 via `MT5ConnectionManager`, calls `get_positions_raw`, and transforms results with `transform_position`. [Source: docs/epics.md#Story-3.4; docs/PRD-MT5-Integration-Service.md#5.2.3]
+4. Returns JSON with positions array, `total_positions`, `total_profit`, `timestamp`, and caching metadata (`cached`, `cache_age_seconds`), with a 5-second TTL for cache. [Source: docs/epics.md#Story-3.4]
+5. Response time target: <500ms fresh, faster when served from cache; empty positions return empty array without error. [Source: docs/epics.md#Story-3.4]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 3.4</title>
+        <section>Story 3.4</section>
+        <snippet><![CDATA[Defines filters, caching, and response schema for the open positions endpoint.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.2.3 Open Positions</title>
+        <section>5.2.3</section>
+        <snippet><![CDATA[Provides JSON structure (ticket, symbol, type, prices, open_time) required by the endpoint.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/3-1-api-authentication-middleware.context.xml</path>
+        <title>Story 3.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents the API key/JWT/ownership dependencies applied to this endpoint.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-2-mt5-data-retrieval-functions.context.xml</path>
+        <title>Story 2.2 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Defines the `get_positions_raw` helper used to fetch MT5 positions.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-3-mt5-data-transformation-layer.context.xml</path>
+        <title>Story 2.3 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents `transform_position`, the transformer applied to raw MT5 positions.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/api/routes/mt5.py</path>
+        <kind>router</kind>
+        <symbol>GET /api/mt5/account/{account_id}/positions</symbol>
+        <lines>-</lines>
+        <reason>Endpoint implementation location, including query param parsing, caching, and response building.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/api/schemas/mt5.py</path>
+        <kind>schema-module</kind>
+        <symbol>PositionsResponse</symbol>
+        <lines>-</lines>
+        <reason>Pydantic models for query parameters and response shape.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/core/cache.py</path>
+        <kind>utility</kind>
+        <symbol>TTL cache helper</symbol>
+        <lines>-</lines>
+        <reason>Shared cache utility providing the 5-second TTL for positions responses.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>FastAPI</name>
+        <version>referenced</version>
+        <notes>Used for route definition, dependency injection, and response modeling.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>cachetools</name>
+        <version>referenced</version>
+        <notes>Provides TTL caching for 5-second response reuse.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Endpoint must remain stateless and never store credentials.
+- Caching TTL = 5 seconds for real-time data; ensure invalidation when login fails.
+- Optional filters must be applied after transformation to avoid MT5 limitations.
+  ]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>GET /api/mt5/account/{account_id}/positions</name>
+      <kind>REST endpoint</kind>
+      <signature>GET /api/mt5/account/{account_id}/positions?symbols=EURUSD,GBPUSD&type=buy</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes>Returns filtered positions with caching metadata; requires API key + JWT + ownership.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Tests should mock MT5/Supabase, verifying filters, caching, and error handling.]]></standards>
+    <locations><![CDATA[tests/api/test_mt5.py]]></locations>
+    <ideas><![CDATA[
+- Ensure symbol/type filters produce expected subsets.
+- Verify cached responses include `cached=true` and age metadata.
+- Simulate MT5 failure to confirm proper error payload.
+- Measure response times in tests/logs to ensure <500ms goal.]]></ideas>
+  </tests>
+</story-context>

@@ -1,6 +1,6 @@
 # Story 2.3: MT5 Data Transformation Layer
 
-Status: drafted
+Status: ready-for-dev
 
 ## Story
 
@@ -54,7 +54,7 @@ so that **our API responses match the PRD schemas and remain consistent even if 
 
 ### Context Reference
 
-<!-- Story context XML will be added later -->
+- `docs/stories/2-3-mt5-data-transformation-layer.context.xml`
 
 ### Agent Model Used
 

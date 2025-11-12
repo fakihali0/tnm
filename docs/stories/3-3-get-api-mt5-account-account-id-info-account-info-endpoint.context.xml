@@ -1,0 +1,133 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>3</storyId>
+    <title>GET /api/mt5/account/{account_id}/info - Account Info Endpoint</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T12:58:35Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-3-get-api-mt5-account-account-id-info-account-info-endpoint.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>an authenticated endpoint that returns live MT5 account metrics (balance/equity/margin) for a given account_id</iWant>
+    <soThat>the frontend can display accurate account information without storing credentials</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Endpoint + auth wiring:
+  - [ ] Define FastAPI route with dependencies (`verify_api_key`, `verify_jwt_token`, `verify_account_ownership`).
+  - [ ] Validate `account_id` UUID using Pydantic or path converter.
+- [ ] **Task 2 (AC:2,3)** – Credential fetch + MT5 call + transformation:
+  - [ ] Query Supabase `trading_accounts`, decrypt password, invoke `MT5ConnectionManager.login` and `get_account_info_raw`.
+  - [ ] Pass the raw result through `transform_account_info()` and build PRD-compliant response object including metadata.
+- [ ] **Task 3 (AC:3,4)** – Caching + performance:
+  - [ ] Implement 30-second in-memory cache keyed by account_id; track timestamps to compute `cache_age_seconds` and performance targets.
+  - [ ] Instrument logging to capture response times and cache hits.
+- [ ] **Task 4 (AC:5)** – Error handling & testing:
+  - [ ] Map Supabase/MT5 failures to 4xx/5xx responses per PRD; ensure sensitive info never logged.
+  - [ ] Add tests or manual scenarios verifying unauthorized access, invalid ownership, cache behavior, and MT5 failure fallback.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `GET /api/mt5/account/{account_id}/info` lives in `app/api/routes/mt5.py`, requires `X-API-Key`, JWT auth, and verifies account ownership via Supabase. [Source: docs/epics.md#Story-3.3]
+2. Endpoint loads account credentials from `trading_accounts`, decrypts the password (AES-256 per Story 7.1), and calls `MT5ConnectionManager.login` followed by `get_account_info_raw`. [Source: docs/epics.md#Story-3.3]
+3. Results are transformed via `transform_account_info()` to PRD-compliant JSON and cached in-memory for 30 seconds, including `cached` and `cache_age_seconds` metadata. [Source: docs/epics.md#Story-3.3]
+4. Response time targets: <1s on fresh fetch, <100ms for cached responses; cache invalidates after 30s or when login fails. [Source: docs/epics.md#Story-3.3]
+5. Errors return appropriate HTTP status codes (401/403/500) with standardized payloads; credentials are never persisted by this endpoint. [Source: docs/PRD-MT5-Integration-Service.md#5.2.2; §5.5]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 3.3</title>
+        <section>Story 3.3</section>
+        <snippet><![CDATA[Defines authentication/ownership requirements, credential loading, transformation, and caching for the account info endpoint.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.2.2 Account Information</title>
+        <section>5.2.2</section>
+        <snippet><![CDATA[Provides the canonical response schema (balance, equity, margin, etc.) that this endpoint must match.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/3-1-api-authentication-middleware.context.xml</path>
+        <title>Story 3.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents the API key/JWT/ownership dependencies applied to every MT5 API route.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-1-mt5-connection-manager-with-connection-pooling.context.xml</path>
+        <title>Story 2.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Describes the MT5 connection manager API (login, get_account_info) that this endpoint must reuse.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-3-mt5-data-transformation-layer.context.xml</path>
+        <title>Story 2.3 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Defines `transform_account_info` which maps raw MT5 AccountInfo objects to PRD-compliant JSON.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/api/routes/mt5.py</path>
+        <kind>router</kind>
+        <symbol>GET /api/mt5/account/{account_id}/info</symbol>
+        <lines>-</lines>
+        <reason>Location for the new route implementation, including caching and response formatting.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/api/schemas/mt5.py</path>
+        <kind>schema-module</kind>
+        <symbol>AccountInfoResponse</symbol>
+        <lines>-</lines>
+        <reason>Pydantic models for request/response validation.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/core/cache.py</path>
+        <kind>utility</kind>
+        <symbol>TTL cache helper</symbol>
+        <lines>-</lines>
+        <reason>Shared caching utility for 30-second in-memory cache of account info responses.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>FastAPI</name>
+        <version>referenced</version>
+        <notes>Used for route definition, dependency injection, and response modeling.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>cachetools</name>
+        <version>referenced</version>
+        <notes>Optional TTL cache backend to achieve the 30-second caching requirement.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Endpoint must remain stateless (credentials never returned or stored).
+- Caching TTL = 30 seconds; ensure invalidation when MT5 login fails.
+- Error responses follow PRD §5.5 format.
+- Decryption uses existing AES helpers (Story 7.1).]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>GET /api/mt5/account/{account_id}/info</name>
+      <kind>REST endpoint</kind>
+      <signature>GET /api/mt5/account/{account_id}/info</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes>Returns account metrics plus caching metadata; requires API key + JWT + ownership.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Test suite should mock MT5/Supabase, verifying cache hits, credential failures, and response schema compliance.]]></standards>
+    <locations><![CDATA[tests/api/test_mt5.py]]></locations>
+    <ideas><![CDATA[
+- Successful fetch returns expected JSON with `cached=false`.
+- Cached request (within 30s) returns `cached=true` and `cache_age_seconds`.
+- Invalid ownership raises 403; invalid credentials propagate MT5 error.
+- Timeout path (MT5 slow) covered via mocks.]]></ideas>
+  </tests>
+</story-context>

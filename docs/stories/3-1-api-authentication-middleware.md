@@ -1,6 +1,6 @@
 # Story 3.1: API Authentication Middleware
 
-Status: drafted
+Status: ready-for-dev
 
 ## Story
 
@@ -58,7 +58,7 @@ so that **only authorized services/users can call MT5 endpoints and requests are
 
 ### Context Reference
 
-_To be completed by story-context workflow._
+- `docs/stories/3-1-api-authentication-middleware.context.xml`
 
 ### Agent Model Used
 

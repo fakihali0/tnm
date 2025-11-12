@@ -1,0 +1,126 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>2</epicId>
+    <storyId>4</storyId>
+    <title>Connection State Management and Error Handling</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T12:15:42Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/2-4-connection-state-management-and-error-handling.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>robust MT5 connection state tracking with automatic recovery and graceful degradation</iWant>
+    <soThat>temporary broker outages don’t cause prolonged downtime or cascading errors</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1,2)** – State tracking & error detection:
+  - [ ] Add Enum for connection states and integrate transitions into `MT5ConnectionManager`. [Source: docs/epics.md#Story-2.4]
+  - [ ] Implement failure detection using `mt5.last_error()`, exponential backoff (1s, 2s, 4s) and limit attempts before marking `ERROR`. [Source: docs/epics.md#Story-2.4; docs/PRD-MT5-Integration-Service.md#5.5]
+- [ ] **Task 2 (AC:3,4,6)** – Health-check + circuit breaker:
+  - [ ] Create an asyncio/FastAPI background task (consider Janus queue or simple loop) that runs every 30s to reconnect when unhealthy. [Source: docs/epics.md#Story-2.4; context7:/aio-libs/janus]
+  - [ ] Integrate caching strategy (reuse existing request cache or stub) so read endpoints can return last known good data during outages; otherwise surface PRD-standard error. [Source: docs/PRD-MT5-Integration-Service.md#5.5]
+  - [ ] Add circuit-breaker guard that short-circuits new MT5 commands when state is `ERROR` to avoid spamming the broker.
+- [ ] **Task 3 (AC:5)** – Observability:
+  - [ ] Extend `/health` endpoint (or service health struct) to include MT5 connection state, last error code, and timestamp. [Source: docs/epics.md#Story-2.4]
+  - [ ] Ensure logs capture state changes for auditing.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `MT5ConnectionManager` tracks state via enum values (`CONNECTED`, `DISCONNECTED`, `RECONNECTING`, `ERROR`) and logs each transition with timestamps. [Source: docs/epics.md#Story-2.4]
+2. When MT5 operations fail (terminal crash, broker unreachable) the manager inspects `mt5.last_error()`, marks the state unhealthy, and attempts reinitialization with exponential backoff (1s, 2s, 4s). After 3 failures it remains `ERROR`. [Source: docs/epics.md#Story-2.4; docs/PRD-MT5-Integration-Service.md#5.5]
+3. A background health-check task runs every 30 seconds (FastAPI background task or asyncio loop) to retry initialization when the state is not `CONNECTED`. [Source: docs/epics.md#Story-2.4]
+4. While unhealthy, API calls either return cached data (if available) or a standardized error payload referencing the PRD error structure. [Source: docs/PRD-MT5-Integration-Service.md#5.5]
+5. The `/health` endpoint surface MT5 connection status (enum plus last error) so observability tools can detect outages. [Source: docs/epics.md#Story-2.4]
+6. Circuit-breaker style logic prevents hammering the broker (e.g., queue requests or reject new ones when in `ERROR`). [Source: docs/epics.md#Story-2.4]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 2.4</title>
+        <section>Story 2.4</section>
+        <snippet><![CDATA[Outlines the required state machine, retry schedule, background health checks, cached responses, and `/health` reporting for MT5 availability.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.5 Error Handling</title>
+        <section>5.5</section>
+        <snippet><![CDATA[Defines broker error categories, retry/backoff expectations, and standardized error payloads that the connection manager must emit when unhealthy.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-1-mt5-connection-manager-with-connection-pooling.context.xml</path>
+        <title>Story 2.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents the existing `MT5ConnectionManager` API that this story extends with state tracking and reinitialization logic.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-2-mt5-data-retrieval-functions.context.xml</path>
+        <title>Story 2.2 Context</title>
+        <section>Constraints</section>
+        <snippet><![CDATA[Highlights the downstream data helpers that depend on connection health, so their callers must honor circuit-breaker behavior.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/core/mt5_manager.py</path>
+        <kind>service-module</kind>
+        <symbol>MT5ConnectionManager</symbol>
+        <lines>-</lines>
+        <reason>Primary implementation target where state enum, retry, and circuit-breaker logic will live.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/main.py</path>
+        <kind>fastapi-bootstrap</kind>
+        <symbol>startup events</symbol>
+        <lines>-</lines>
+        <reason>Likely location for registering the background health-check task that pings the connection manager every 30 seconds.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>MetaTrader5</name>
+        <version>referenced</version>
+        <notes>Provides `mt5.last_error()` used to detect failures and classify states.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>janus</name>
+        <version>referenced</version>
+        <notes>Async queue utility (context7:/aio-libs/janus) that can back the background health-check/circuit-breaker dispatch logic.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Must extend the existing connection manager instead of creating parallel mechanisms.
+- Retry timing (1s/2s/4s) and maximum attempts must match epic requirements; after max failures, state remains ERROR and circuit breaker engages.
+- Cached responses/error payloads must align with PRD §5.5 structure.
+- `/health` endpoint must expose MT5 status for monitoring dashboards.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>MT5ConnectionManager.state</name>
+      <kind>enum</kind>
+      <signature>CONNECTED | DISCONNECTED | RECONNECTING | ERROR</signature>
+      <path>app/core/mt5_manager.py</path>
+      <notes>Central state machine consumed by API endpoints and health checks.]]></notes>
+    </interface>
+    <interface>
+      <name>/health</name>
+      <kind>REST endpoint</kind>
+      <signature>GET /health → { status, mt5_state, last_error }</signature>
+      <path>app/api/routes/health.py (expected)</path>
+      <notes>Must display MT5 connection state and last error timestamp for observability.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Unit/integration tests should simulate MT5 failures, verify retry scheduling, circuit-breaker behavior, cached responses, and `/health` payload updates.]]></standards>
+    <locations><![CDATA[tests/test_mt5_manager.py, tests/test_health_endpoint.py (to be created).]]></locations>
+    <ideas><![CDATA[
+- Force `mt5.last_error()` to return failure codes and assert state transitions plus retry intervals.
+- Simulate prolonged outages to ensure circuit breaker blocks new MT5 commands and returns cached/error responses.
+- Mock the background task to confirm it attempts reconnection every 30 seconds when state != CONNECTED.
+- Hit `/health` after simulated failures to ensure MT5 state and last error fields update correctly.]]></ideas>
+  </tests>
+</story-context>

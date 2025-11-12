@@ -1,0 +1,124 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>2</epicId>
+    <storyId>2</storyId>
+    <title>MT5 Data Retrieval Functions</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T12:11:44Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/2-2-mt5-data-retrieval-functions.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>functions to retrieve account info, open positions, and historical trades from MT5</iWant>
+    <soThat>API endpoints can serve real trading data sourced from the terminal</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1,2)** – Implement account/position retrieval:
+  - [ ] Add `get_account_info_raw` that calls `mt5.account_info()` and extracts balance, equity, margin, free_margin, margin_level, currency, leverage, profit, credit fields into a dict/Pydantic-ready structure. [Source: docs/epics.md#Story-2.2]
+  - [ ] Add `get_positions_raw` that calls `mt5.positions_get(symbol=symbol)` when provided and returns a list of dicts containing ticket, symbol, type, volume, prices, sl/tp, profit, swap, commission, magic, comment, and time. [Source: docs/epics.md#Story-2.2]
+- [ ] **Task 2 (AC:1,2,3)** – Implement history retrieval utilities:
+  - [ ] Add helper to convert Python datetimes to MT5 timestamps (handle timezone via `dateutil` or `datetime.timestamp()`), verifying inputs are timezone-aware to avoid DST drift. [Source: context7:/dateutil/dateutil]
+  - [ ] Implement `get_history_deals_raw(from_dt, to_dt, symbol=None)` returning deal metadata (ticket, order, time, type, entry, position_id, volume, price, profit, swap, commission, symbol, comment). [Source: docs/epics.md#Story-2.2]
+  - [ ] Implement `get_history_orders_raw(from_dt, to_dt, symbol=None)` returning closed order metadata. [Source: docs/epics.md#Story-2.2]
+- [ ] **Task 3 (AC:4)** – Error handling and logging:
+  - [ ] Centralize MT5 error logging with helper that records `mt5.last_error()` codes + descriptions and returns `None`/empty list when a call fails. [Source: docs/epics.md#Story-2.2]
+  - [ ] Add lightweight validation to ensure connection manager is initialized before fetching; raise/log meaningful errors when not connected. [Source: docs/epics.md#Story-2.2]]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `app/core/mt5_manager.py` exposes raw retrieval helpers: `get_account_info_raw`, `get_positions_raw`, `get_history_deals_raw(from_dt, to_dt, symbol=None)`, and `get_history_orders_raw(from_dt, to_dt, symbol=None)` that wrap the corresponding MetaTrader5 calls. [Source: docs/epics.md#Story-2.2]
+2. Each helper extracts the required fields listed in the epic (balances, position ticket/symbol/volume/etc., deal/order metadata) and returns typed dicts/objects for downstream transformation. [Source: docs/epics.md#Story-2.2]
+3. Date parameters accept Python `datetime` objects (timezone-aware) and are converted to MT5-compatible timestamps before invocation; optional symbol filters limit the dataset when provided. [Source: docs/epics.md#Story-2.2; context7:/dateutil/dateutil]
+4. All functions handle MT5 errors gracefully: retries unnecessary here but failures must return `None`/empty lists, log `mt5.last_error()` diagnostics, and avoid crashing the service. [Source: docs/epics.md#Story-2.2]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 2.2</title>
+        <section>Story 2.2</section>
+        <snippet><![CDATA[Defines the required raw retrieval helpers (account info, positions, history deals/orders) and the fields each must expose.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD Success Criteria</title>
+        <section>5.2.3–5.2.4</section>
+        <snippet><![CDATA[Specifies the JSON fields for positions and historical trades responses, informing how raw MT5 data must be shaped.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-1-mt5-connection-manager-with-connection-pooling.context.xml</path>
+        <title>Story 2.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Describes the `MT5ConnectionManager` API that these retrieval helpers must reuse instead of reinitializing MT5.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-7-environment-variable-configuration-and-secret-management.md</path>
+        <title>Env Settings</title>
+        <section>Dev Notes</section>
+        <snippet><![CDATA[Documents backend configuration keys (e.g., history window defaults) that retrieval functions should respect via environment settings.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/core/mt5_manager.py</path>
+        <kind>service-module</kind>
+        <symbol>MT5ConnectionManager</symbol>
+        <lines>-</lines>
+        <reason>Location where raw retrieval helpers will be added alongside the connection manager from Story 2.1.]]></reason>
+      </artifact>
+      <artifact>
+        <path>docs/stories/2-1-mt5-connection-manager-with-connection-pooling.md</path>
+        <kind>story</kind>
+        <symbol>Story 2.1 draft</symbol>
+        <lines>-</lines>
+        <reason>Provides architectural context and existing tasks the data functions must respect (connection reuse, telemetry hooks).]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>MetaTrader5</name>
+        <version>referenced</version>
+        <notes>Underlying SDK providing account_info, positions_get, history_deals_get, and history_orders_get.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>python-dateutil</name>
+        <version>referenced</version>
+        <notes>Used for timezone-aware datetime conversions before calling MT5 history APIs (per context7:/dateutil/dateutil).]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Must reuse `MT5ConnectionManager` from Story 2.1; no new initialization logic.
+- Datetime inputs need to be timezone-aware and converted to MT5 timestamps consistently.
+- Functions return raw dicts/lists only; higher-level transformations happen in Story 2.3.
+- Graceful error handling: return None/[] and log `mt5.last_error()` without crashing the service.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>get_account_info_raw</name>
+      <kind>function</kind>
+      <signature>get_account_info_raw() -> dict | None</signature>
+      <path>app/core/mt5_manager.py</path>
+      <notes>Returns the subset of AccountInfo fields required by downstream stories.]]></notes>
+    </interface>
+    <interface>
+      <name>get_positions_raw</name>
+      <kind>function</kind>
+      <signature>get_positions_raw(symbol: str | None = None) -> list[dict]</signature>
+      <path>app/core/mt5_manager.py</path>
+      <notes>Wraps `mt5.positions_get` and filters by symbol when provided.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Unit tests should mock MT5 responses to verify field extraction, symbol filtering, datetime conversion, and error logging.]]></standards>
+    <locations><![CDATA[tests/test_mt5_manager.py (planned in Story 2.5)]]></locations>
+    <ideas><![CDATA[
+- Mock `mt5.account_info` to ensure balance/equity/margin fields map correctly and None inputs return None.
+- Simulate `mt5.positions_get` with multiple symbols to confirm filtering and field extraction.
+- Supply dateutil timezone-aware datetimes to history helpers and verify MT5 timestamp conversion.
+- Force MT5 errors to ensure logging occurs and functions return empty results gracefully.]]></ideas>
+  </tests>
+</story-context>

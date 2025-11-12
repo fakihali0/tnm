@@ -1,0 +1,131 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>6</storyId>
+    <title>POST /api/mt5/account/{account_id}/sync - Manual Sync Trigger Endpoint</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T13:03:40Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-6-post-api-mt5-account-account-id-sync-manual-sync-trigger-endpoint.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>an endpoint that queues a manual MT5 sync (full or incremental) for a specific account</iWant>
+    <soThat>users can refresh data on demand instead of waiting for scheduled jobs</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1,2)** – Endpoint + validation:
+  - [ ] Define FastAPI route with auth dependencies, rate limiting guard, and request body schema (Pydantic model) enforcing allowed values.
+- [ ] **Task 2 (AC:3)** – Background task enqueue + response:
+  - [ ] Generate `sync_id`, compute estimated duration, enqueue background task via `BackgroundTasks.add_task`, return immediate JSON response.
+- [ ] **Task 3 (AC:4)** – Sync executor implementation:
+  - [ ] Implement background function that fetches credentials, logs into MT5 (connection manager), retrieves account info/positions/history, transforms, and upserts to Supabase tables; update `last_sync_at` and insert record into `sync_logs`.
+  - [ ] Support "full" vs "incremental" logic using `last_sync_at` when available.
+- [ ] **Task 4 (AC:5)** – Error handling & rate limiting:
+  - [ ] Log sync errors, capture them in `sync_logs`, and ensure retries or user notifications follow PRD guidance.
+  - [ ] Enforce per-account manual sync limit (1/min) via in-memory or Redis TTL.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `POST /api/mt5/account/{account_id}/sync` in `app/api/routes/mt5.py` enforces API key + JWT + ownership validation and rate limits (max 1 sync per account per minute). [Source: docs/epics.md#Story-3.6]
+2. Request body accepts `sync_type` ("full" or "incremental"), `sync_history` (bool), and `history_days` (int, default 30) with validation. [Source: docs/epics.md#Story-3.6]
+3. Endpoint generates `sync_id` (UUID), enqueues a FastAPI `BackgroundTasks` job, and immediately returns a response with sync metadata (status=processing, estimated_duration_seconds). [Source: docs/epics.md#Story-3.6]
+4. Background task performs the sync: fetches account info, positions, and history (full vs incremental), transforms data, upserts to Supabase tables (`trading_accounts`, `trades`), and updates `last_sync_at`, logging results into `sync_logs`. [Source: docs/epics.md#Story-3.6; docs/PRD-MT5-Integration-Service.md#5.2.5]
+5. Failures inside the background task are logged and recorded in `sync_logs`, but do not crash the FastAPI worker; optional sync-status endpoint can query by `sync_id` (future story). [Source: docs/epics.md#Story-3.6]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 3.6</title>
+        <section>Story 3.6</section>
+        <snippet><![CDATA[Defines sync_type options, request schema, background task behavior, and rate limiting for the manual sync endpoint.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.2.5 Manual Sync</title>
+        <section>5.2.5</section>
+        <snippet><![CDATA[Details the manual sync flow, expected payload, and logging requirements.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/3-3-get-api-mt5-account-account-id-info-account-info-endpoint.context.xml</path>
+        <title>Story 3.3 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Provides account info retrieval patterns reused during sync.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/3-4-get-api-mt5-account-account-id-positions-open-positions-endpoint.context.xml</path>
+        <title>Story 3.4 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents the positions retrieval logic referenced by the manual sync.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/3-5-get-api-mt5-account-account-id-history-historical-trades-endpoint.context.xml</path>
+        <title>Story 3.5 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Describes historical trades retrieval and transformation used by the sync process.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/api/routes/mt5.py</path>
+        <kind>router</kind>
+        <symbol>POST /api/mt5/account/{account_id}/sync</symbol>
+        <lines>-</lines>
+        <reason>Endpoint definition, request validation, rate limiting, and background task enqueue.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/services/sync.py</path>
+        <kind>service-module</kind>
+        <symbol>manual_sync_task</symbol>
+        <lines>-</lines>
+        <reason>Background sync executor handling MT5 calls and Supabase upserts.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/core/security.py</path>
+        <kind>dependency</kind>
+        <symbol>verify_api_key/verify_jwt_token</symbol>
+        <lines>-</lines>
+        <reason>Authentication helpers reused by the sync endpoint.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>FastAPI</name>
+        <version>referenced</version>
+        <notes>Provides BackgroundTasks and dependency injection for the route.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>Supabase Python client</name>
+        <version>referenced</version>
+        <notes>Used for updating trading_accounts, trades, and sync_logs tables.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Endpoint must be non-blocking; background tasks handle heavy lifting.
+- Rate limit to 1 manual sync per account per minute.
+- Log sync outcomes (success/failure) in `sync_logs` for future status endpoints.
+- Handle both full and incremental sync modes using `last_sync_at`.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>POST /api/mt5/account/{account_id}/sync</name>
+      <kind>REST endpoint</kind>
+      <signature>POST /api/mt5/account/{account_id}/sync</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes>Queues manual sync tasks and returns sync_id metadata immediately.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Tests should mock MT5/Supabase and verify enqueueing, rate limits, and logging behavior.]]></standards>
+    <locations><![CDATA[tests/api/test_mt5.py, tests/services/test_sync.py]]></locations>
+    <ideas><![CDATA[
+- Valid requests return sync metadata and trigger background task.
+- Rate limit enforcement returns 429 when exceeded.
+- Background task handles full vs incremental history ranges and logs results.
+- Failure inside background task recorded in `sync_logs`.]]></ideas>
+  </tests>
+</story-context>

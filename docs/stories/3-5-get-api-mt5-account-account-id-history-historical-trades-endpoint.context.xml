@@ -1,0 +1,133 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>5</storyId>
+    <title>GET /api/mt5/account/{account_id}/history - Historical Trades Endpoint</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T13:01:51Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-5-get-api-mt5-account-account-id-history-historical-trades-endpoint.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>an endpoint that returns paginated historical trades for a given account with flexible filters</iWant>
+    <soThat>users can analyze past trading performance without storing MT5 credentials</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1,2)** – Endpoint + validation:
+  - [ ] Define FastAPI route with auth dependencies and parse query params (defaulting from_date = now-30d, to_date = now).
+  - [ ] Validate date formats (ISO 8601 or Unix timestamp) and ensure limit/offset constraints.
+- [ ] **Task 2 (AC:3)** – MT5 fetch + transformation:
+  - [ ] Retrieve Supabase credentials, decrypt password, login via connection manager, and call `get_history_deals_raw`.
+  - [ ] Pass results through `transform_history_to_trades`, then apply symbol filter.
+- [ ] **Task 3 (AC:4,5)** – Summary, pagination, and caching:
+  - [ ] Compute summary stats (profit/loss, win rate, pips) and apply limit/offset slicing.
+  - [ ] Implement 5-minute TTL cache keyed by account_id + filters; include `cached` boolean and metadata in response.
+- [ ] **Task 4 (AC:5)** – Error handling & testing:
+  - [ ] Handle MT5/Supabase failures with standardized error responses; log events.
+  - [ ] Verify performance targets and caching behavior via tests or instrumentation.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `GET /api/mt5/account/{account_id}/history` (in `app/api/routes/mt5.py`) enforces API key + JWT + ownership validation. [Source: docs/epics.md#Story-3.5]
+2. Supports query params `from_date`, `to_date`, `symbol`, `limit` (≤1000, default 100), and `offset` (default 0). Invalid dates/ranges return 400. [Source: docs/epics.md#Story-3.5]
+3. Fetches Supabase credentials, decrypts password, logs into MT5 via `MT5ConnectionManager`, calls `get_history_deals_raw`, converts to trades using `transform_history_to_trades`, and applies symbol filter. [Source: docs/epics.md#Story-3.5; docs/PRD-MT5-Integration-Service.md#5.2.4]
+4. Computes summary metrics (total_profit, total_loss, net_profit, win_rate, total_pips) and returns paginated trades along with period metadata, caching results for 5 minutes. [Source: docs/epics.md#Story-3.5]
+5. Response times target <2 seconds; cached responses include `cached` metadata. [Source: docs/epics.md#Story-3.5]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 3.5</title>
+        <section>Story 3.5</section>
+        <snippet><![CDATA[Defines filters, pagination, summaries, and caching requirements for historical trades.] ]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.2.4 Historical Trades</title>
+        <section>5.2.4</section>
+        <snippet><![CDATA[Provides response schema and default query parameters (from/to dates, limits) for historical trades.] ]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/3-1-api-authentication-middleware.context.xml</path>
+        <title>Story 3.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Lists the auth dependencies (API key + JWT + ownership) to reuse here.] ]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-2-mt5-data-retrieval-functions.context.xml</path>
+        <title>Story 2.2 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents `get_history_deals_raw` used to retrieve MT5 history before transformation.] ]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-3-mt5-data-transformation-layer.context.xml</path>
+        <title>Story 2.3 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Defines `transform_history_to_trades` that groups deals into trade objects.] ]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/api/routes/mt5.py</path>
+        <kind>router</kind>
+        <symbol>GET /api/mt5/account/{account_id}/history</symbol>
+        <lines>-</lines>
+        <reason>Endpoint implementation location with query parsing, caching, and response formatting.] ]></reason>
+      </artifact>
+      <artifact>
+        <path>app/api/schemas/mt5.py</path>
+        <kind>schema-module</kind>
+        <symbol>HistoryResponse</symbol>
+        <lines>-</lines>
+        <reason>Pydantic models for request/response validation and pagination metadata.] ]></reason>
+      </artifact>
+      <artifact>
+        <path>app/core/cache.py</path>
+        <kind>utility</kind>
+        <symbol>TTL cache helper</symbol>
+        <lines>-</lines>
+        <reason>Shared caching utility providing the 5-minute TTL for history responses.] ]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>FastAPI</name>
+        <version>referenced</version>
+        <notes>Framework for route, dependency injection, and response modeling.] ]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>cachetools</name>
+        <version>referenced</version>
+        <notes>Used for 5-minute TTL caching of historical responses.] ]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Endpoint must remain stateless; credentials never stored.
+- Caching TTL = 5 minutes; respect filters and pagination when caching.
+- Date parsing should accept ISO 8601 and Unix timestamps with timezone awareness.
+  ]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>GET /api/mt5/account/{account_id}/history</name>
+      <kind>REST endpoint</kind>
+      <signature>GET /api/mt5/account/{account_id}/history?from_date=ISO&to_date=ISO&symbol=EURUSD&limit=100&offset=0</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes>Returns paginated trades plus summary stats, respecting full/incremental filters.] ]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Tests should mock MT5/Supabase to validate filtering, pagination, caching, and summary calculations.] ]></standards>
+    <locations><![CDATA[tests/api/test_mt5.py]]></locations>
+    <ideas><![CDATA[
+- Verify default 30-day window when no dates provided.
+- Ensure symbol filter returns matching trades only.
+- Confirm pagination (`limit`/`offset`) and `has_more` behave as expected.
+- Simulate incremental vs full sync windows using `last_sync_at`.]]></ideas>
+  </tests>
+</story-context>

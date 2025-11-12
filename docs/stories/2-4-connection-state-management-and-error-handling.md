@@ -1,6 +1,6 @@
 # Story 2.4: Connection State Management and Error Handling
 
-Status: drafted
+Status: ready-for-dev
 
 ## Story
 
@@ -55,7 +55,7 @@ so that **temporary broker outages don’t cause prolonged downtime or cascading
 
 ### Context Reference
 
-_To be filled when story-context runs._
+- `docs/stories/2-4-connection-state-management-and-error-handling.context.xml`
 
 ### Agent Model Used
 

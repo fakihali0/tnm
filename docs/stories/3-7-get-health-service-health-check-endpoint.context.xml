@@ -1,0 +1,151 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>7</storyId>
+    <title>GET /health - Service Health Check Endpoint</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T13:20:34Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-7-get-health-service-health-check-endpoint.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>DevOps engineer</asA>
+    <iWant>a public health check endpoint reporting FastAPI and MT5 connection status</iWant>
+    <soThat>monitoring tools can detect outages and alert the team promptly</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1,2)** – Health endpoint skeleton & wiring
+  - [ ] Scaffold `app/api/routes/health.py`, expose `GET /health` without auth, and register the router in `app/main.py` with proper prefix/tags.
+  - [ ] Load service metadata (version, start_time) from global state so monitoring responses stay consistent.
+- [ ] **Task 2 (AC:1,3)** – Telemetry aggregation
+  - [ ] Pull MT5 status, pool size, and last_error via `MT5ConnectionManager` helpers from Story 2.1/2.4.
+  - [ ] Query Supabase `trading_accounts` for a fast count, and compute uptime from stored start timestamp.
+  - [ ] Collect CPU %, memory MB, and disk free GB via `psutil`, providing fallback zeros/log warnings when the module is unavailable.
+- [ ] **Task 3 (AC:2,4)** – Response semantics & performance guardrails
+  - [ ] Map MT5/service states to `healthy`, `degraded`, `unhealthy` and emit HTTP 200/503 accordingly.
+  - [ ] Include timestamp, version, MT5 flag, connection metrics, resource usage, and last error in the JSON response; keep total execution <100ms by caching expensive calls and avoiding sync Supabase queries.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `GET /health` lives in `app/api/routes/health.py`, requires no auth, and returns status, timestamp, version, MT5 status, connection metrics, uptime, resource usage, and last error per PRD §5.2.6.
+2. Response status labels are `healthy`, `degraded`, or `unhealthy`, yielding HTTP 200/200/503 respectively.
+3. Health calculation inspects MT5 initialization state, active connection pool size, Supabase `trading_accounts` total, service uptime, and psutil-derived CPU/memory/disk metrics.
+4. Endpoint completes in <100 ms so it can be used by UptimeRobot/Nginx health probes.]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Story 3.7 spec</title>
+        <section>Story 3.7</section>
+        <snippet><![CDATA[Defines the unauthenticated `GET /health` route, expected payload fields (status, timestamp, version, MT5 metrics, uptime, resource usage, last_error), and the 200/503 status mapping with <100 ms response time.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.2.6 Health & Status</title>
+        <section>5.2.6</section>
+        <snippet><![CDATA[Presents the canonical JSON example for `/health`, including `mt5_initialized`, `active_connections`, `total_accounts`, `uptime_seconds`, nested `resource_usage`, and `last_error`, setting the fields and semantics monitoring tools rely on.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local FastAPI walkthrough</title>
+        <section>4.5 FastAPI scaffolding</section>
+        <snippet><![CDATA[Shows the sample FastAPI app with `@app.get("/health")` plus global startup metadata, reinforcing how the health route should read version/start_time and remain lightweight.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-4-connection-state-management-and-error-handling.context.xml</path>
+        <title>Story 2.4 context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents that `/health` must include MT5 connection enum state, last error, and background retry visibility so observability dashboards catch outages.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/2-1-mt5-connection-manager-with-connection-pooling.context.xml</path>
+        <title>Story 2.1 context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Details the `MT5ConnectionManager` API (initialize/login/is_connected/metrics) that the health endpoint should query instead of rolling independent MT5 checks.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/api/routes/health.py</path>
+        <kind>router</kind>
+        <symbol>GET /health</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Defines the unauthenticated health route, response model, and dependency wiring that surface all telemetry fields.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/main.py</path>
+        <kind>fastapi-bootstrap</kind>
+        <symbol>app.include_router / startup events</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Holds global metadata (version, start_time) and includes the health router so uptime and version tracking remain consistent.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/core/mt5_manager.py</path>
+        <kind>service-module</kind>
+        <symbol>MT5ConnectionManager</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Source of MT5 connection state, active pool metrics, and last error info consumed by the health response.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/integrations/supabase.py</path>
+        <kind>integration</kind>
+        <symbol>get_supabase_client</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Provides the reusable Supabase client used to count `trading_accounts` quickly inside the health check.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/services/health_metrics.py</path>
+        <kind>service-module</kind>
+        <symbol>collect_resource_usage</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Encapsulates psutil-based CPU/memory/disk sampling with graceful fallbacks so `/health` stays sub-100 ms.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>fastapi</name>
+        <version>referenced</version>
+        <notes><![CDATA[Supplies routing, dependency injection, and BackgroundTasks primitives for the health endpoint.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>psutil</name>
+        <version>referenced</version>
+        <notes><![CDATA[Used to capture system CPU %, memory usage, and disk space statistics returned in the health payload.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>supabase-py</name>
+        <version>referenced</version>
+        <notes><![CDATA[Provides the client for counting `trading_accounts` and surfacing database connectivity in the health response.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Endpoint must remain public, respond in under 100 ms, and never block on heavy Supabase queries—cache or prefetch counts when needed.
+- `/health` should always consume MT5 status from `MT5ConnectionManager` (story 2.1/2.4) rather than calling MetaTrader directly.
+- Resource sampling must handle missing psutil gracefully by returning fallback values and logging warnings, keeping response schema stable.
+- Rate limiting and authentication middleware must explicitly bypass this route so UptimeRobot, Nginx, and Supabase monitors can call it freely.
+- Logged `last_error` values must align with PRD error taxonomy for downstream alerting.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>GET /health</name>
+      <kind>REST endpoint</kind>
+      <signature>GET /health → {status, timestamp, version, mt5_initialized, active_connections, total_accounts, uptime_seconds, resource_usage, last_error}</signature>
+      <path>app/api/routes/health.py</path>
+      <notes><![CDATA[Primary health probe for UptimeRobot/Nginx; emits 200 (healthy/degraded) or 503 (unhealthy) based on MT5/service states.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Use pytest + httpx TestClient to exercise FastAPI routes, combined with dependency overrides/mocks for MT5 manager, Supabase client, and psutil so health responses stay deterministic.]]></standards>
+    <locations><![CDATA[tests/api/test_health.py, tests/services/test_health_metrics.py]]></locations>
+    <ideas><![CDATA[
+- **AC1/AC3**: Mock MT5 manager to return connected pool metrics and assert the response payload matches spec fields and remains unauthenticated.
+- **AC2**: Force MT5 manager states (healthy/degraded/unhealthy) to confirm HTTP 200 vs 503 behavior and status strings.
+- **AC3**: Inject Supabase mock counts and psutil stats to ensure uptime, account totals, and resource usage appear even when psutil raises ImportError.
+- **AC4**: Simulate slow dependencies to verify caching/fallback logic keeps runtime below 100 ms and logs warnings instead of blocking.]]></ideas>
+  </tests>
+</story-context>

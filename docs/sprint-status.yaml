@@ -31,6 +31,10 @@ development_status:
   # Epic 2: Core MT5 Integration
   2-1-mt5-connection-manager-with-connection-pooling: drafted
 
+  # Epic 3: REST API Implementation
+  3-6-post-api-mt5-account-account-id-sync-manual-sync-trigger-endpoint: drafted
+  3-7-get-health-service-health-check-endpoint: ready-for-dev
+
 # =============================================================================
 # SPRINT METRICS
 # =============================================================================
