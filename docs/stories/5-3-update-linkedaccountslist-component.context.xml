@@ -1,0 +1,141 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>5</epicId>
+    <storyId>3</storyId>
+    <title>Update LinkedAccountsList Component</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T20:59:41Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/5-3-update-linkedaccountslist-component.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>frontend developer</asA>
+    <iWant>LinkedAccountsList to display synced MT5 accounts with live data and actions</iWant>
+    <soThat>users can monitor status, trigger manual syncs, and manage accounts</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Base layout (cards/rows with metrics + countdowns).
+- [ ] **Task 2 (AC:2)** – Action buttons (refresh, view details modal, disconnect).
+- [ ] **Task 3 (AC:3)** – Status badges per epic rules.
+- [ ] **Task 4 (AC:4)** – Modal details (metrics, sync history).
+- [ ] **Task 5 (AC:5)** – Realtime/polling + UX (loading states, toasts).
+- [ ] **Task 6 (Testing)** – Jest/RTL + Cypress coverage and manual QA.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. Component removes alert and shows list/card with broker/server/login/balance/equity/status/last sync/next sync. [Source: docs/epics.md#Story-5.3]
+2. Provides actions per account: Refresh Now, View Details (modal), Disconnect. [Source: docs/epics.md#Story-5.3]
+3. Status badges use green/yellow/red/gray logic defined in epic. [Source: docs/epics.md#Story-5.3]
+4. Modal displays metrics + last 5 sync entries. [Source: docs/epics.md#Story-5.3; docs/stories/4-3-database-schema-updates-for-mt5-integration.context.xml]
+5. Real-time updates/polling ensure UI refreshes after sync; loading indicators shown during refresh actions. [Source: docs/epics.md#Story-5.3; context7:/supabase/realtime]
+6. Manual/cypress tests verify flows. [Source: docs/epics.md#Story-5.3]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 5 – Story 5.3</title>
+        <section>Story 5.3</section>
+        <snippet><![CDATA[Lists required fields, badges, modal details, and action buttons.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §7.3 Linked Accounts UI</title>
+        <section>7.3</section>
+        <snippet><![CDATA[Describes UX expectations, sample copy, and KPI tiles for the account list.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-2-update-sync-trading-data-edge-function.context.xml</path>
+        <title>Story 4.2 Context</title>
+        <section>Artifacts</section>
+        <snippet><![CDATA[Provides sync fields (`last_sync_at`, `sync_logs`) needed for badges/modals.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/5-2-update-auth-ts-state-management.context.xml</path>
+        <title>Story 5.2 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Explains store methods (`syncAccount`, `getAccountStatus`) that power LinkedAccountsList actions.]]></snippet>
+      </doc>
+      <doc>
+        <path>context7:/supabase/realtime</path>
+        <title>Supabase Realtime Docs</title>
+        <section>Postgres Changes</section>
+        <snippet><![CDATA[Reference for listening to Postgres changes (trading_accounts/sync_logs) to refresh UI.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/src/components/tnm-pro/LinkedAccountsList.tsx</path>
+        <kind>react-component</kind>
+        <symbol>LinkedAccountsList</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Primary component implementing the UI.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/components/tnm-pro/modals/AccountDetailsModal.tsx</path>
+        <kind>react-component</kind>
+        <symbol>AccountDetailsModal</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Modal displaying metrics and sync history.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/store/auth.ts</path>
+        <kind>zustand-store</kind>
+        <symbol>useAccountStore</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Provides account data, sync helpers, and status flags consumed by the component.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/hooks/useRealtimeMT5Data.ts</path>
+        <kind>react-hook</kind>
+        <symbol>useRealtimeMT5Data</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Optional hook supplying realtime updates for badges and tables.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/sync-trading-data/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>syncHandler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Manual refresh button ultimately calls this backend function via store.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>date-fns</name>
+        <version>latest</version>
+        <notes><![CDATA[Used for `formatDistanceToNow` to display times.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>@supabase/supabase-js</name>
+        <version>2.x</version>
+        <notes><![CDATA[Provides client for realtime subscriptions/polling fallback.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Ensure status badges remain consistent with Story 5.3 color rules and accessible labels.
+- Avoid expensive re-renders; memoize rows and use per-account loading states.
+- Protect user actions: confirm disconnect, disable buttons while operations run, and log outcomes.
+- Support fallback polling in case Supabase Realtime unavailable.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>useAccountStore selectors</name>
+      <kind>store</kind>
+      <signature>{ accounts, syncAccount, deleteAccount, getAccountStatus, lastSyncTime }</signature>
+      <path>tnm_concept/src/store/auth.ts</path>
+      <notes><![CDATA[Primary data source for the component.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Use Jest/RTL for component tests and Cypress for end-to-end flows; manual QA via staging data.]]></standards>
+    <locations><![CDATA[tnm_concept/src/components/tnm-pro/__tests__/LinkedAccountsList.test.tsx, tnm_concept/cypress/e2e/linked-accounts.cy.ts]]></locations>
+    <ideas><![CDATA[
+- Snapshot/DOM tests for badges/tables.
+- Mock store actions to assert refresh + modal flows.
+- Cypress scenario covering manual refresh + disconnect and verifying UI updates.]]></ideas>
+  </tests>
+</story-context>

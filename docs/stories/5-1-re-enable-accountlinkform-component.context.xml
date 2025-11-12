@@ -1,0 +1,164 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>5</epicId>
+    <storyId>1</storyId>
+    <title>Re-enable AccountLinkForm Component</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T20:50:34Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/5-1-re-enable-accountlinkform-component.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>frontend developer</asA>
+    <iWant>the AccountLinkForm component re-enabled and connected to the Supabase connect edge function</iWant>
+    <soThat>users can add MT5 accounts through the TNM Pro UI once the new backend flow is live</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Re-enable base UI
+  - [ ] Remove the “temporarily unavailable” alert and reintroduce the form submission controls.
+  - [ ] Reconnect form state management (Zustand or internal state) and client-side validation.
+- [ ] **Task 2 (AC:2)** – Broker/server config
+  - [ ] Create `src/config/brokers.ts` with broker metadata and server lists.
+  - [ ] Wire cascading dropdowns so server options depend on the selected broker.
+- [ ] **Task 3 (AC:3)** – Test Connection flow
+  - [ ] Instantiate Supabase functions client and call `connect-mt5-account` with JSON payload.
+  - [ ] Show loading indicator, success state, and error message without persisting data.
+- [ ] **Task 4 (AC:4)** – Connect Account + persistence
+  - [ ] On success, refresh account store, reset form, and show success toast.
+  - [ ] Ensure LinkedAccountsList reflects new account.
+- [ ] **Task 5 (AC:5)** – Error handling & documentation
+  - [ ] Surface API errors in UI and document ngrok workflow for QA.
+- [ ] **Task 6 (Testing)** – Verification
+  - [ ] Add Jest/RTL tests and capture manual QA (success/failure) steps.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `/tnm_concept/src/components/tnm-pro/AccountLinkForm.tsx` removes the banner, restores the form, and validates login/password/broker/server. [Source: docs/epics.md#Story-5.1]
+2. Broker + server dropdowns come from `src/config/brokers.ts`, filtered by selected broker. [Source: docs/epics.md#Story-5.1]
+3. “Test Connection” calls `connect-mt5-account` via Supabase functions invoke, showing loading/success/error without saving. [Source: docs/epics.md#Story-5.1; docs/stories/4-1-update-connect-mt5-account-edge-function.context.xml; context7:/supabase/supabase-js]
+4. “Connect Account” reuses the call, saves the account (`LinkedAccountsList` reflects it), shows toast, and resets form. [Source: docs/epics.md#Story-5.1]
+5. Errors bubble to UI with guidance (ngrok workflow) and manual tests cover both success/failure. [Source: docs/epics.md#Story-5.1; docs/stories/1-5-ngrok-tunnel-for-supabase-edge-function-testing.md]
+6. Manual tests via `supabase functions serve`/dashboard verify both flows. [Source: docs/PRD-MT5-Integration-Service.md#7.1 Component Updates]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 5 – Story 5.1</title>
+        <section>Story 5.1</section>
+        <snippet><![CDATA[Defines the AccountLinkForm requirements (validation rules, broker/server dropdowns, test/connect buttons, UI feedback).]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §7.1 AccountLinkForm</title>
+        <section>7.1</section>
+        <snippet><![CDATA[Provides UI expectations, sample validation messages, and Supabase invoke flow for the form.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-1-update-connect-mt5-account-edge-function.context.xml</path>
+        <title>Story 4.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Documents the backend edge function contract (payload, headers, success/error responses) the form must call.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-5-supabase-edge-function-deployment.context.xml</path>
+        <title>Story 4.5 Context</title>
+        <section>Artifacts</section>
+        <snippet><![CDATA[Confirms connect/sync functions deployed with secrets/cron, ensuring AccountLinkForm targets the correct endpoints.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-5-ngrok-tunnel-for-supabase-edge-function-testing.md</path>
+        <title>Story 1.5</title>
+        <section>Task 4</section>
+        <snippet><![CDATA[Explains how to configure Supabase secrets/ngrok for local testing, referenced in AC5.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-7-environment-variable-configuration-and-secret-management.md</path>
+        <title>Story 1.7</title>
+        <section>Acceptance Criteria</section>
+        <snippet><![CDATA[Lists required frontend env vars (`VITE_MT5_SERVICE_URL`, etc.) that the form should consume.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/src/components/tnm-pro/AccountLinkForm.tsx</path>
+        <kind>react-component</kind>
+        <symbol>AccountLinkForm</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Primary component to re-enable; handles form state, validation, and Supabase invocations.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/config/brokers.ts</path>
+        <kind>config</kind>
+        <symbol>brokerConfig</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Config file providing broker/server metadata for dropdowns.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/store/auth.ts</path>
+        <kind>zustand-store</kind>
+        <symbol>useAccountStore</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Exposes `addAccount`, `loadAccounts`, and status flags the form must call after connect.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/connect-mt5-account/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>connectHandler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Backend function invoked by the form for test/connect flows.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/components/tnm-pro/LinkedAccountsList.tsx</path>
+        <kind>react-component</kind>
+        <symbol>LinkedAccountsList</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Downstream component that should reflect new accounts immediately; ensures contract between form and list.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>@supabase/supabase-js</name>
+        <version>2.x</version>
+        <notes><![CDATA[Used to invoke the `connect-mt5-account` edge function with headers and error handling.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>react-hook-form or equivalent</name>
+        <version>latest</version>
+        <notes><![CDATA[Existing form validation library; ensures login/password rules run client-side.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>zustand</name>
+        <version>latest</version>
+        <notes><![CDATA[State management for account store interactions (`loadAccounts`).]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Use env-driven URLs/keys (Story 1.7) rather than hardcoding endpoints or secrets.
+- Keep UI responsive: disable buttons during Supabase call, show spinners, and ensure keyboard accessibility.
+- Handle errors gracefully (display message, log details) and never persist data when test call fails.
+- Respect story dependencies: only use `useAccountStore` methods defined in Story 5.2, LinkedAccountsList should not require manual refresh.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>Supabase Edge Function – connect-mt5-account</name>
+      <kind>HTTP</kind>
+      <signature>POST /functions/v1/connect-mt5-account</signature>
+      <path>supabase/functions/connect-mt5-account/index.ts</path>
+      <notes><![CDATA[Form submits credentials via this endpoint; returns `account_id` or error details.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Use Jest/React Testing Library for component unit tests plus manual QA via Supabase dashboard/ngrok; integration tests should mock Supabase functions client.]]></standards>
+    <locations><![CDATA[tnm_concept/src/components/tnm-pro/__tests__/AccountLinkForm.test.tsx, docs/QA/account-link-form.md]]></locations>
+    <ideas><![CDATA[
+- Validate required fields and error messages (AC1).
+- Mock Supabase invoke success/failure to assert UI states (AC3/AC5).
+- Ensure “Connect Account” triggers store refresh and resets form (AC4).
+- Manual QA: use ngrok + Supabase dashboard to verify remote call success.]]></ideas>
+  </tests>
+</story-context>

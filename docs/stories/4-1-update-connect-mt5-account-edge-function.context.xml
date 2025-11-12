@@ -1,0 +1,161 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>4</epicId>
+    <storyId>1</storyId>
+    <title>Update connect-mt5-account Edge Function</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T14:09:17Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/4-1-update-connect-mt5-account-edge-function.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>the connect-mt5-account Supabase edge function to call the Python MT5 service</iWant>
+    <soThat>users can link their MT5 accounts from the frontend without MetaAPI dependencies</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Refactor edge function scaffolding
+  - [ ] Remove MetaAPI imports, handlers, and unused secrets.
+  - [ ] Normalize request schema (TypeScript zod or manual guard) for login/password/server/broker_name.
+  - [ ] Load Supabase URL/key and service role key securely for DB access.
+- [ ] **Task 2 (AC:2)** – MT5 service integration
+  - [ ] Build helper to invoke `{MT5_SERVICE_URL}/api/mt5/connect` with `X-API-Key` header and JSON payload.
+  - [ ] Implement timeout + single retry (backoff) and translate FastAPI error payloads into edge function responses.
+- [ ] **Task 3 (AC:3)** – Credential encryption + persistence
+  - [ ] Reuse Story 7.1 AES-256 utility (or placeholder until merged) to encrypt password before storage.
+  - [ ] Insert/merge `trading_accounts` (status, broker, server metadata) and `account_integrations` (encrypted_password, broker_name) within a transactional block.
+- [ ] **Task 4 (AC:4,5)** – Error handling, logging, configuration
+  - [ ] Capture service responses + validation failures in structured logs, including connection attempts and request IDs.
+  - [ ] Update secrets (`MT5_SERVICE_URL`, `MT5_SERVICE_API_KEY`) via `supabase secrets set ...` for dev/stage/prod; document alignment with Story 1.5 ngrok workflow.
+  - [ ] Write failure handler that surfaces `last_connection_error` and never persists partial data.
+- [ ] **Task 5 (AC:6)** – Verification & rollout
+  - [ ] Run `supabase functions serve connect-mt5-account --env-file .env.edge` locally against ngrok/Windows MT5 service.
+  - [ ] Add CLI or REST invocation samples for QA and frontend teams, noting expected JSON contract.
+  - [ ] Capture manual test evidence (success + failure) in Debug Log References section for the dev agent.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `supabase/functions/connect-mt5-account/index.ts` accepts `login`, `password`, `server`, and `broker_name`, validates payloads, and removes all legacy MetaAPI logic. [Source: docs/epics.md#Story-4.1]
+2. The function calls `POST {MT5_SERVICE_URL}/api/mt5/connect` with `X-API-Key: {MT5_SERVICE_API_KEY}`, reusing the FastAPI authentication model (Story 3.1) and retrying once on timeout before failing. [Source: docs/epics.md#Story-4.1; docs/PRD-MT5-Integration-Service.md#Function:-connect-mt5-account]
+3. Successful responses encrypt the password using the AES-256 helper from Story 7.1, insert/merge the MT5 record in `trading_accounts`, persist encrypted credentials in `account_integrations`, and return the new `account_id`. [Source: docs/epics.md#Story-4.1; docs/PRD-MT5-Integration-Service.md#Function:-connect-mt5-account]
+4. Failed validations or MT5 errors return structured errors without writing to Supabase, while logging attempt metadata and updating `last_connection_error` fields for observability. [Source: docs/epics.md#Story-4.1]
+5. The function is configurable via `MT5_SERVICE_URL` and `MT5_SERVICE_API_KEY` secrets (per Story 1.7) and includes structured logging so Supabase dashboard traces each attempt. [Source: docs/LOCAL-DEVELOPMENT-GUIDE.md#Update-Supabase-Edge-Functions; docs/stories/1-7-environment-variable-configuration-and-secret-management.md]
+6. Manual tests via `supabase functions serve connect-mt5-account` and cloud invokes demonstrate success + failure paths, ensuring the frontend can call the updated function without further changes. [Source: docs/PRD-MT5-Integration-Service.md#Function:-connect-mt5-account]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 4 – Story 4.1</title>
+        <section>Story 4.1</section>
+        <snippet><![CDATA[Specifies the connect edge function flow (payload validation, MT5 service call, AES encrypt + DB writes, retries) and removal of MetaAPI code.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.2.5 Function: connect-mt5-account</title>
+        <section>Function: connect-mt5-account</section>
+        <snippet><![CDATA[Defines Supabase function responsibilities: call `/api/mt5/connect`, encrypt credentials, insert into trading_accounts/account_integrations, and log attempts/retries.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Dev Guide</title>
+        <section>Update Supabase Edge Functions</section>
+        <snippet><![CDATA[Details how to set `MT5_SERVICE_URL` secrets, restart functions, and use ngrok when testing Supabase → Windows service traffic.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-5-ngrok-tunnel-for-supabase-edge-function-testing.md</path>
+        <title>Story 1.5</title>
+        <section>Task 4 – Configure Supabase Edge Functions</section>
+        <snippet><![CDATA[Provides CLI steps (`supabase secrets set ...`) and verification flow to ensure edge functions reach the local MT5 service through ngrok.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-7-environment-variable-configuration-and-secret-management.md</path>
+        <title>Story 1.7</title>
+        <section>Acceptance Criteria</section>
+        <snippet><![CDATA[Lists required secrets (MT5_SERVICE_URL, MT5_SERVICE_API_KEY, AES key) and enforces consistent configuration/templates across backend and Supabase.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>supabase/functions/connect-mt5-account/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>handler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Primary Deno entry point where payload validation, MT5 service calls, encryption, DB writes, and logging will live.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/_shared/crypto.ts</path>
+        <kind>shared-module</kind>
+        <symbol>encryptPassword</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Shared AES-256 helper (from Story 7.1) reused to encrypt credentials before persisting to Supabase tables.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/_shared/supabase-client.ts</path>
+        <kind>shared-module</kind>
+        <symbol>createServiceRoleClient</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Wrapper for instantiating Supabase client with service-role key so the edge function can upsert trading_accounts/account_integrations.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/api/routes/mt5.py</path>
+        <kind>backend-endpoint</kind>
+        <symbol>POST /api/mt5/connect</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Target FastAPI endpoint invoked by the edge function; its auth contract (X-API-Key, JWT) dictates request headers and error handling.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>deno</ecosystem>
+        <name>Supabase Edge Runtime</name>
+        <version>latest</version>
+        <notes><![CDATA[Functions execute in Deno; use native fetch, `Deno.env.get`, and std libraries.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>@supabase/supabase-js</name>
+        <version>2.x</version>
+        <notes><![CDATA[Used by edge functions to interact with Supabase tables (trading_accounts, account_integrations, sync_logs).]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>crypto libraries (e.g., crypto-js)</name>
+        <version>latest</version>
+        <notes><![CDATA[Provides AES-256 encryption/decryption utilities aligned with Story 7.1 requirements.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>cli</ecosystem>
+        <name>Supabase CLI</name>
+        <version>latest</version>
+        <notes><![CDATA[Used for `supabase functions serve/deploy` and `supabase secrets set` per story tasks.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Never persist raw MT5 passwords; encrypt with the shared AES-256 helper using the Story 7.1 key (32 bytes) and store ciphertext only.
+- Honor MT5 service auth: include `X-API-Key` and reuse FastAPI security middleware expectations; failures must not bypass rate limits or logging.
+- Secrets come from Story 1.7 templates; avoid hardcoding URLs/keys and document how ngrok overrides are applied (Story 1.5).
+- Edge function execution must remain idempotent—do not create duplicate trading_accounts entries and always guard against partial writes.
+- Structured logging (request ID, broker, result) is required for Supabase dashboard observability; sensitive fields must be redacted.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>POST {MT5_SERVICE_URL}/api/mt5/connect</name>
+      <kind>REST endpoint</kind>
+      <signature>POST /api/mt5/connect → { success, account_id, error? }</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes><![CDATA[Edge function submits credentials plus API key to validate MT5 login; response drives Supabase inserts and error propagation.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Use Deno’s built-in test runner (or Vitest with `npm:` specifiers) plus Supabase CLI invoke commands; mock MT5 service responses where needed.]]></standards>
+    <locations><![CDATA[supabase/functions/tests/connect-mt5-account.test.ts, supabase/tests/integration/connect-mt5-account.integration.ts]]></locations>
+    <ideas><![CDATA[
+- **AC1/AC2**: Schema validation rejects malformed payloads and ensures MT5 service calls include headers + retry once on timeout.
+- **AC3**: Encrypt helper invoked and Supabase upserts executed exactly once; verify ciphertext stored.
+- **AC4**: Simulate MT5 failure and confirm no DB writes plus structured error logged.
+- **AC5**: Secrets loaded from `Deno.env`; toggling values should change target URL/API key without redeploying code.
+- **AC6**: CLI serve invocation returns expected success + synthetic failure responses; log entries appear in Supabase dashboard.]]></ideas>
+  </tests>
+</story-context>

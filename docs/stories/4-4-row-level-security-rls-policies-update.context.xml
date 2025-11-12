@@ -1,0 +1,155 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>4</epicId>
+    <storyId>4</storyId>
+    <title>Row Level Security (RLS) Policies Update</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T14:32:22Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/4-4-row-level-security-rls-policies-update.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>security engineer</asA>
+    <iWant>Row Level Security policies on all MT5-related tables</iWant>
+    <soThat>users only access their own trading data while service-role integrations retain full privileges</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Enable RLS on `trading_accounts`
+  - [ ] Update migration to enable RLS and add four policies for select/insert/update/delete tied to `auth.uid()`.
+  - [ ] Comment each policy with rationale and dependency references.
+- [ ] **Task 2 (AC:2)** – Secure `trades`
+  - [ ] Enable RLS and create a SELECT policy that joins against `trading_accounts` (`account_id IN (SELECT id FROM trading_accounts WHERE user_id = auth.uid())`).
+- [ ] **Task 3 (AC:3)** – Guard `sync_logs`
+  - [ ] Decide if only admins/service-role can read; create policy accordingly (owner-only or restricted). Document reasoning.
+- [ ] **Task 4 (AC:4)** – Service role / edge function considerations
+  - [ ] Document in migration comments + Dev Notes how `service_role` bypasses RLS for edge functions and MT5 services.
+- [ ] **Task 5 (AC:5)** – Verification plan
+  - [ ] Use Supabase SQL editor or `psql` with mocked JWTs to test with two users, ensuring unauthorized access fails.
+  - [ ] Record test steps/results in Dev Agent Debug Log instructions.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `trading_accounts` has RLS enabled plus policies for SELECT/INSERT/UPDATE/DELETE that enforce `auth.uid() = user_id`, matching the epic specification. [Source: docs/epics.md#Story-4.4; docs/PRD-MT5-Integration-Service.md#6.3-Row-Level-Security]
+2. `trades` gains RLS with a SELECT policy that only returns rows where `account_id` belongs to the caller’s accounts. [Source: docs/epics.md#Story-4.4; docs/PRD-MT5-Integration-Service.md#6.3-Row-Level-Security]
+3. `sync_logs` (optional) enables RLS with admin-only or owner-only SELECT policies, ensuring telemetry isn’t exposed cross-user. [Source: docs/epics.md#Story-4.4]
+4. Policies include comments referencing Stories 4.1–4.3, and migrations/documentation explain how the Supabase service role bypasses RLS for edge functions. [Source: docs/epics.md#Story-4.4]
+5. RLS behavior is tested using Supabase SQL editor or CLI by impersonating multiple users, confirming access is restricted appropriately; test evidence recorded in Dev Notes. [Source: docs/PRD-MT5-Integration-Service.md#6.3-Row-Level-Security]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 4 – Story 4.4</title>
+        <section>Story 4.4</section>
+        <snippet><![CDATA[Defines required policies per table (trading_accounts, trades, sync_logs) and emphasizes testing + service-role behavior.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §6.3 Row Level Security</title>
+        <section>6.3</section>
+        <snippet><![CDATA[Provides example SQL for enabling RLS and creating policies, plus expectations for user isolation and service-role bypass.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-3-database-schema-updates-for-mt5-integration.md</path>
+        <title>Story 4.3</title>
+        <section>Acceptance Criteria</section>
+        <snippet><![CDATA[Documents the schema elements (columns, sync_logs) that these RLS policies must protect, so migration ordering is clear.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-1-update-connect-mt5-account-edge-function.md</path>
+        <title>Story 4.1</title>
+        <section>Dev Notes</section>
+        <snippet><![CDATA[Highlights service role usage in edge functions—policies must allow service-role access while blocking regular users.]]></snippet>
+      </doc>
+      <doc>
+        <path>context7:/supabase.com/llmstxt</path>
+        <title>Supabase RLS examples</title>
+        <section>RLS Policies</section>
+        <snippet><![CDATA[Provides SQL patterns for enabling RLS and crafting SELECT/UPDATE policies, mirroring Supabase guidance.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/supabase/migrations/20251112130000_mt5_rls_policies.sql</path>
+        <kind>sql-migration</kind>
+        <symbol>up/down</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Migration enabling RLS and creating policies for trading_accounts, trades, and sync_logs with descriptive comments.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/supabase/migrations/20251112121000_sync_logs_table.sql</path>
+        <kind>sql-migration</kind>
+        <symbol>sync_logs table</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Schema source for sync_logs; policies must reference its FK columns and indexes once table exists.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/supabase/tests/security/rls_trading_accounts.sql</path>
+        <kind>test-sql</kind>
+        <symbol>rls_trading_accounts</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[SQL test script that impersonates two users to verify trading_accounts policies; to be added per Task 5.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/connect-mt5-account/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>connectHandler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Uses service-role key; migration comments must note that service-role bypass is intentional.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/sync-trading-data/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>syncHandler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Reads/writes trading_accounts, trades, sync_logs—RLS policies must allow service-role updates while protecting user sessions.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>cli</ecosystem>
+        <name>Supabase CLI</name>
+        <version>latest</version>
+        <notes><![CDATA[Runs migrations (`supabase db push`) and can execute SQL policies via `supabase db remote commit`.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>postgresql</ecosystem>
+        <name>Supabase Postgres</name>
+        <version>managed</version>
+        <notes><![CDATA[Target database where RLS must be enabled without disrupting existing data.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>cli</ecosystem>
+        <name>psql</name>
+        <version>15+</version>
+        <notes><![CDATA[Used for impersonation tests (SET ROLE / JWT claims) to verify policies behave as expected.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Do not enable RLS until Story 4.3 migrations are applied; policies depend on new columns and tables.
+- Ensure service-role key (used by edge functions) retains unrestricted access; document this explicitly to avoid accidental blocking.
+- Policy names should follow consistent conventions and include comments referencing the related stories to aid auditors.
+- Provide CLEAR rollback SQL (`DROP POLICY ...`, `ALTER TABLE ... DISABLE ROW LEVEL SECURITY`) so RLS can be disabled if needed.
+- Testing must cover multiple users plus anonymous access to guarantee policies do not leak data across tenants.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>Supabase SQL editor / CLI</name>
+      <kind>tooling</kind>
+      <signature>supabase db remote commit / SQL editor sessions</signature>
+      <path>docs/PRD-MT5-Integration-Service.md</path>
+      <notes><![CDATA[Used to apply/verify RLS policies; testers need instructions for running queries as specific users.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Use Supabase SQL editor, CLI, or `psql` to simulate multiple users; capture commands and outputs as part of security verification.]]></standards>
+    <locations><![CDATA[tnm_concept/supabase/tests/security/rls_trading_accounts.sql, tnm_concept/supabase/tests/security/rls_trades.sql]]></locations>
+    <ideas><![CDATA[
+- **AC1**: Attempt SELECT/INSERT/UPDATE/DELETE on trading_accounts as another user and confirm access is denied; same user should succeed.
+- **AC2**: Query trades for a user and ensure only their accounts return results (join with trading_accounts in policy logic).
+- **AC3**: Test sync_logs with both owner-level access and admin/service-role overrides.
+- **AC4**: Confirm service-role (edge functions) bypass RLS by running queries with service-role key.
+- **AC5**: Document test scripts and outputs in Dev Notes to prove compliance.]]></ideas>
+  </tests>
+</story-context>

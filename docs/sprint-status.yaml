@@ -34,6 +34,27 @@ development_status:
   # Epic 3: REST API Implementation
   3-6-post-api-mt5-account-account-id-sync-manual-sync-trigger-endpoint: drafted
   3-7-get-health-service-health-check-endpoint: ready-for-dev
+  
+  # Epic 4: Supabase Integration
+  4-1-update-connect-mt5-account-edge-function: ready-for-dev
+  4-2-update-sync-trading-data-edge-function: ready-for-dev
+  4-3-database-schema-updates-for-mt5-integration: ready-for-dev
+  4-4-row-level-security-rls-policies-update: ready-for-dev
+  4-5-supabase-edge-function-deployment: ready-for-dev
+
+  # Epic 5: Frontend MT5 Integration
+  5-1-re-enable-accountlinkform-component: ready-for-dev
+  5-2-update-auth-ts-state-management: ready-for-dev
+  5-3-update-linkedaccountslist-component: ready-for-dev
+  5-4-update-aihub-component-for-live-data-display: ready-for-dev
+  5-5-frontend-environment-configuration: ready-for-dev
+  
+  # Epic 6: Real-time WebSocket (Phase 2)
+  6-1-websocket-endpoint-implementation: ready-for-dev
+  6-2-websocket-hook-userealtimemt5data: ready-for-dev
+  6-3-websocket-connection-testing-and-load-testing: ready-for-dev
+  5-4-update-aihub-component-for-live-data-display: drafted
+  5-3-update-linkedaccountslist-component: drafted
 
 # =============================================================================
 # SPRINT METRICS

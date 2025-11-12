@@ -1,0 +1,180 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>4</epicId>
+    <storyId>2</storyId>
+    <title>Update sync-trading-data Edge Function</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T14:19:19Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/4-2-update-sync-trading-data-edge-function.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>the sync-trading-data Supabase edge function to orchestrate MT5 account refreshes through the Python service</iWant>
+    <soThat>account balances, positions, and history stay current every five minutes without relying on MetaAPI</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Refactor edge function bootstrap
+  - [ ] Strip MetaAPI imports/logic and load service role key + Supabase client via environment secrets defined in Story 1.7.
+  - [ ] Query `trading_accounts` filtered by `is_active = true` and optional health flags from Story 4.3.
+- [ ] **Task 2 (AC:2)** – MT5 service batching helpers
+  - [ ] Build a batching iterator (size 10) that schedules `Promise.allSettled` calls to the three MT5 endpoints per account with shared headers.
+  - [ ] Implement timeout + retry (single backoff) consistent with Story 4.1 patterns so transient failures retry once.
+- [ ] **Task 3 (AC:3)** – Persistence + transformation
+  - [ ] Map info payloads to `balance/equity/margin/last_sync_at` updates on `trading_accounts`.
+  - [ ] Upsert open positions and insert new closed trades via `supabase.from('trades').upsert(..., { onConflict: 'ticket' })`.
+- [ ] **Task 4 (AC:4,5)** – Resilience & observability
+  - [ ] Write per-account result objects (status, duration_ms, error) into `sync_logs` (Story 4.3 schema) and bump `sync_failure_count` when needed.
+  - [ ] Log batch timings + totals; wrap batches with short `await` to avoid exceeding 5-minute runtime.
+- [ ] **Task 5 (AC:6)** – Scheduling & verification
+  - [ ] Document Supabase cron entry (`supabase functions deploy sync-trading-data --no-verify-jwt` + dashboard schedule) and provide CLI serve instructions referencing `.env.edge`.
+  - [ ] Capture manual invocation evidence (success/failure) for Dev Agent Debug Log references.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `/supabase/functions/sync-trading-data/index.ts` loads all active `trading_accounts` (`is_active = true`) with the Supabase service role key and removes any remaining MetaAPI references. [Source: docs/epics.md#Story-4.2; docs/PRD-MT5-Integration-Service.md#Function:-sync-trading-data]
+2. Accounts are processed in batches of 10 using async concurrency guards; each account invokes the MT5 service endpoints (`GET /api/mt5/account/{id}/info`, `/positions`, `/history?from_date={last_sync_at}`) with the same API key/auth used by Story 3.x. [Source: docs/epics.md#Story-4.2]
+3. After each batch, the function updates `trading_accounts` (balance/equity/margin/`last_sync_at`) and upserts current positions plus new history rows into `trades`, matching tickets to avoid duplicates. [Source: docs/epics.md#Story-4.2; docs/PRD-MT5-Integration-Service.md#Function:-sync-trading-data]
+4. Failures for one account never halt others—errors are captured per account, `sync_logs` receives the outcome (status, duration, error), and `trading_accounts.last_connection_error/sync_failure_count` are updated when applicable. [Source: docs/epics.md#Story-4.2; docs/PRD-MT5-Integration-Service.md#Function:-sync-trading-data]
+5. Execution respects Supabase’s 5-minute limit: batches throttle via `Promise.allSettled`, and instrumentation logs batch timings plus totals. [Source: docs/epics.md#Story-4.2]
+6. A Supabase cron entry (`0 */5 * * *`) or CLI scheduling docs accompany the deployment steps so cloud runs match requirements; manual `supabase functions serve sync-trading-data` tests cover success/failure flows. [Source: docs/epics.md#Story-4.2; docs/PRD-MT5-Integration-Service.md#Function:-sync-trading-data; context7:/supabase/cli]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 4 – Story 4.2</title>
+        <section>Story 4.2</section>
+        <snippet><![CDATA[Defines batching (10 accounts), MT5 info/positions/history calls, and requirements for sync_logs logging plus cron schedule.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.2.5 – sync-trading-data</title>
+        <section>Function: sync-trading-data</section>
+        <snippet><![CDATA[Lists flow: query active accounts, call MT5 endpoints, update trading_accounts, upsert trades, update last_sync_at, and log results.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/LOCAL-DEVELOPMENT-GUIDE.md</path>
+        <title>Local Dev Guide</title>
+        <section>Update Supabase Edge Functions</section>
+        <snippet><![CDATA[Explains how to set MT5 secrets, use ngrok for cloud→Windows testing, and restart functions—critical for validating sync invocations.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-3-database-schema-updates-for-mt5-integration.md</path>
+        <title>Story 4.3</title>
+        <section>Acceptance Criteria</section>
+        <snippet><![CDATA[Documents schema columns (`last_successful_sync_at`, `sync_failure_count`, `sync_logs`) that this edge function must populate.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-5-ngrok-tunnel-for-supabase-edge-function-testing.md</path>
+        <title>Story 1.5</title>
+        <section>Task 4</section>
+        <snippet><![CDATA[Provides step-by-step instructions for configuring edge-function secrets and verifying Supabase → local MT5 calls via ngrok.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>supabase/functions/sync-trading-data/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>handler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Implementation location for batching logic, MT5 calls, Supabase writes, and logging described in this story.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/_shared/batching.ts</path>
+        <kind>shared-module</kind>
+        <symbol>runInBatches</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Utility for queueing work in groups of 10 with Promise.allSettled, ensuring Supabase execution stays under 5 minutes.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/_shared/mt5-service.ts</path>
+        <kind>shared-module</kind>
+        <symbol>fetchAccountData</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Centralizes calls to FastAPI endpoints (`info`, `positions`, `history`) with shared headers, retries, and error translation.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/_shared/supabase-client.ts</path>
+        <kind>shared-module</kind>
+        <symbol>createServiceRoleClient</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Instantiates Supabase client with service-role key for batched selects/updates on trading_accounts, trades, sync_logs.]]></reason>
+      </artifact>
+      <artifact>
+        <path>app/api/routes/mt5.py</path>
+        <kind>backend-endpoint</kind>
+        <symbol>GET /api/mt5/account/{id}/*</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[FastAPI endpoints providing account info, positions, and history that the edge function consumes; contract dictates request/response format.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>deno</ecosystem>
+        <name>Supabase Edge Runtime</name>
+        <version>latest</version>
+        <notes><![CDATA[Edge functions execute on Deno; batching logic must use native fetch, timers, and Promise utilities.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>@supabase/supabase-js</name>
+        <version>2.x</version>
+        <notes><![CDATA[Provides typed client to read/write trading_accounts, trades, and sync_logs using service-role credentials.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>cli</ecosystem>
+        <name>Supabase CLI</name>
+        <version>latest</version>
+        <notes><![CDATA[Used for `functions serve`, `functions deploy`, `secrets set`, and verifying cron schedules (`0 */5 * * *`).]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>http</ecosystem>
+        <name>FastAPI MT5 service</name>
+        <version>current</version>
+        <notes><![CDATA[Remote Python service that exposes `/api/mt5/account/{id}/info|positions|history`; availability dictates sync success.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Must limit concurrent MT5 calls to batches of 10 and exit before the 5-minute Supabase limit; implement short sleeps between batches if needed.
+- Never persist partial account data—apply updates only after MT5 responses succeed; use transactions or ordered writes.
+- Log every account attempt (status, duration, error) into `sync_logs` and increment `sync_failure_count` so downstream monitoring works.
+- Secrets (`MT5_SERVICE_URL`, `MT5_SERVICE_API_KEY`) must be read from Deno.env (Story 1.7); do not hardcode URLs or keys.
+- Handle per-account failures gracefully (Promise.allSettled) so one outage never aborts the whole batch; record last_connection_error.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>GET /api/mt5/account/{account_id}/info</name>
+      <kind>REST endpoint</kind>
+      <signature>GET /api/mt5/account/{id}/info → { balance, equity, margin, ... }</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes><![CDATA[Supplies account metrics mapped back into trading_accounts; requires authentication headers from Story 3.x middleware.]]></notes>
+    </interface>
+    <interface>
+      <name>GET /api/mt5/account/{account_id}/positions</name>
+      <kind>REST endpoint</kind>
+      <signature>GET /api/mt5/account/{id}/positions → [ { ticket, symbol, ... } ]</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes><![CDATA[Provides open positions to upsert into trades; function must dedupe on ticket per AC3.]]></notes>
+    </interface>
+    <interface>
+      <name>GET /api/mt5/account/{account_id}/history</name>
+      <kind>REST endpoint</kind>
+      <signature>GET /api/mt5/account/{id}/history?from_date={last_sync_at}</signature>
+      <path>app/api/routes/mt5.py</path>
+      <notes><![CDATA[Returns closed trades since last sync; results determine inserts into trades table and last_sync_at updates.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Use Deno’s built-in test runner and Supabase CLI invokes; rely on mocked MT5 responses for deterministic checks, plus integration tests against staging Supabase.]]></standards>
+    <locations><![CDATA[supabase/functions/tests/sync-trading-data.test.ts, supabase/tests/integration/sync-trading-data.cron.test.ts]]></locations>
+    <ideas><![CDATA[
+- **AC1**: Unit test ensures only `is_active=true` accounts are fetched and MetaAPI code path removed.
+- **AC2**: Simulate >10 accounts and verify batching helper only processes 10 at a time and retries once on timeout.
+- **AC3**: Mock MT5 payloads to ensure trading_accounts fields and trades upserts reflect latest data without duplicates.
+- **AC4**: Force one account failure and confirm `sync_logs` captures error while other accounts continue.
+- **AC5**: Benchmark local `supabase functions serve` run to ensure completion under 5 minutes; log includes batch timing.
+- **AC6**: CLI invoke plus cron job dry-run show success/failure flows captured in Supabase logs.]]></ideas>
+  </tests>
+</story-context>

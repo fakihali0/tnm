@@ -1,0 +1,132 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>5</epicId>
+    <storyId>5</storyId>
+    <title>Frontend Environment Configuration</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T21:04:17Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/5-5-frontend-environment-configuration.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>frontend developer</asA>
+    <iWant>MT5-related environment variables configured for both dev and production</iWant>
+    <soThat>the React app can talk to the MT5 service and Supabase edge functions consistently</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Local env template.
+- [ ] **Task 2 (AC:2)** – Production (Vercel) env setup.
+- [ ] **Task 3 (AC:3)** – Code usage + safeguards.
+- [ ] **Task 4 (AC:4)** – Documentation updates.
+- [ ] **Task 5 (AC:5)** – Verification (build + evidence).]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `.env.local` includes MT5/Supabase vars (`VITE_MT5_SERVICE_URL`, `VITE_MT5_SERVICE_WS`, `VITE_ENABLE_REALTIME`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`). [Source: docs/epics.md#Story-5.5; docs/PRD-MT5-Integration-Service.md#11.3-Environment-Configuration]
+2. Vercel env settings configured with same vars; documentation lists names/values. [Source: docs/epics.md#Story-5.5]
+3. Frontend code reads vars via `import.meta.env` and build fails when missing. [Source: docs/epics.md#Story-5.5]
+4. README/Local Dev Guide updated with instructions referencing Stories 1.5 and 1.7. [Source: docs/epics.md#Story-5.5]
+5. Verification includes `npm run build` and evidence of Vercel env entries. [Source: docs/epics.md#Story-5.5]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 5 – Story 5.5</title>
+        <section>Story 5.5</section>
+        <snippet><![CDATA[Defines required environment variables and documentation expectations.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §11.3 Environment Configuration</title>
+        <section>11.3</section>
+        <snippet><![CDATA[List of MT5/Supabase vars for frontend/staging/prod.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-5-ngrok-tunnel-for-supabase-edge-function-testing.md</path>
+        <title>Story 1.5</title>
+        <section>Task 4</section>
+        <snippet><![CDATA[Explains ngrok workflow referenced when documenting QA instructions.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/1-7-environment-variable-configuration-and-secret-management.md</path>
+        <title>Story 1.7</title>
+        <section>Dev Notes</section>
+        <snippet><![CDATA[Back-end env governance to align with frontend variables.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-5-supabase-edge-function-deployment.context.xml</path>
+        <title>Story 4.5 Context</title>
+        <section>Dependencies</section>
+        <snippet><![CDATA[Confirms MT5 service and edge functions expect specific env vars; ensures naming parity.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/.env.local.example</path>
+        <kind>env-template</kind>
+        <symbol>.env.local.example</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Template listing required vars for developers.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/.env.local</path>
+        <kind>env-file</kind>
+        <symbol>.env.local</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Actual dev env file (documented, gitignored).]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/README.md</path>
+        <kind>doc</kind>
+        <symbol>README env section</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Needs updates describing Vercel + dev env steps.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/scripts/check-env.ts</path>
+        <kind>script</kind>
+        <symbol>checkEnv</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Optional script ensuring required vars exist before build.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>platform</ecosystem>
+        <name>Vercel Environment Settings</name>
+        <version>web</version>
+        <notes><![CDATA[Where production/staging vars are configured.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>vite</name>
+        <version>latest</version>
+        <notes><![CDATA[Env vars must start with `VITE_`; build step will validate usage.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Never commit real secrets; `.env.local` stays gitignored and `.env.local.example` uses placeholders.
+- Keep dev/prod parity; document staging/prod differences explicitly.
+- Build step should fail loudly if required vars missing.
+- Provide evidence (screenshots/logs) for Vercel env configuration.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>import.meta.env</name>
+      <kind>Vite env API</kind>
+      <signature>import.meta.env.VITE_MT5_SERVICE_URL etc.</signature>
+      <path>tnm_concept/src/*</path>
+      <notes><![CDATA[Frontend reads envs through this Vite interface.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Manual: run `npm run build` locally; verify env-check script passes; produce screenshot of Vercel env page.]]></standards>
+    <locations><![CDATA[docs/QA/env-config.md]]></locations>
+    <ideas><![CDATA[
+- Build without envs to confirm failure, then document.
+- Smoke test staging build after updating Vercel vars.
+- Provide checklist for rotating secrets.]]></ideas>
+  </tests>
+</story-context>

@@ -1,0 +1,135 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>6</epicId>
+    <storyId>2</storyId>
+    <title>WebSocket Hook (useRealtimeMT5Data)</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T21:11:45Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/6-2-websocket-hook-userealtimemt5data.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>frontend developer</asA>
+    <iWant>a React hook that manages the MT5 WebSocket connection</iWant>
+    <soThat>components can subscribe to real-time account updates without duplicating logic</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Hook scaffolding (API structure).
+- [ ] **Task 2 (AC:2)** – WebSocket lifecycle (connect/reconnect, state flags).
+- [ ] **Task 3 (AC:3)** – Message handling (update state, toasts for events).
+- [ ] **Task 4 (AC:4)** – Heartbeat ping/pong.
+- [ ] **Task 5 (AC:5)** – Manual refresh fallback.
+- [ ] **Task 6 (AC:6)** – Cleanup & testing (close socket on unmount, Jest/QA).]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. Hook exports API shown in epic. [Source: docs/epics.md#Story-6.2]
+2. Establishes WS connection to `/ws/account/{accountId}?token={jwt}`, handles lifecycle + reconnection. [Source: docs/epics.md#Story-6.2; context7:/supabase/realtime]
+3. Parses message types from Story 6.1 and updates state/toasts. [Source: docs/epics.md#Story-6.2; docs/stories/6-1-websocket-endpoint-implementation.context.xml]
+4. Sends ping every 30s, expects pong, updates `isConnected`. [Source: docs/epics.md#Story-6.2]
+5. `refresh()` triggers fallback REST fetch when realtime lags. [Source: docs/epics.md#Story-6.2]
+6. Hook cleans up WebSocket on unmount; tests/manual QA verify flows. [Source: docs/epics.md#Story-6.2]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 6 – Story 6.2</title>
+        <section>Story 6.2</section>
+        <snippet><![CDATA[Specifies hook API, reconnection, ping/pong, and message types.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §5.3 WebSocket Protocol</title>
+        <section>5.3</section>
+        <snippet><![CDATA[Defines payload schema, heartbeat rules referenced by the hook.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/6-1-websocket-endpoint-implementation.context.xml</path>
+        <title>Story 6.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Describes server message types the hook must parse.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/5-2-update-auth-ts-state-management.context.xml</path>
+        <title>Story 5.2 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Explains store data/refresh methods consumed by the hook.]]></snippet>
+      </doc>
+      <doc>
+        <path>context7:/supabase/realtime</path>
+        <title>Supabase Realtime Docs</title>
+        <section>WebSocket Lifecycle</section>
+        <snippet><![CDATA[Provides best practices for reconnecting/listening to Postgres changes.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/src/hooks/useRealtimeMT5Data.ts</path>
+        <kind>react-hook</kind>
+        <symbol>useRealtimeMT5Data</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Hook implementation location.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/store/auth.ts</path>
+        <kind>zustand-store</kind>
+        <symbol>useAccountStore</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Provides fallback data and refresh methods.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/utils/websocketClient.ts</path>
+        <kind>utils</kind>
+        <symbol>createWebSocket</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Optional helper abstracting browser WebSocket API.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/components/tnm-pro/LinkedAccountsList.tsx</path>
+        <kind>react-component</kind>
+        <symbol>LinkedAccountsList</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[First consumer of the hook, ensuring API stability.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>@supabase/supabase-js</name>
+        <version>2.x</version>
+        <notes><![CDATA[Provides session/token retrieval for WebSocket auth.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>zustand</name>
+        <version>latest</version>
+        <notes><![CDATA[Hook interacts with store selectors/actions.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Must handle reconnect/backoff without flooding server.
+- Pings should stop when unmounted; avoid memory leaks.
+- Provide stable API for downstream components (LinkedAccountsList, AIHub).
+- Ensure error handling uses toast/log conventions.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>useRealtimeMT5Data return value</name>
+      <kind>hook interface</kind>
+      <signature>{ accountData, positions, isConnected, error, lastUpdate, refresh }
+      </signature>
+      <path>tnm_concept/src/hooks/useRealtimeMT5Data.ts</path>
+      <notes><![CDATA[Contract consumed by UI components.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Jest + mock WebSocket implementations; manual QA using browser console and backend logs.]]></standards>
+    <locations><![CDATA[tnm_concept/src/hooks/__tests__/useRealtimeMT5Data.test.ts, docs/QA/websocket-hook.md]]></locations>
+    <ideas><![CDATA[
+- Mock open/message/error events to ensure state updates.
+- Simulate missing pong to verify reconnect.
+- Manual QA: run staging backend, compare UI updates to websocket logs.]]></ideas>
+  </tests>
+</story-context>

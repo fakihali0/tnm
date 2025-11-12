@@ -1,0 +1,140 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>5</epicId>
+    <storyId>2</storyId>
+    <title>Update auth.ts State Management</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T20:54:38Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/5-2-update-auth-ts-state-management.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>frontend developer</asA>
+    <iWant>the `auth.ts` Zustand store updated to orchestrate MT5 account operations</iWant>
+    <soThat>AccountLinkForm and future MT5 UI share a single, reliable source of truth</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Rebuild `addAccount`
+  - [ ] Wire Supabase functions invoke for `connect-mt5-account`; manage `isConnecting` and refresh accounts.
+- [ ] **Task 2 (AC:2)** – Implement sync helpers (`syncAccount`, `deleteAccount`, `refreshAccountData`, `getAccountStatus`).
+- [ ] **Task 3 (AC:3)** – Extend store state with `lastSyncTime`, `syncErrors`, etc.
+- [ ] **Task 4 (AC:4)** – Error + loading instrumentation (consistent return objects, toasts, logs).
+- [ ] **Task 5 (AC:5)** – Testing & docs (Jest/RTL plus manual QA steps).]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. `/tnm_concept/src/store/auth.ts` reintroduces `addAccount` flow invoking `connect-mt5-account`, refreshing accounts, tracking `isConnecting`. [Source: docs/epics.md#Story-5.2; docs/stories/4-1-update-connect-mt5-account-edge-function.context.xml]
+2. New methods exist: `syncAccount`, `deleteAccount`, `refreshAccountData`, `getAccountStatus`, leveraging Story 4.2 APIs. [Source: docs/epics.md#Story-5.2; docs/stories/4-2-update-sync-trading-data-edge-function.context.xml]
+3. State includes `isConnecting`, `lastSyncTime`, `syncErrors`, etc. [Source: docs/epics.md#Story-5.2]
+4. Methods handle errors gracefully and expose loading/error states for UI feedback. [Source: docs/epics.md#Story-5.2]
+5. Tests + manual QA verify success/failure flows (ngrok, staging). [Source: docs/epics.md#Story-5.2; docs/stories/1-5-ngrok-tunnel-for-supabase-edge-function-testing.md]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 5 – Story 5.2</title>
+        <section>Story 5.2</section>
+        <snippet><![CDATA[Defines required store API (`addAccount`, sync helpers, state fields, error handling).]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §7.2 State Management Updates</title>
+        <section>7.2</section>
+        <snippet><![CDATA[Explains how the frontend store should orchestrate account operations and expose status flags.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-1-update-connect-mt5-account-edge-function.context.xml</path>
+        <title>Story 4.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Details the connect edge function contract consumed by `addAccount`.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-2-update-sync-trading-data-edge-function.context.xml</path>
+        <title>Story 4.2 Context</title>
+        <section>Artifacts</section>
+        <snippet><![CDATA[Describes sync API endpoints and logging fields (`last_successful_sync_at`, `sync_failure_count`).]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/5-1-re-enable-accountlinkform-component.context.xml</path>
+        <title>Story 5.1 Context</title>
+        <section>Dependencies</section>
+        <snippet><![CDATA[Shows how AccountLinkForm will consume the store, ensuring API stability.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/src/store/auth.ts</path>
+        <kind>zustand-store</kind>
+        <symbol>useAccountStore</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Primary file where new methods/state live.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/connect-mt5-account/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>connectHandler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Backend target invoked by `addAccount`.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/sync-trading-data/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>syncHandler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Manual sync endpoint used by `syncAccount`.]]></reason>
+      </artifact>
+      <artifact>
+        <path>docs/stories/4-5-supabase-edge-function-deployment.context.xml</path>
+        <kind>story-context</kind>
+        <symbol>deployment runbook</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Confirms functions deployed and secrets set; store should rely on env-driven URLs.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/hooks/useRealtimeMT5Data.ts</path>
+        <kind>react-hook</kind>
+        <symbol>useRealtimeMT5Data</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Future consumer (Story 6.2); store should expose data in a way the hook can leverage.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>@supabase/supabase-js</name>
+        <version>2.x</version>
+        <notes><![CDATA[Used to invoke edge functions and REST endpoints from the store.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>zustand</name>
+        <version>latest</version>
+        <notes><![CDATA[State management library powering `useAccountStore`.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Store functions must be idempotent and return structured results ({ success, error }).
+- Errors should never leave the form in inconsistent state; always reset `isConnecting` via `finally`.
+- Use env-driven URLs/keys from Story 1.7; no hardcoded endpoints.
+- Ensure compatibility with future realtime hook (Story 6.2) by exposing selectors for account status.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>useAccountStore API</name>
+      <kind>store</kind>
+      <signature>{ addAccount, syncAccount, deleteAccount, refreshAccountData, getAccountStatus, loadAccounts }</signature>
+      <path>tnm_concept/src/store/auth.ts</path>
+      <notes><![CDATA[Defines the contract UI components will consume.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Use Jest + msw to mock Supabase responses; manual QA via ngrok/staging for success/failure flows.]]></standards>
+    <locations><![CDATA[tnm_concept/src/store/__tests__/auth.store.test.ts, docs/QA/account-store.md]]></locations>
+    <ideas><![CDATA[
+- Mock success/failure from Supabase invoke and ensure state updates accordingly.
+- Simulate sync failures to confirm `syncErrors` updates.
+- Manual QA: run form + LinkedAccountsList end-to-end with staging backend.]]></ideas>
+  </tests>
+</story-context>

@@ -1,0 +1,163 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>4</epicId>
+    <storyId>3</storyId>
+    <title>Database Schema Updates for MT5 Integration</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T14:26:56Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/4-3-database-schema-updates-for-mt5-integration.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>database developer</asA>
+    <iWant>Supabase migrations that add the MT5-specific tables/columns for accounts, trades, and sync logs</iWant>
+    <soThat>the edge functions and Python service can persist connection health, metrics, and sync telemetry reliably</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Extend `trading_accounts`
+  - [ ] Generate migration (`supabase migration new mt5_trading_accounts_extensions`).
+  - [ ] Add columns + index per AC, ensuring appropriate defaults/nullability to avoid locking issues.
+- [ ] **Task 2 (AC:2)** – Create `sync_logs`
+  - [ ] Define table with UUID PK, FK to `trading_accounts`, and columns for sync metadata, status, timing, errors.
+  - [ ] Add `idx_sync_logs_account` index for chronological lookups.
+- [ ] **Task 3 (AC:3)** – Rollback coverage
+  - [ ] Implement `down` SQL that removes added objects while leaving prior data intact.
+- [ ] **Task 4 (AC:4)** – Validation & rollout
+  - [ ] Run migrations locally (document commands/output), confirm schema via `supabase db remote commit --dry-run` or `psql` inspection.
+  - [ ] Plan staging → production promotion with Supabase CLI steps.
+- [ ] **Task 5 (AC:5)** – Documentation & impact
+  - [ ] Update Dev Notes/README stubs to explain new columns/log table for Stories 4.1/4.2 usage.
+  - [ ] Note that MT5 edge functions require these fields for rate limiting and telemetry.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. New migration files under `supabase/migrations/` add the required columns to `trading_accounts` (mt5_service_account_id, connection_status, last_connection_error, last_successful_sync_at, sync_failure_count, broker_server_time_offset) plus the `idx_trading_accounts_sync_status` index. [Source: docs/epics.md#Story-4.3; docs/PRD-MT5-Integration-Service.md#6.2-Database-Schema-Updates]
+2. `sync_logs` table is created with the schema defined in PRD (id, account_id FK, sync_type, started_at, completed_at, status, trades_synced, error_message, duration_ms, created_at) and an index on `(account_id, started_at DESC)`. [Source: docs/epics.md#Story-4.3; docs/PRD-MT5-Integration-Service.md#6.2-Database-Schema-Updates]
+3. A rollback (down migration) exists that drops the new columns, index, and `sync_logs` table without data loss for pre-existing fields. [Source: docs/epics.md#Story-4.3]
+4. Migrations run via Supabase CLI locally (`supabase db reset` in dev, `supabase db push`) with test evidence captured, and staging is updated before production. [Source: docs/epics.md#Story-4.3; docs/PRD-MT5-Integration-Service.md#6.2-Database-Schema-Updates]
+5. Existing data is preserved during upgrade—columns default safely, and comments describe relation to Stories 4.1/4.2 for downstream developers. [Source: docs/epics.md#Story-4.3]]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 4 – Story 4.3</title>
+        <section>Story 4.3</section>
+        <snippet><![CDATA[Outlines the new `trading_accounts` columns, `sync_logs` table, and CLI workflow (`supabase db reset/push`) plus rollback requirements.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §6.2 Database Schema Updates</title>
+        <section>6.2</section>
+        <snippet><![CDATA[Provides exact SQL for new columns/index and the `sync_logs` table structure, ensuring migrations match business expectations.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §6.3 Row Level Security</title>
+        <section>6.3</section>
+        <snippet><![CDATA[Describes upcoming RLS policies that depend on the new schema, reinforcing why columns must exist before Story 4.4.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-1-update-connect-mt5-account-edge-function.md</path>
+        <title>Story 4.1</title>
+        <section>Acceptance Criteria</section>
+        <snippet><![CDATA[Highlights use of `last_connection_error` and encrypted credentials, showing how the new fields support manual connect flows.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-2-update-sync-trading-data-edge-function.md</path>
+        <title>Story 4.2</title>
+        <section>Acceptance Criteria</section>
+        <snippet><![CDATA[Requires `last_successful_sync_at`, `sync_failure_count`, and `sync_logs` to be present for batch sync telemetry.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/supabase/migrations/20251112120000_mt5_schema_update.sql</path>
+        <kind>sql-migration</kind>
+        <symbol>up/down</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Primary migration adding `trading_accounts` columns, sync index, and referencing comments; includes rollback statements in same file.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/supabase/migrations/20251112121000_sync_logs_table.sql</path>
+        <kind>sql-migration</kind>
+        <symbol>create sync_logs</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Creates `sync_logs` table plus `(account_id, started_at)` index described in PRD §6.2.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/supabase/migrations/README.md</path>
+        <kind>doc</kind>
+        <symbol>migration runbook</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Should be updated to document `supabase db reset/push` workflow, dependencies on Stories 4.1/4.2, and rollback plan.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/sync-trading-data/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>batchSync</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Consumes new `last_successful_sync_at`, `sync_failure_count`, and `sync_logs` columns; migration must precede its implementation.]]></reason>
+      </artifact>
+      <artifact>
+        <path>supabase/functions/connect-mt5-account/index.ts</path>
+        <kind>edge-function</kind>
+        <symbol>connectHandler</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Relies on `trading_accounts` connection metadata columns to persist MT5 service IDs and health data.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>cli</ecosystem>
+        <name>Supabase CLI</name>
+        <version>latest</version>
+        <notes><![CDATA[Used for `supabase migration new`, `supabase db reset`, and `supabase db push` commands referenced in story tasks.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>postgresql</ecosystem>
+        <name>Supabase Postgres (15+)</name>
+        <version>managed</version>
+        <notes><![CDATA[Schema changes target the managed Postgres instance backing Supabase; ensure index creation and column defaults respect hosted constraints.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>node-pg-migrate</name>
+        <version>latest</version>
+        <notes><![CDATA[Migration tooling referenced in Dev Notes; provides `up`/`down` helpers per Context7 guidance.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>cli</ecosystem>
+        <name>psql</name>
+        <version>15+</version>
+        <notes><![CDATA[Used to verify schema (`\d trading_accounts`, `\d sync_logs`) after running migrations.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Apply column additions with `DEFAULT NULL` and `NOT VALID` constraints if needed to avoid long table locks; create indexes concurrently where possible.
+- Migrations must be idempotent—use `IF NOT EXISTS` to prevent failures when rerun locally or in CI.
+- Provide explicit `down` steps that drop only the newly-added columns/tables to preserve existing data.
+- Document dependency order (Story 4.3 before Stories 4.1, 4.2, 4.4) directly in migration comments to avoid accidental deploy sequencing issues.
+- Capture evidence of `supabase db reset` + `supabase db push` runs so changes are traceable during review.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>Supabase CLI – db push</name>
+      <kind>command</kind>
+      <signature>supabase db push</signature>
+      <path>docs/epics.md</path>
+      <notes><![CDATA[Applies migrations to local/staging environments per Story 4.3 instructions; must succeed before edge functions deploy.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Use Supabase CLI (`db reset`, `db push`) plus `psql` inspections; optionally add automated schema checks in `supabase/tests/` to verify columns/indexes.]]></standards>
+    <locations><![CDATA[tnm_concept/supabase/tests/schema/check_mt5_columns.sql, tnm_concept/supabase/tests/schema/check_sync_logs.sql]]></locations>
+    <ideas><![CDATA[
+- **AC1**: Post-migration `\d trading_accounts` shows all new columns with expected defaults and the `idx_trading_accounts_sync_status` index.
+- **AC2**: `\d sync_logs` verifies schema plus `(account_id, started_at)` index; FK to trading_accounts enforced.
+- **AC3**: Run `supabase db reset` followed by `db push` twice to confirm rollback + rerun works cleanly.
+- **AC4**: Execute `supabase db push --db-url <staging>` to ensure migrations succeed in staging; capture CLI output in Dev Notes.
+- **AC5**: Run sample connect/sync edge function unit tests (Stories 4.1/4.2) against the migrated schema to confirm columns exist before implementation.]]></ideas>
+  </tests>
+</story-context>

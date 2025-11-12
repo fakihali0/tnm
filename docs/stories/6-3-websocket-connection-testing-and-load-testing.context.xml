@@ -1,0 +1,119 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>6</epicId>
+    <storyId>3</storyId>
+    <title>WebSocket Connection Testing and Load Testing</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T21:13:11Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/6-3-websocket-connection-testing-and-load-testing.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>the WebSocket endpoint load-tested under realistic concurrency</iWant>
+    <soThat>we prove it supports 300+ simultaneous MT5 users with acceptable latency</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Test harness (locust/websocket-bench) simulating 300 clients for 5 minutes.
+- [ ] **Task 2 (AC:2)** – Metrics instrumentation (latency, CPU, memory).
+- [ ] **Task 3 (AC:3)** – Edge cases (disconnects, server restart, MT5 outage, latency injection).
+- [ ] **Task 4 (AC:4)** – Reporting (charts/logs/action items).
+- [ ] **Task 5 (AC:5)** – Automation/documentation for reruns.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. Load tests simulate 300 concurrent WebSocket clients, 5-minute sessions, heartbeat pings every 30s. [Source: docs/epics.md#Story-6.3]
+2. Metrics captured: message latency <500ms, CPU <70%, memory <12GB, zero unexpected drops. [Source: docs/epics.md#Story-6.3; docs/PRD-MT5-Integration-Service.md#Performance]
+3. Edge cases tested: abrupt disconnect, server restart, MT5 crash, network latency. [Source: docs/epics.md#Story-6.3]
+4. Results documented with evidence and action items. [Source: docs/epics.md#Story-6.3]
+5. Tests run on staging before prod; manual QA evidence stored. [Source: docs/epics.md#Story-6.3]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 6 – Story 6.3</title>
+        <section>Story 6.3</section>
+        <snippet><![CDATA[Defines load, latency, resource, and edge case requirements.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD Performance Requirements</title>
+        <section>11.x</section>
+        <snippet><![CDATA[Specifies acceptable latency/CPU/memory thresholds.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/6-1-websocket-endpoint-implementation.context.xml</path>
+        <title>Story 6.1 Context</title>
+        <section>Interfaces</section>
+        <snippet><![CDATA[Describes endpoint behavior tested under load.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tests/load/websocket/locustfile.py</path>
+        <kind>load-test</kind>
+        <symbol>locustfile</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Implements the load-test scenarios.]]></reason>
+      </artifact>
+      <artifact>
+        <path>docs/TESTING.md</path>
+        <kind>doc</kind>
+        <symbol>Load test procedure</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Documents steps, environment, and evidence.]]></reason>
+      </artifact>
+      <artifact>
+        <path>infra/monitoring/grafana_dashboard.json</path>
+        <kind>config</kind>
+        <symbol>Grafana dashboard</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Used to capture CPU/memory charts during tests.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>locust</name>
+        <version>latest</version>
+        <notes><![CDATA[Primary load-testing tool (with WebSocket plugin).]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>python</ecosystem>
+        <name>websocket-client</name>
+        <version>latest</version>
+        <notes><![CDATA[Provides low-level WebSocket client for scripts.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>monitoring</ecosystem>
+        <name>Grafana/Prometheus</name>
+        <version>current</version>
+        <notes><![CDATA[Collect CPU/memory metrics during tests.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Run tests on staging first; coordinate with ops to avoid prod impact.
+- Ramp load gradually to 300 to observe behavior.
+- Capture logs/artifacts; store in repo under docs/TESTING.
+- Ensure cleanup of load-test infrastructure after run.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>WebSocket load-test script</name>
+      <kind>tooling</kind>
+      <signature>locust tasks opening ws connections</signature>
+      <path>tests/load/websocket/locustfile.py</path>
+      <notes><![CDATA[Defines how clients connect and send pings.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Load-test harness scripts + manual verification of Grafana dashboards; no automated unit tests.]]></standards>
+    <locations><![CDATA[tests/load/websocket/, docs/TESTING.md]]></locations>
+    <ideas><![CDATA[
+- Baseline run (50 clients) before ramping to 300.
+- Record latency histogram and compare to threshold.
+- Document behavior under MT5 outage simulation.]]></ideas>
+  </tests>
+</story-context>

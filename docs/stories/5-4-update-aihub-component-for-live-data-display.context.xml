@@ -1,0 +1,147 @@
+<story-context id="story-context" v="1.0">
+  <metadata>
+    <epicId>5</epicId>
+    <storyId>4</storyId>
+    <title>Update AIHub Component for Live Data Display</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-12T21:02:11Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/5-4-update-aihub-component-for-live-data-display.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>frontend developer</asA>
+    <iWant>AIHub to display live MT5 data, aggregates, and insights</iWant>
+    <soThat>users see accurate account metrics, positions, trades, and sync status inside the AI workspace</soThat>
+    <tasks><![CDATA[- [ ] **Task 1 (AC:1)** – Aggregate metrics.
+- [ ] **Task 2 (AC:2)** – Account selector.
+- [ ] **Task 3 (AC:3)** – Positions & trades panels.
+- [ ] **Task 4 (AC:4)** – Sync status widget.
+- [ ] **Task 5 (AC:5)** – Charts + AI data binding.
+- [ ] **Task 6 (AC:6)** – UX polish + testing.]]></tasks>
+  </story>
+
+  <acceptanceCriteria><![CDATA[1. AIHub shows aggregate tiles (total balance/equity, open positions, daily/weekly/monthly P&L). [Source: docs/epics.md#Story-5.4]
+2. Account selector scopes charts/data when multiple accounts exist. [Source: docs/epics.md#Story-5.4]
+3. Displays realtime positions list and recent trades with P&L. [Source: docs/epics.md#Story-5.4; docs/stories/4-2-update-sync-trading-data-edge-function.context.xml]
+4. Sync status indicator matches LinkedAccountsList conventions. [Source: docs/epics.md#Story-5.4; docs/stories/5-3-update-linkedaccountslist-component.context.xml]
+5. Charts/AI analysis use synced historical data and refresh after sync (polling or Supabase Realtime). [Source: docs/epics.md#Story-5.4; context7:/supabase/realtime]
+6. Loading/error states shown while fetching data. [Source: docs/epics.md#Story-5.4]]></acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic 5 – Story 5.4</title>
+        <section>Story 5.4</section>
+        <snippet><![CDATA[Lists aggregate metrics, account selector, tables, sync indicator, charts, and AI integration.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD-MT5-Integration-Service.md</path>
+        <title>PRD §7.4 AIHub Updates</title>
+        <section>7.4</section>
+        <snippet><![CDATA[Provides UX details, chart expectations, and data freshness requirements for AIHub.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-2-update-sync-trading-data-edge-function.context.xml</path>
+        <title>Story 4.2 Context</title>
+        <section>Artifacts</section>
+        <snippet><![CDATA[Documents the synced data (account info, positions, history) consumed by AIHub.]]></snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/5-3-update-linkedaccountslist-component.context.xml</path>
+        <title>Story 5.3 Context</title>
+        <section>Constraints</section>
+        <snippet><![CDATA[Clarifies sync status badge logic reused by AIHub.]]></snippet>
+      </doc>
+      <doc>
+        <path>context7:/supabase/realtime</path>
+        <title>Supabase Realtime Docs</title>
+        <section>Postgres Changes</section>
+        <snippet><![CDATA[Reference for listening to trading_accounts/trades changes to refresh dashboards.]]></snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>tnm_concept/src/components/tnm-pro/AIHub.tsx</path>
+        <kind>react-component</kind>
+        <symbol>AIHub</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Component to update with tiles, charts, tables, and selectors.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/hooks/useRealtimeMT5Data.ts</path>
+        <kind>react-hook</kind>
+        <symbol>useRealtimeMT5Data</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Provides live data feed for positions and trades.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/store/auth.ts</path>
+        <kind>zustand-store</kind>
+        <symbol>useAccountStore</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Supplies aggregate data and sync timestamps.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/utils/metrics.ts</path>
+        <kind>utils</kind>
+        <symbol>computeAccountAggregates</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Utility for calculating totals/P&L for charts.]]></reason>
+      </artifact>
+      <artifact>
+        <path>tnm_concept/src/components/charts/PerformanceChart.tsx</path>
+        <kind>react-component</kind>
+        <symbol>PerformanceChart</symbol>
+        <lines>-</lines>
+        <reason><![CDATA[Chart component reused in AIHub; needs data binding updates.]]></reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>date-fns</name>
+        <version>latest</version>
+        <notes><![CDATA[Used for relative time in sync badges and tooltips.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>@supabase/supabase-js</name>
+        <version>2.x</version>
+        <notes><![CDATA[Needed for realtime subscriptions or polling fallback.]]></notes>
+      </dependency>
+      <dependency>
+        <ecosystem>npm</ecosystem>
+        <name>recharts (or equivalent)</name>
+        <version>latest</version>
+        <notes><![CDATA[Existing chart library powering AIHub visuals.]]></notes>
+      </dependency>
+    </dependencies>
+  </artifacts>
+
+  <constraints><![CDATA[
+- Keep UI responsive; heavy aggregates should be memoized.
+- Avoid stale data: show timestamp of last update and provide manual refresh.
+- Follow design tokens for cards/badges and maintain accessibility (ARIA labels for status changes).
+- Ensure fallback when realtime unavailable by polling the store or Supabase.]]></constraints>
+
+  <interfaces>
+    <interface>
+      <name>useRealtimeMT5Data</name>
+      <kind>hook</kind>
+      <signature>returns { accountData, positions, isConnected, error, lastUpdate }</signature>
+      <path>tnm_concept/src/hooks/useRealtimeMT5Data.ts</path>
+      <notes><![CDATA[Primary interface for live updates.]]></notes>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards><![CDATA[Jest/RTL for component logic, Cypress for end-to-end dashboard flows, manual QA for realtime updates.]]></standards>
+    <locations><![CDATA[tnm_concept/src/components/tnm-pro/__tests__/AIHub.test.tsx, tnm_concept/cypress/e2e/aihub.cy.ts]]></locations>
+    <ideas><![CDATA[
+- Mock store/hook data to assert aggregates, selector, tables.
+- Simulate realtime messages to ensure UI updates.
+- Cypress test for manual refresh and error states.]]></ideas>
+  </tests>
+</story-context>
