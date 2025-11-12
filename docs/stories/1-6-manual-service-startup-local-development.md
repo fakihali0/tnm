@@ -1,6 +1,6 @@
 # Story 1.6: Manual Service Startup (Local Development)
 
-Status: drafted
+Status: ready-for-dev
 
 ## Story
 
@@ -55,7 +55,7 @@ Story `1-5-ngrok-tunnel-for-supabase-edge-function-testing` is still in `ready-f
 
 ### Context Reference
 
-<!-- Story context XML path will be filled in once story-context workflow runs -->
+- `.bmad-ephemeral/stories/1-6-manual-service-startup-local-development.context.xml`
 
 ### Agent Model Used
 
