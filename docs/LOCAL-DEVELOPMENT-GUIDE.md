@@ -16,7 +16,7 @@ This guide explains how to develop and test the MT5 Integration Service on a **l
 ┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
 │                 │         │                  │         │                 │
 │  Mac (Frontend) │────────▶│ Windows Computer │────────▶│  MT5 Terminal   │
-│  localhost:5173 │  HTTP   │  192.168.1.100   │  Python │  (Broker)       │
+│  localhost:5173 │  HTTP   │ vms.tnm.local    │  Python │  (Broker)       │
 │                 │         │  :8000           │  API    │                 │
 └─────────────────┘         └──────────────────┘         └─────────────────┘
          │                           ▲
@@ -28,7 +28,7 @@ This guide explains how to develop and test the MT5 Integration Service on a **l
                    ┌──────────────────────────┐     │
                    │  ngrok                   │     │
                    │  https://abc.ngrok.io ───┼─────┘
-                   │  → 192.168.1.100:8000   │
+                   │  → vms.tnm.local:8000   │
                    └──────────────────────────┘
 ```
 
@@ -64,18 +64,19 @@ This guide explains how to develop and test the MT5 Integration Service on a **l
 ipconfig
 
 # Look for "IPv4 Address" under your active network adapter
-# Example: 192.168.1.100 or 192.168.0.100
+# Example: 10.4.0.180 (will be mapped to vms.tnm.local)
 ```
 
-**1.2 Set Static IP (Optional but Recommended):**
+**1.2 Set Static IP and Hostname:**
 - Open: Settings → Network & Internet → Properties
 - Under "IP assignment" click "Edit"
 - Choose "Manual" and enable IPv4
 - Set:
-  - IP address: `192.168.1.100` (or any available IP in your subnet)
+  - IP address: `10.4.0.180` (or any available IP in your subnet)
   - Subnet mask: `255.255.255.0`
-  - Gateway: `192.168.1.1` (your router's IP)
+  - Gateway: `10.4.0.1` (your router's IP)
   - DNS: `8.8.8.8` (Google DNS)
+- Add hostname to hosts file: `10.4.0.180    vms.tnm.local`
 
 **1.3 Configure Windows Firewall:**
 ```powershell
@@ -93,10 +94,10 @@ Get-NetFirewallRule -DisplayName "MT5 FastAPI Local Dev"
 **1.4 Test Connectivity from Mac:**
 ```bash
 # On Mac terminal
-ping 192.168.1.100
+ping vms.tnm.local
 
 # Should see responses:
-# 64 bytes from 192.168.1.100: icmp_seq=0 ttl=128 time=2.123 ms
+# 64 bytes from 10.4.0.180: icmp_seq=0 ttl=128 time=2.123 ms
 ```
 
 ---
@@ -288,7 +289,7 @@ if __name__ == "__main__":
 ```powershell
 # start-dev.ps1
 .\venv\Scripts\activate
-Write-Host "Starting MT5 Service on http://192.168.1.100:8000" -ForegroundColor Green
+Write-Host "Starting MT5 Service on http://vms.tnm.local:8000" -ForegroundColor Green
 Write-Host "Press Ctrl+C to stop" -ForegroundColor Yellow
 python run.py
 ```
@@ -369,8 +370,8 @@ curl http://localhost:8000/health
 
 **7.1 Test Health Endpoint:**
 ```bash
-# On Mac terminal (replace IP with your Windows IP)
-curl http://192.168.1.100:8000/health
+# On Mac terminal
+curl http://vms.tnm.local:8000/health
 
 # Expected response:
 # {"status":"healthy","version":"1.0.0","mt5_available":true}
@@ -379,7 +380,7 @@ curl http://192.168.1.100:8000/health
 **7.2 Test CORS (Browser):**
 ```javascript
 // On Mac - Open browser console (http://localhost:5173)
-fetch('http://192.168.1.100:8000/health')
+fetch('http://vms.tnm.local:8000/health')
   .then(r => r.json())
   .then(console.log);
 
@@ -390,7 +391,7 @@ fetch('http://192.168.1.100:8000/health')
 **7.3 Test from Frontend (.env.local):**
 ```bash
 # On Mac - tnm_concept/.env.local
-VITE_MT5_SERVICE_URL=http://192.168.1.100:8000
+VITE_MT5_SERVICE_URL=http://vms.tnm.local:8000
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_key
 
@@ -438,7 +439,7 @@ ping 192.168.1.100
 
 **Symptom:** Browser console shows:
 ```
-Access to fetch at 'http://192.168.1.100:8000/health' from origin 'http://localhost:5173' 
+Access to fetch at 'http://vms.tnm.local:8000/health' from origin 'http://localhost:5173' 
 has been blocked by CORS policy
 ```
 
@@ -513,10 +514,10 @@ choco install ngrok -y
 **2. Create ngrok Tunnel:**
 ```bash
 # Start tunnel
-ngrok http 192.168.1.100:8000
+ngrok http vms.tnm.local:8000
 
 # Output:
-# Forwarding: https://abc123.ngrok.io -> http://192.168.1.100:8000
+# Forwarding: https://abc123.ngrok.io -> http://vms.tnm.local:8000
 ```
 
 **3. Update Supabase Edge Function:**
@@ -554,7 +555,7 @@ npm run dev
 **Terminal 3 (Mac) - Testing:**
 ```bash
 # Test endpoints
-curl http://192.168.1.100:8000/health
+curl http://vms.tnm.local:8000/health
 
 # Or use Postman/Insomnia for complex requests
 ```
@@ -607,17 +608,17 @@ Get-Content logs\app.log -Tail 50 -Wait
 ### Mac Testing Commands:
 ```bash
 # Health check
-curl http://192.168.1.100:8000/health
+curl http://vms.tnm.local:8000/health
 
 # API test with auth
-curl -X POST http://192.168.1.100:8000/api/mt5/connect \
+curl -X POST http://vms.tnm.local:8000/api/mt5/connect \
   -H "Content-Type: application/json" \
   -H "X-API-Key: dev_local_test_key_12345" \
   -d '{"login":12345,"password":"test","server":"MetaQuotes-Demo"}'
 ```
 
 ### Important IPs/URLs:
-- Windows Service: `http://192.168.1.100:8000`
+- Windows Service: `http://vms.tnm.local:8000`
 - Frontend Dev: `http://localhost:5173`
 - ngrok Tunnel: `https://abc123.ngrok.io` (changes on restart)
 

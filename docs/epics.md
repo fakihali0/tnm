@@ -63,7 +63,7 @@ So that **I can test the full integration locally before spending money on VPS h
 **When** I configure it for development  
 **Then** the Windows machine is updated to latest version
 
-**And** Static local IP address is assigned (e.g., 192.168.1.100 or 192.168.0.100)
+**And** Static local IP address is assigned (10.4.0.180) and mapped to hostname (vms.tnm.local)
   - Document this IP address for all future configuration
 **And** PowerShell execution policy is set to allow script execution:
   ```powershell
@@ -80,7 +80,7 @@ So that **I can test the full integration locally before spending money on VPS h
 **And** Connectivity test from Mac succeeds:
   ```bash
   # From Mac terminal
-  ping 192.168.1.100
+  ping vms.tnm.local
   # Should receive responses
   ```
 **And** Remote Desktop (RDP) is optionally enabled for easier access from Mac

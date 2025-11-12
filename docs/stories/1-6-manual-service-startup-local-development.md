@@ -21,7 +21,7 @@ so that **I can control restarts, view logs, and debug locally before investing 
   - [ ] Add PowerShell snippets for activating the venv, running `python run.py`, and running `uvicorn ... --reload`, plus log-watching and `Ctrl+C` shutdown notes. [Source: docs/LOCAL-DEVELOPMENT-GUIDE.md#Development-Workflow]
   - [ ] Expand troubleshooting tips (missing venv, port conflicts, permissions) so developers can recover quickly when the manual start fails. [Source: docs/LOCAL-DEVELOPMENT-GUIDE.md#Quick-Reference]
 - [ ] **Task 2 (AC:3)** – Implement the `start-dev.ps1` helper:
-  - [ ] Create the script in `C:\mt5-service` that activates the virtual environment, prints a "Starting MT5 Service on http://192.168.1.100:8000" banner, and starts Uvicorn with `--reload`. [Source: docs/epics.md#Story-1.6]
+  - [ ] Create the script in `C:\mt5-service` that activates the virtual environment, prints a "Starting MT5 Service on http://vms.tnm.local:8000" banner, and starts Uvicorn with `--reload`. [Source: docs/epics.md#Story-1.6]
   - [ ] Document script usage (prerequisites, how to stop, how logs appear) in the Local Development Guide’s Daily Workflow and Quick Reference sections. [Source: docs/LOCAL-DEVELOPMENT-GUIDE.md#Quick-Reference]
 - [ ] **Task 3 (AC:4)** – Align documentation with future deployment expectations:
   - [ ] Update local docs to reference `start-dev.ps1`, describe log tail options (console + `Get-Content logs\app.log -Tail 50 -Wait`), and restate that manual control precedes NSSM automation. [Source: docs/LOCAL-DEVELOPMENT-GUIDE.md#Quick-Reference]
