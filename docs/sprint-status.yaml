@@ -76,8 +76,8 @@ development_status:
   4-5-supabase-edge-function-deployment: done
 
   # Epic 5: Frontend MT5 Integration
-  epic-5: backlog
-  5-1-re-enable-accountlinkform-component: ready-for-dev
+  epic-5: contexted
+  5-1-re-enable-accountlinkform-component: in-progress
   5-2-update-auth-ts-state-management: ready-for-dev
   5-3-update-linkedaccountslist-component: ready-for-dev
   5-4-update-aihub-component-for-live-data-display: ready-for-dev
@@ -109,16 +109,16 @@ development_status:
 # SPRINT METRICS
 # =============================================================================
 sprint_metrics:
-  total_stories: 26
-  ready_for_dev: 8
-  in_progress: 0
+  total_stories: 27
+  ready_for_dev: 4
+  in_progress: 1
   in_review: 0
-  completed: 18
+  completed: 22
   blocked: 0
   
   # Story points (estimate)
-  total_points: 120
-  completed_points: 87
+  total_points: 125
+  completed_points: 97
   
   # Sprint dates
   sprint_start: 2025-11-12
@@ -129,9 +129,9 @@ sprint_metrics:
   epic_2_core_mt5: 4/4 complete (100%)
   epic_3_rest_api: 7/7 complete (100%)
   epic_4_supabase: 5/5 complete (100%)
-  epic_5_frontend: 0/5 complete (0%)
+  epic_5_frontend: 0/5 complete (0%) - NEXT EPIC
   epic_6_websocket: 0/3 complete (0%)
-  epic_7_security: 0/3 complete (0%)
+  epic_7_security: 0/4 complete (0%)
   
 # =============================================================================
 # RECENT COMPLETIONS
@@ -175,11 +175,12 @@ recent_completions:
 # =============================================================================
 # NOTES
 # =============================================================================
-# - Epic 1 (Foundation): Nearly complete, only 1-5 (ngrok) and 1-8 (e2e testing) remaining
-# - Epic 2 (Core MT5): Fully complete with connection manager, data retrieval, transformers, caching
-# - Epic 3 (REST API): Fully complete with all 7 endpoints (auth, connect, info, positions, history, sync, health)
+# - Epic 1 (Foundation): COMPLETE - all 8 stories done
+# - Epic 2 (Core MT5): COMPLETE - connection manager, data retrieval, transformers, caching
+# - Epic 3 (REST API): COMPLETE - all 7 endpoints (auth, connect, info, positions, history, sync, health)
 # - Epic 4 (Supabase): COMPLETE - all 5 stories done (edge functions, schema, RLS, deployment)
-# - Epic 5 (Frontend) is next priority - integrate with deployed edge functions
+# - Epic 5 (Frontend): IN PROGRESS - Story 5-1 started (re-enable AccountLinkForm)
+# - NEXT STORY: 5-1 Re-enable AccountLinkForm Component
 # - Edge functions deployed but need MT5 service in cloud for full functionality
 # - Total test coverage: 195 passing tests for Python MT5 service
 # - Database backup created before migrations: 360 records across 4 tables

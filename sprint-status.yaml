@@ -121,22 +121,83 @@ stories:
       - "Cache age reporting in API responses"
       - "Standardized error responses aligned with PRD 5.5"
 
-  - id: "2.5"
-    title: "MT5 Connection Manager Unit Tests"
+  - id: "3.1"
+    title: "API Authentication Middleware"
     status: "complete"
-    completed: "2025-01-12"
-    epic: "epic-2"
-    features:
-      - "Comprehensive pytest test suite with 55 tests"
-      - "Mocked MT5 SDK calls (no live terminal required)"
-      - "Connection manager tests: init, login, pooling, retry, states"
-      - "State transition and circuit breaker tests"
-      - "Data caching and expiration tests"
-      - "Transformer tests: symbol normalization, timestamps, pips, schema"
-      - "PRD 5.2 schema compliance validation"
-      - "Coverage: 65% mt5_manager, 84% transformers"
-      - "CI-ready pytest configuration"
-      - "TESTING.md documentation with all commands"
+    completed: "2025-01-13"
+    epic: "epic-3"
+    
+  - id: "3.2"
+    title: "POST /api/mt5/connect - Account Connection Endpoint"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-3"
+    
+  - id: "3.3"
+    title: "GET /api/mt5/account/{account_id}/info - Account Info Endpoint"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-3"
+    
+  - id: "3.4"
+    title: "GET /api/mt5/account/{account_id}/positions - Open Positions Endpoint"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-3"
+    
+  - id: "3.5"
+    title: "GET /api/mt5/account/{account_id}/history - Historical Trades Endpoint"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-3"
+    
+  - id: "3.6"
+    title: "POST /api/mt5/account/{account_id}/sync - Manual Sync Trigger Endpoint"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-3"
+    
+  - id: "3.7"
+    title: "GET /health - Service Health Check Endpoint"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-3"
+
+  - id: "4.1"
+    title: "Update connect-mt5-account Edge Function"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-4"
+    
+  - id: "4.2"
+    title: "Update sync-trading-data Edge Function"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-4"
+    
+  - id: "4.3"
+    title: "Database Schema Updates for MT5 Integration"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-4"
+    
+  - id: "4.4"
+    title: "Row Level Security (RLS) Policies Update"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-4"
+    
+  - id: "4.5"
+    title: "Supabase Edge Function Deployment"
+    status: "complete"
+    completed: "2025-01-13"
+    epic: "epic-4"
+
+  - id: "5.1"
+    title: "Re-enable AccountLinkForm Component"
+    status: "in-progress"
+    started: "2025-11-13"
+    epic: "epic-5"
 
 environment:
   windows:
@@ -161,5 +222,22 @@ epic-2:
   started: "2025-01-12"
   completed: "2025-01-12"
 
-next_epic: "epic-3"
-next_story: "3.1 - Account Info REST Endpoint"
+epic-3:
+  title: "REST API Implementation"
+  status: "complete"
+  started: "2025-01-12"
+  completed: "2025-01-13"
+
+epic-4:
+  title: "Supabase Integration"
+  status: "complete"
+  started: "2025-01-13"
+  completed: "2025-01-13"
+
+epic-5:
+  title: "Frontend MT5 Integration"
+  status: "in-progress"
+  started: "2025-11-13"
+
+next_epic: "epic-5"
+next_story: "5.1 - Re-enable AccountLinkForm Component"
