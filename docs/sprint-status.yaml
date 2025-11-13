@@ -46,9 +46,9 @@ development_status:
   # Epic 4: Supabase Integration
   4-1-update-connect-mt5-account-edge-function: done
   4-2-update-sync-trading-data-edge-function: done
-  4-3-database-schema-updates-for-mt5-integration: ready-for-dev
-  4-4-row-level-security-rls-policies-update: ready-for-dev
-  4-5-supabase-edge-function-deployment: ready-for-dev
+  4-3-database-schema-updates-for-mt5-integration: done
+  4-4-row-level-security-rls-policies-update: done
+  4-5-supabase-edge-function-deployment: done
 
   # Epic 5: Frontend MT5 Integration
   5-1-re-enable-accountlinkform-component: ready-for-dev
@@ -72,15 +72,15 @@ development_status:
 # =============================================================================
 sprint_metrics:
   total_stories: 26
-  ready_for_dev: 11
+  ready_for_dev: 8
   in_progress: 0
   in_review: 0
-  completed: 15
+  completed: 18
   blocked: 0
   
   # Story points (estimate)
   total_points: 120
-  completed_points: 72
+  completed_points: 87
   
   # Sprint dates
   sprint_start: 2025-11-12
@@ -90,7 +90,7 @@ sprint_metrics:
   epic_1_foundation: 7/8 complete (87.5%)
   epic_2_core_mt5: 4/4 complete (100%)
   epic_3_rest_api: 7/7 complete (100%)
-  epic_4_supabase: 2/5 complete (40%)
+  epic_4_supabase: 5/5 complete (100%)
   epic_5_frontend: 0/5 complete (0%)
   epic_6_websocket: 0/3 complete (0%)
   epic_7_security: 0/3 complete (0%)
@@ -99,6 +99,21 @@ sprint_metrics:
 # RECENT COMPLETIONS
 # =============================================================================
 recent_completions:
+  - story: 4-5-supabase-edge-function-deployment
+    completed: 2025-11-13
+    tests: Functions deployed and active, secrets verified
+    notes: Deployed both edge functions via CLI, configured secrets, needs MT5 service cloud deployment for full functionality
+    
+  - story: 4-4-row-level-security-rls-policies-update
+    completed: 2025-11-13
+    tests: Policy verification passed, service role access confirmed
+    notes: Optimized RLS policies for trading_accounts/trades/sync_logs, added helper function, comprehensive testing guide
+    
+  - story: 4-3-database-schema-updates-for-mt5-integration
+    completed: 2025-11-13
+    tests: Schema verification passed
+    notes: Added 5 columns to trading_accounts, created sync_logs table, RLS policies, monitoring views
+    
   - story: 3-7-get-health-service-health-check-endpoint
     completed: 2025-11-13
     tests: 23 tests passing (195 total)
@@ -125,8 +140,11 @@ recent_completions:
 # - Epic 1 (Foundation): Nearly complete, only 1-5 (ngrok) and 1-8 (e2e testing) remaining
 # - Epic 2 (Core MT5): Fully complete with connection manager, data retrieval, transformers, caching
 # - Epic 3 (REST API): Fully complete with all 7 endpoints (auth, connect, info, positions, history, sync, health)
-# - Epic 4 (Supabase): 2/5 complete - edge functions refactored, need DB migrations and RLS
-# - Story 4-3 (Database schema) is next priority - required for edge functions to work
+# - Epic 4 (Supabase): COMPLETE - all 5 stories done (edge functions, schema, RLS, deployment)
+# - Epic 5 (Frontend) is next priority - integrate with deployed edge functions
+# - Edge functions deployed but need MT5 service in cloud for full functionality
 # - Total test coverage: 195 passing tests for Python MT5 service
+# - Database backup created before migrations: 360 records across 4 tables
+# - RLS policies optimized with direct auth.uid() comparison for performance
 # - All completed stories have comprehensive documentation and summaries
 

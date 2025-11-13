@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { getCorsHeaders } from '../_shared/cors.ts';
@@ -100,22 +100,44 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Load all active trading accounts
-    const { data: accounts, error: accountsError } = await supabaseAdmin
+    // Parse request body to check for specific account_id
+    let specificAccountId: string | null = null;
+    try {
+      const body = await req.json();
+      specificAccountId = body.account_id || null;
+      secureLog('Request body parsed', { specificAccountId });
+    } catch {
+      // No body or invalid JSON - sync all accounts
+      secureLog('No valid request body - will sync all accounts');
+    }
+
+    // Load trading accounts (specific account or all active)
+    let accountsQuery = supabaseAdmin
       .from('trading_accounts')
       .select('id, user_id, mt5_service_account_id, login_number, broker_name, server, last_sync_at')
       .eq('is_active', true)
       .not('mt5_service_account_id', 'is', null);
+
+    // Filter by specific account if provided
+    if (specificAccountId) {
+      accountsQuery = accountsQuery.eq('id', specificAccountId);
+      secureLog('Filtering for specific account', { account_id: specificAccountId });
+    }
+
+    const { data: accounts, error: accountsError } = await accountsQuery;
 
     if (accountsError) {
       throw new Error(`Failed to load accounts: ${accountsError.message}`);
     }
 
     if (!accounts || accounts.length === 0) {
-      secureLog('No active accounts to sync', { executionId });
+      const message = specificAccountId 
+        ? `Account ${specificAccountId} not found or inactive`
+        : 'No active accounts to sync';
+      secureLog(message, { executionId });
       return new Response(JSON.stringify({
-        success: true,
-        message: 'No active accounts to sync',
+        success: false,
+        message,
         totalAccounts: 0,
         syncResults: [],
         executionId,
@@ -303,18 +325,18 @@ async function syncAccount(
         account_id: account.id,
         ticket: pos.ticket.toString(),
         symbol: pos.symbol,
-        type: pos.type === 0 ? 'buy' : 'sell',
+        direction: pos.type === 0 ? 'BUY' : 'SELL',
         volume: pos.volume,
-        open_price: pos.price_open,
-        open_time: new Date(pos.time * 1000).toISOString(),
+        entry_price: pos.price_open,
+        opened_at: new Date(pos.time * 1000).toISOString(),
         stop_loss: pos.sl || null,
         take_profit: pos.tp || null,
-        current_price: pos.price_current,
-        profit: pos.profit,
+        exit_price: pos.price_current,
+        pnl: pos.profit,
         swap: pos.swap,
         commission: 0, // Not available in positions
-        status: 'open',
-        comment: pos.comment || null
+        trade_status: 'open',
+        notes: pos.comment || null
       }));
 
       await supabaseAdmin
@@ -332,17 +354,17 @@ async function syncAccount(
           account_id: account.id,
           ticket: deal.ticket.toString(),
           symbol: deal.symbol,
-          type: deal.type === 0 ? 'buy' : 'sell',
+          direction: deal.type === 0 ? 'BUY' : 'SELL',
           volume: deal.volume,
-          open_price: deal.price,
-          open_time: new Date(deal.time * 1000).toISOString(),
-          close_price: deal.price,
-          close_time: new Date(deal.time * 1000).toISOString(),
-          profit: deal.profit,
+          entry_price: deal.price,
+          opened_at: new Date(deal.time * 1000).toISOString(),
+          exit_price: deal.price,
+          closed_at: new Date(deal.time * 1000).toISOString(),
+          pnl: deal.profit,
           swap: deal.swap,
           commission: deal.commission,
-          status: 'closed',
-          comment: deal.comment || null
+          trade_status: 'closed',
+          notes: deal.comment || null
         }));
 
       if (historyTrades.length > 0) {
@@ -417,6 +439,7 @@ async function fetchAccountInfo(
     method: 'GET',
     headers: {
       'X-API-Key': mt5ServiceApiKey,
+      'ngrok-skip-browser-warning': 'true',
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT)
   });
@@ -439,6 +462,7 @@ async function fetchPositions(
     method: 'GET',
     headers: {
       'X-API-Key': mt5ServiceApiKey,
+      'ngrok-skip-browser-warning': 'true',
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT)
   });
@@ -464,6 +488,7 @@ async function fetchHistory(
       method: 'GET',
       headers: {
         'X-API-Key': mt5ServiceApiKey,
+        'ngrok-skip-browser-warning': 'true',
       },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT)
     }

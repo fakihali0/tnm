@@ -6,7 +6,9 @@
 const ALLOWED_ORIGINS = [
   'https://tradenmore.com',
   'https://www.tradenmore.com',
-  'https://1b5d5c4f-1260-431d-b9ed-fedc311bbd61.lovableproject.com'
+  'https://1b5d5c4f-1260-431d-b9ed-fedc311bbd61.lovableproject.com',
+  'http://localhost:8080',
+  'http://localhost:5173'
 ];
 
 /**

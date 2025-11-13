@@ -11,12 +11,16 @@ interface LinkedAccountCardProps {
   account: LinkedAccount;
   isSelected?: boolean;
   onSelect?: () => void;
+  lastSync?: Date;
+  syncError?: string;
 }
 
 export const LinkedAccountCard: React.FC<LinkedAccountCardProps> = ({
   account,
   isSelected = false,
   onSelect,
+  lastSync,
+  syncError,
 }) => {
   const { t } = useTranslation('tnm-ai');
   const rtl = useRTL();
@@ -41,29 +45,29 @@ export const LinkedAccountCard: React.FC<LinkedAccountCardProps> = ({
       dir={rtl.dir}
     >
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Wallet className="h-5 w-5" />
-            {t('accountCard.account', { platform: account.platform })}
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2 min-w-0">
+            <Wallet className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate">{t('accountCard.account', { platform: account.platform })}</span>
           </CardTitle>
-          <Badge variant={isSelected ? 'default' : 'secondary'}>
+          <Badge variant={isSelected ? 'default' : 'secondary'} className="flex-shrink-0">
             {account.platform}
           </Badge>
         </div>
-        <div className="text-sm text-muted-foreground">
-          <div>{t('accountCard.labels.login')}: {account.login}</div>
-          <div>{t('accountCard.labels.server')}: {account.server}</div>
+        <div className="text-sm text-muted-foreground space-y-1">
+          <div className="truncate">{t('accountCard.labels.login')}: {account.login}</div>
+          <div className="truncate" title={account.server}>{t('accountCard.labels.server')}: {account.server}</div>
         </div>
       </CardHeader>
       
       <CardContent className="pt-0">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <DollarSign className="h-4 w-4" />
               {t('accountCard.labels.balance')}
             </div>
-            <div className="text-xl font-semibold">
+            <div className="text-lg sm:text-xl font-semibold break-words">
               {formatCurrency(account.balance)}
             </div>
           </div>
@@ -73,10 +77,10 @@ export const LinkedAccountCard: React.FC<LinkedAccountCardProps> = ({
               <Activity className="h-4 w-4" />
               {t('accountCard.labels.equity')}
             </div>
-            <div className="text-xl font-semibold flex items-center gap-2">
-              {formatCurrency(account.equity)}
+            <div className="text-lg sm:text-xl font-semibold flex items-center gap-2 flex-wrap">
+              <span className="break-words">{formatCurrency(account.equity)}</span>
               {equityChange !== 0 && (
-                <div className={`flex items-center text-sm ${
+                <div className={`flex items-center text-sm whitespace-nowrap ${
                   equityChange > 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
                   {equityChange > 0 ? (
@@ -91,14 +95,14 @@ export const LinkedAccountCard: React.FC<LinkedAccountCardProps> = ({
           </div>
         </div>
         
-        <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4 text-sm">
+        <div className="mt-4 pt-4 border-t grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <span className="text-muted-foreground">{t('accountCard.labels.margin')}:</span>
-            <div className="font-medium">{formatCurrency(account.margin)}</div>
+            <div className="font-medium break-words">{formatCurrency(account.margin)}</div>
           </div>
           <div>
             <span className="text-muted-foreground">{t('accountCard.labels.freeMargin')}:</span>
-            <div className="font-medium">{formatCurrency(account.freeMargin)}</div>
+            <div className="font-medium break-words">{formatCurrency(account.freeMargin)}</div>
           </div>
         </div>
         
@@ -109,8 +113,20 @@ export const LinkedAccountCard: React.FC<LinkedAccountCardProps> = ({
           </div>
         )}
         
-        <div className="mt-3 text-xs text-muted-foreground">
-          {t('accountCard.labels.connected')}: {new Date(account.createdAt).toLocaleDateString()}
+        <div className="mt-3 space-y-1">
+          <div className="text-xs text-muted-foreground">
+            {t('accountCard.labels.connected')}: {new Date(account.createdAt).toLocaleDateString()}
+          </div>
+          {lastSync && (
+            <div className="text-xs text-muted-foreground">
+              Last sync: {new Date(lastSync).toLocaleString()}
+            </div>
+          )}
+          {syncError && (
+            <div className="text-xs text-red-600">
+              Sync error: {syncError}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

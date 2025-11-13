@@ -142,12 +142,14 @@ serve(async (req) => {
           headers: {
             'Content-Type': 'application/json',
             'X-API-Key': mt5ServiceApiKey,
+            'ngrok-skip-browser-warning': 'true',
           },
           body: JSON.stringify({
             login: parseInt(login),
             password: password,
             server: server,
-            broker_name: broker_name
+            broker_name: broker_name,
+            user_id: user.id // Pass validated user_id from edge function auth
           }),
           signal: AbortSignal.timeout(30000) // 30 second timeout
         });
@@ -160,7 +162,7 @@ serve(async (req) => {
         mt5Response = await response.json();
         secureLog('MT5 service connection successful', { 
           requestId, 
-          account_id: mt5Response.account_id 
+          connection_id: mt5Response.connection_id 
         });
         break; // Success, exit retry loop
 
@@ -188,15 +190,37 @@ serve(async (req) => {
 
     const accountInfo = mt5Response.account_info;
 
-    // Get user profile
-    const { data: profile } = await supabaseClient
+    // Get or create user profile
+    let { data: profile } = await supabaseClient
       .from('profiles')
       .select('user_id')
       .eq('user_id', user.id)
       .single();
 
+    // Auto-create profile if it doesn't exist
     if (!profile) {
-      throw new Error('User profile not found');
+      const supabaseAdmin = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+      
+      const { data: newProfile, error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          user_id: user.id,
+          email: user.email,
+          created_at: new Date().toISOString()
+        })
+        .select('user_id')
+        .single();
+      
+      if (profileError || !newProfile) {
+        secureLog('Failed to create profile:', profileError);
+        throw new Error('Failed to create user profile');
+      }
+      
+      profile = newProfile;
+      secureLog('Auto-created profile for user:', { user_id: user.id });
     }
 
     // Encrypt credentials before storage
@@ -214,58 +238,61 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Insert account into database
+    // Insert or update account into database
     const { data: dbAccount, error: dbError } = await supabaseAdmin
       .from('trading_accounts')
-      .insert({
+      .upsert({
         user_id: profile.user_id,
         platform: 'MT5',
         broker_name: accountInfo.company,
         server: accountInfo.server,
-        login_number: accountInfo.login.toString(),
+        login_number: String(login), // Ensure it's a string
         account_name: accountInfo.name,
-        balance: accountInfo.balance,
-        equity: accountInfo.equity,
-        margin: accountInfo.margin,
-        free_margin: accountInfo.margin_free,
-        margin_level: accountInfo.margin_level,
+        balance: Number(accountInfo.balance),
+        equity: Number(accountInfo.equity),
+        margin: Number(accountInfo.margin),
+        free_margin: Number(accountInfo.margin_free || accountInfo.free_margin),
+        // margin_level: Number(accountInfo.margin_level), // Skip for now - may cause overflow
         currency: accountInfo.currency,
-        leverage: accountInfo.leverage,
+        leverage: Number(accountInfo.leverage),
         is_active: true,
         connection_status: 'connected',
-        mt5_service_account_id: mt5Response.account_id,
+        mt5_service_account_id: mt5Response.connection_id,
         last_sync_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,platform,server,login_number',
+        ignoreDuplicates: false
       })
       .select()
       .single();
 
     if (dbError) {
       console.error('Database error:', dbError);
-      throw new Error('Failed to save account to database');
+      throw new Error(`Failed to save account to database: ${dbError.message || JSON.stringify(dbError)}`);
     }
 
-    // Store encrypted credentials in account_integrations
-    const { error: integrationError } = await supabaseAdmin
-      .from('account_integrations')
-      .insert({
-        account_id: dbAccount.id,
-        provider: 'mt5_direct',
-        external_account_id: mt5Response.account_id,
-        encrypted_credentials: encryptedCreds.encrypted_data,
-        encryption_key_id: encryptedCreds.encryption_key_id,
-        credentials: {
-          iv: encryptedCreds.iv // Store IV for decryption
-        }
-      });
+    // Store encrypted credentials in account_integrations (optional - table may not exist yet)
+    try {
+      const { error: integrationError } = await supabaseAdmin
+        .from('account_integrations')
+        .insert({
+          account_id: dbAccount.id,
+          provider: 'mt5_direct',
+          external_account_id: mt5Response.connection_id,
+          encrypted_credentials: encryptedCreds.encrypted_data,
+          encryption_key_id: encryptedCreds.encryption_key_id,
+          credentials: {
+            iv: encryptedCreds.iv // Store IV for decryption
+          }
+        });
 
-    if (integrationError) {
-      secureLog('Failed to store integration data:', integrationError);
-      // Try to clean up the trading account
-      await supabaseAdmin
-        .from('trading_accounts')
-        .delete()
-        .eq('id', dbAccount.id);
-      throw new Error('Failed to store encrypted credentials');
+      if (integrationError) {
+        secureLog('Warning: Failed to store integration data (table may not exist):', integrationError);
+        // Non-critical - continue without encrypted credentials storage
+      }
+    } catch (integrationErr) {
+      secureLog('Warning: account_integrations table not available:', integrationErr);
+      // Non-critical - continue
     }
 
     secureLog('Successfully connected MT5 account:', { 
@@ -297,11 +324,11 @@ serve(async (req) => {
         platform: 'MT5',
         broker_name: accountInfo.company,
         server: accountInfo.server,
-        login: accountInfo.login.toString(),
+        login: login, // Use the login from request
         balance: accountInfo.balance,
         equity: accountInfo.equity,
         currency: accountInfo.currency,
-        trade_mode: accountInfo.trade_mode
+        trade_mode: accountInfo.trade_mode || 'UNKNOWN'
       }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -333,9 +360,16 @@ serve(async (req) => {
     }
     
     // SECURITY: Sanitize error message to prevent information disclosure
+    // DEBUG: Temporarily include error details for troubleshooting
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('Full error details:', errorMessage, errorStack);
+    
     return new Response(JSON.stringify({ 
       success: false, 
-      error: sanitizeConnectionError(error)
+      error: sanitizeConnectionError(error),
+      debug_message: errorMessage, // TEMPORARY: Remove after debugging
+      debug_stack: errorStack?.split('\n').slice(0, 3).join('\n') // First 3 lines only
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

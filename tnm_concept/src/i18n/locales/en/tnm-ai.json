@@ -525,6 +525,8 @@
     "investorPassword": "Investor Password",
     "passwordPlaceholder": "Read-only investor password",
     "passwordHint": "Use your read-only investor password for secure access",
+    "connect": "Connect Account",
+    "connecting": "Connecting...",
     "submit": "Link Account",
     "submitting": "Connecting...",
     "temporarilyDisabled": "Temporarily Unavailable",

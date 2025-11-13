@@ -411,9 +411,14 @@ interface AccountState {
   selectedAccount: LinkedAccount | null;
   isConnecting: boolean;
   isLoading: boolean;
+  lastSyncTime: Record<string, Date>;
+  syncErrors: Record<string, string>;
   addAccount: (account: { platform: 'MT4' | 'MT5'; broker_name: string; server: string; login_number: string; password: string }) => Promise<{ success: boolean; error?: string }>;
   updateAccount: (accountId: string, updates: Partial<LinkedAccount>) => void;
   removeAccount: (accountId: string) => Promise<{ success: boolean; error?: string }>;
+  syncAccount: (accountId: string) => Promise<{ success: boolean; error?: string }>;
+  refreshAccountData: (accountId: string) => Promise<{ success: boolean; error?: string }>;
+  getAccountStatus: (accountId: string) => { lastSync?: Date; error?: string; isActive: boolean };
   setSelectedAccount: (account: LinkedAccount | null) => void;
   loadAccounts: () => Promise<void>;
   clearAccounts: () => void;
@@ -424,6 +429,8 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   selectedAccount: null,
   isConnecting: false,
   isLoading: false,
+  lastSyncTime: {},
+  syncErrors: {},
 
   loadAccounts: async () => {
     const authState = useAuthStore.getState();
@@ -438,17 +445,11 @@ export const useAccountStore = create<AccountState>((set, get) => ({
 
       if (error) throw error;
 
-      // Helper to identify demo accounts
-      const isDemo = (acc: LinkedAccount) =>
-        (acc.account_name || '').toLowerCase().includes('demo') ||
-        (acc.server || '').toLowerCase().includes('demo');
-
       const allAccounts = (data || []).map(adaptLinkedAccount);
-      const liveAccounts = allAccounts.filter(acc => !isDemo(acc));
       
       set({ 
-        accounts: liveAccounts,
-        selectedAccount: liveAccounts[0] || null,
+        accounts: allAccounts,
+        selectedAccount: allAccounts[0] || null,
         isLoading: false,
       });
     } catch (error) {
@@ -458,12 +459,48 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   },
 
   addAccount: async (accountData) => {
-    // MetaAPI integration disabled
-    set({ isConnecting: false });
-    return { 
-      success: false, 
-      error: 'Account connection is temporarily unavailable. New integration coming soon!' 
-    };
+    try {
+      set({ isConnecting: true });
+
+      // Get the current session for authentication
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('Not authenticated');
+      }
+
+      // Call the Supabase edge function
+      const { data, error } = await supabase.functions.invoke('connect-mt5-account', {
+        body: {
+          broker_name: accountData.broker_name,
+          server: accountData.server,
+          login: accountData.login_number,
+          password: accountData.password,
+          platform: accountData.platform,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data || !data.success) {
+        throw new Error(data?.error || 'Failed to connect MT5 account');
+      }
+
+      // Reload accounts to include the newly added one
+      await get().loadAccounts();
+
+      set({ isConnecting: false });
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error adding account:', error);
+      set({ isConnecting: false });
+      return { 
+        success: false, 
+        error: error.message || 'Failed to connect account. Please check your credentials.' 
+      };
+    }
   },
 
   updateAccount: (accountId: string, updates: Partial<LinkedAccount>) => {
@@ -496,9 +533,15 @@ export const useAccountStore = create<AccountState>((set, get) => ({
           ? (updatedAccounts[0] || null) 
           : state.selectedAccount;
         
+        // Remove sync state for deleted account
+        const { [accountId]: removedSync, ...remainingSyncTime } = state.lastSyncTime;
+        const { [accountId]: removedError, ...remainingSyncErrors } = state.syncErrors;
+        
         return {
           accounts: updatedAccounts,
           selectedAccount: newSelectedAccount,
+          lastSyncTime: remainingSyncTime,
+          syncErrors: remainingSyncErrors,
         };
       });
 
@@ -508,12 +551,99 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     }
   },
 
+  syncAccount: async (accountId: string) => {
+    try {
+      // Clear previous error
+      set(state => ({
+        syncErrors: { ...state.syncErrors, [accountId]: '' }
+      }));
+
+      console.log('🔄 Calling sync-trading-data edge function with account_id:', accountId);
+
+      // Call the sync edge function
+      const { data, error } = await supabase.functions.invoke('sync-trading-data', {
+        body: { account_id: accountId }
+      });
+
+      console.log('📦 Edge function response:', { data, error });
+
+      if (error) {
+        console.error('❌ Edge function error:', error);
+        throw error;
+      }
+
+      if (!data || !data.success) {
+        const errorMsg = data?.error || data?.message || 'Failed to sync account data';
+        console.error('❌ Edge function returned failure:', data);
+        console.log('📊 Sync details:', {
+          executionId: data?.executionId,
+          totalAccounts: data?.totalAccounts,
+          syncResults: data?.syncResults,
+          message: data?.message
+        });
+        throw new Error(errorMsg);
+      }
+
+      console.log('✅ Sync successful, data:', data);
+      console.log('📊 Sync summary:', {
+        executionId: data.executionId,
+        totalAccounts: data.totalAccounts,
+        successCount: data.successCount,
+        failureCount: data.failureCount,
+        syncResults: data.syncResults
+      });
+
+      // Update last sync time
+      set(state => ({
+        lastSyncTime: { ...state.lastSyncTime, [accountId]: new Date() }
+      }));
+
+      // Reload accounts to get fresh data
+      await get().loadAccounts();
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('❌ Error syncing account:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        raw: error
+      });
+      set(state => ({
+        syncErrors: { ...state.syncErrors, [accountId]: error.message }
+      }));
+      return { 
+        success: false, 
+        error: error.message || 'Failed to sync account data' 
+      };
+    }
+  },
+
+  refreshAccountData: async (accountId: string) => {
+    // Alias for syncAccount for convenience
+    return get().syncAccount(accountId);
+  },
+
+  getAccountStatus: (accountId: string) => {
+    const state = get();
+    const account = state.accounts.find(acc => acc.id === accountId);
+    
+    return {
+      lastSync: state.lastSyncTime[accountId],
+      error: state.syncErrors[accountId],
+      isActive: account?.is_active ?? false
+    };
+  },
+
   clearAccounts: () => {
     set({
       accounts: [],
       selectedAccount: null,
       isConnecting: false,
       isLoading: false,
+      lastSyncTime: {},
+      syncErrors: {},
     });
   },
 }));
@@ -585,6 +715,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
   selectedStrategy: null,
 
   loadTrades: async (accountId: string) => {
+    console.log('📥 Loading trades from database for account:', accountId);
     set({ isLoading: true });
     
     try {
@@ -594,15 +725,30 @@ export const useJournalStore = create<JournalState>((set, get) => ({
         .eq('account_id', accountId)
         .order('opened_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error loading trades:', error);
+        throw error;
+      }
+
+      console.log('✅ Trades loaded from database:', {
+        count: data?.length || 0,
+        rawData: data,
+        firstTrade: data?.[0]
+      });
+
+      const adaptedTrades = (data || []).map(adaptTrade);
+      console.log('✅ Trades adapted:', {
+        count: adaptedTrades.length,
+        firstAdapted: adaptedTrades[0]
+      });
 
       set({ 
-        trades: (data || []).map(adaptTrade),
+        trades: adaptedTrades,
         isLoading: false 
       });
     } catch (error) {
-      console.error('Error loading trades:', error);
-      set({ isLoading: false });
+      console.error('❌ Error loading trades:', error);
+      set({ isLoading: false, trades: [] });
     }
   },
 

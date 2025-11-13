@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
-import { Plug, Server, Key, Eye, EyeOff, AlertTriangle, Construction } from 'lucide-react';
-import { validatePasswordStrength } from '@/utils/enhanced-form-security';
+import { Plug, Server, Key, Eye, EyeOff } from 'lucide-react';
 import { useRTL } from '@/hooks/useRTL';
 
 export const AccountLinkForm: React.FC = () => {
@@ -17,7 +16,6 @@ export const AccountLinkForm: React.FC = () => {
   const rtl = useRTL();
   const { addAccount, isConnecting } = useAccountStore();
   const [showPassword, setShowPassword] = useState(false);
-  const [passwordValidation, setPasswordValidation] = useState<{ isValid: boolean; message?: string }>({ isValid: true });
   const [formData, setFormData] = useState({
     platform: '',
     server: '',
@@ -27,12 +25,6 @@ export const AccountLinkForm: React.FC = () => {
 
   const handlePasswordChange = (password: string) => {
     setFormData(prev => ({ ...prev, investorPassword: password }));
-    if (password) {
-      const validation = validatePasswordStrength(password);
-      setPasswordValidation(validation);
-    } else {
-      setPasswordValidation({ isValid: true });
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -109,14 +101,6 @@ export const AccountLinkForm: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Temporarily Disabled Notice */}
-        <Alert className="mb-4 border-orange-500/50 bg-orange-500/10">
-          <Construction className="h-4 w-4" />
-          <AlertTitle>{t('accountLink.disabledNotice.title')}</AlertTitle>
-          <AlertDescription>
-            {t('accountLink.disabledNotice.description')}
-          </AlertDescription>
-        </Alert>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="platform">{t('accountLink.platform')}</Label>
@@ -202,12 +186,6 @@ export const AccountLinkForm: React.FC = () => {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
-            {!passwordValidation.isValid && formData.investorPassword && (
-              <div className="flex items-center gap-2 text-xs text-destructive">
-                <AlertTriangle className="h-3 w-3" />
-                {passwordValidation.message}
-              </div>
-            )}
             <p className="text-xs text-muted-foreground">
               {t('accountLink.passwordHint')}
             </p>
@@ -216,9 +194,9 @@ export const AccountLinkForm: React.FC = () => {
           <Button 
             type="submit" 
             className="w-full" 
-            disabled={true}
+            disabled={isConnecting}
           >
-            {t('accountLink.temporarilyDisabled')}
+            {isConnecting ? t('accountLink.connecting') : t('accountLink.connect')}
           </Button>
         </form>
       </CardContent>
