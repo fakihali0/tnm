@@ -1,0 +1,145 @@
+<story-context id="story-context/7-4-rate-limiting-and-ddos-protection" v="1.0">
+  <metadata>
+    <epicId>7</epicId>
+    <storyId>7.4</storyId>
+    <title>Rate Limiting and DDoS Protection</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-12T23:54:59Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/7-4-rate-limiting-and-ddos-protection.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>DevOps engineer</asA>
+    <iWant>rate limiting layered in FastAPI and Nginx so MT5 APIs resist abuse</iWant>
+    <soThat>malicious clients cannot starve legitimate traffic or crash the VPS</soThat>
+    <tasks>
+      <![CDATA[
+- Integrate SlowAPI (and supporting configuration) to enforce default and endpoint-specific request ceilings keyed by API key/IP.
+- Add helper methods for `/api/mt5/connect`, `/api/mt5/account/{id}/sync`, and `/health` with tailored limits plus structured 429 responses.
+- Emit observability signals/logs for throttled clients and document how UI/Supabase call sites should honor Retry-After headers.
+- Update Nginx to mirror the limiter (limit_conn_zone/limit_req_zone, timeouts, body-size caps) and capture reload/testing procedures.
+- Provide automated + manual verification (pytest, curl, Locust/k6) and surface runbooks for ops response.
+      ]]>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <![CDATA[
+1. FastAPI limiter defaults: 100 req/min per API key across APIs (decorators/middleware) with structured logging.
+2. Endpoint-specific limits — `/api/mt5/connect` (10/min per key), `/api/mt5/account/{id}/sync` (1/min per key), `/health` (20/min per IP if unauthenticated) — enforce and return 429 JSON payloads + Retry-After headers.
+3. Limits reset every minute, emit metrics/logs for observability, and allow future Redis-backed storage without rewrites.
+4. Tests/manual QA cover throttled and compliant flows (curl scripts, Locust/k6) with documented evidence in Dev Agent records.
+5. Nginx adds complementary `limit_conn_zone`, `limit_req_zone`, timeout, and body-size settings (≤50 connections/IP, 30s timeout, 1 MB body) with reload instructions.
+6. Documentation instructs AccountLinkForm, edge functions, and other clients how to interpret 429s (respect Retry-After, show toasts).
+    ]]>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <![CDATA[
+- path: docs/epics.md#story-7.4-rate-limiting-and-ddos-protection
+  title: Epic 7 Story 7.4
+  section: Rate Limiting and DDoS Protection
+  snippet: Defines per-API-key and per-IP ceilings, required 429 payload, Nginx limits (50 conns/IP, 30s timeout, 1 MB body), and documentation expectations for client behavior.
+- path: docs/PRD-MT5-Integration-Service.md#8.2-security-requirements
+  title: PRD §8.2 Security
+  section: Credential Protection / Access Control
+  snippet: Emphasizes sanitizing logs, preventing credential leakage, and ensuring authentication boundaries remain intact when rate limiting rejects requests.
+- path: docs/PRD-MT5-Integration-Service.md#8.3-reliability-&-availability-requirements
+  title: PRD §8.3 Reliability & Availability
+  section: Monitoring & Alerting
+  snippet: Requires health checks every 60s, alerting on errors/CPU spikes, and enforcing response SLAs — rate limiting must integrate with these alerts rather than masking genuine failures.
+- path: docs/technical/WINDOWS-DEPLOYMENT-GUIDE.md#7-nginx-reverse-proxy-setup
+  title: Windows Deployment Guide §7
+  section: Nginx Reverse Proxy Setup
+  snippet: Provides concrete `limit_req_zone`, upstream definitions, SSL headers, and shows where to inject connection/request limits to mirror SlowAPI throttles.
+- path: docs/stories/3-7-get-health-service-health-check-endpoint.md
+  title: Story 3.7 – GET /health
+  section: Acceptance Criteria
+  snippet: Specifies `/health` as public, lightweight, and suitable for UptimeRobot; new rate limits must preserve <100 ms responses and expose service status even under throttle.
+      ]]>
+    </docs>
+
+    <code>
+      <![CDATA[
+- path: tnm_concept/src/utils/security-monitor.ts
+  kind: utility
+  symbol: logSecurity / security monitor helpers
+  lines: 1-120
+  reason: Frontend security monitors expect consistent event logging and should respond to backend rate-limit alerts; reuse nomenclature for warnings surfaced to UI.
+- path: tnm_concept/src/utils/production-logger.ts
+  kind: utility
+  symbol: ProductionLogger
+  lines: 1-140
+  reason: Demonstrates sanitized logging and buffering strategies; backend throttling logs should match these conventions for unified observability.
+      ]]>
+    </code>
+
+    <dependencies>
+      <![CDATA[
+- ecosystem: python
+  packages:
+    - fastapi / uvicorn[standard]
+    - slowapi (or equivalent limiter)
+    - contextvars / uuid (built-in) for correlation keys
+    - redis (optional future state backend)
+    - psutil (already required for health metrics)
+- ecosystem: infrastructure
+  packages:
+    - Nginx (Windows build) configured per Windows Deployment Guide
+      ]]>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <![CDATA[
+- Never log full API keys or credentials; redaction rules from PRD §8.2 still apply to limiter logs.
+- `/health` must remain public and fast; rate limits for unauthenticated IPs should avoid false positives for monitoring tools (document allowlists).
+- Ensure 429 responses include `Retry-After` and don't expose internal stack traces.
+- Nginx and FastAPI rules must stay synchronized to prevent inconsistent user experience; document both layers in the ops runbook.
+    ]]>
+  </constraints>
+
+  <interfaces>
+    <![CDATA[
+- name: POST /api/mt5/connect-account
+  kind: REST endpoint
+  signature: POST /api/mt5/connect-account → { account_id, status }
+  path: docs/stories/3-2-post-api-mt5-connect-account-connection-endpoint.md
+  notes: Endpoint is expensive (MT5 login), hence dedicated 10 rpm limit; ensure limiter keys on API key + account.
+- name: POST /api/mt5/account/{account_id}/sync
+  kind: REST endpoint
+  signature: POST /api/mt5/account/{account_id}/sync → background sync trigger
+  path: docs/stories/3-6-post-api-mt5-account-account-id-sync-manual-sync-trigger-endpoint.md
+  notes: Must enforce 1 sync/minute per account to avoid MT5 overload; share limiter logic with background job queue.
+- name: GET /health
+  kind: REST endpoint
+  signature: GET /health → service status JSON
+  path: docs/stories/3-7-get-health-service-health-check-endpoint.md
+  notes: Only endpoint allowed unauthenticated; limit to 20 req/min per IP and keep latency <100 ms even when throttled.
+    ]]>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <![CDATA[
+Use pytest with FastAPI TestClient and caplog fixtures to simulate bursts, assert 429 payloads, and verify Retry-After headers. Combine with Locust/k6 load scripts (documented in Dev Notes) for manual validation. Monitoring requirements demand logging throttled events for alerting.
+      ]]>
+    </standards>
+    <locations>
+      <![CDATA[
+- tests/ (FastAPI backend tests)
+- scripts/load-testing/ (new location for Locust/k6 scenarios, referenced in story tasks)
+      ]]>
+    </locations>
+    <ideas>
+      <![CDATA[
+- AC1/2: Use pytest parametrized requests to hammer `/api/mt5/connect` and `/api/mt5/account/{id}/sync`, ensuring 429 after the configured thresholds with proper JSON body + Retry-After.
+- AC2/3: Simulate missing API key and confirm IP-based `limit_req` rejects unauthorized `/health` floods while still allowing monitoring cadence.
+- AC5: Execute nginx `limit_req` integration test by sending bursts via `hey`/`k6` and confirming both FastAPI and Nginx logs record throttles.
+- AC6: Run frontend/supabase client mocks to ensure 429 responses trigger documented toast/backoff logic.
+      ]]>
+    </ideas>
+  </tests>
+</story-context>

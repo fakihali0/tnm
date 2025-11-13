@@ -1,0 +1,139 @@
+<story-context id="story-context/8-1-structured-logging-implementation" v="1.0">
+  <metadata>
+    <epicId>8</epicId>
+    <storyId>8.1</storyId>
+    <title>Structured Logging Implementation</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-12T23:52:13Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/8-1-structured-logging-implementation.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>structured JSON logging with request-scoped correlation IDs and sanitization across the FastAPI MT5 service</iWant>
+    <soThat>operations and downstream tools can query logs reliably while meeting PRD monitoring and security requirements</soThat>
+    <tasks>
+      <![CDATA[
+- Build `app/core/logger.py` with `python-json-logger` formatting, centralized configuration, and `.env`-driven log levels.
+- Add middleware that stamps UUID correlation IDs via `contextvars` and forwards them to Supabase/edge-function calls.
+- Implement redaction/audit filters to mask secrets and channel sensitive events to `audit.log`.
+- Configure TimedRotatingFileHandlers for `app.log`, `audit.log`, and `error.log`, and expose logger health via `/health`.
+- Back the work with pytest coverage plus documentation describing ingestion, redaction, and operational processes.
+      ]]>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <![CDATA[
+1. All INFO+ records emit structured JSON (timestamp, level, logger, message, file/module, correlation_id, request_path, duration_ms, domain fields) with log levels toggled via `.env`.
+2. Middleware seeds per-request correlation IDs (UUID v4), stores them in `contextvars`, and injects them into outgoing headers/log entries.
+3. Sensitive keys (passwords, API keys, PII) are redacted before hitting any handler and MT5 credentials never appear in logs.
+4. Daily-rotated `app.log`, `audit.log`, `error.log` files (30-day retention, compressed) exist under `logs/`, with logger health surfaced in `/health`.
+5. Pytest (e.g., using `caplog`) validates JSON structure/redaction; docs show sample logs, ELK/Grafana ingestion guidance, and QA evidence.
+    ]]>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <![CDATA[
+- path: docs/epics.md#story-8.1-structured-logging-implementation
+  title: Epic 8 Story 8.1
+  section: Structured Logging Implementation
+  snippet: Defines JSON log schema, correlation IDs, sanitization, multiple log files, and testing/documentation expectations for the backend logger.
+- path: docs/PRD-MT5-Integration-Service.md#8.4-operational-requirements
+  title: PRD §8.4 Operational Requirements
+  section: Logging
+  snippet: Requires structured JSON logging with ERROR/WARN/INFO/DEBUG levels, daily rotation (30-day retention), request logging, and stack traces for errors.
+- path: docs/PRD-MT5-Integration-Service.md#8.2-security-requirements
+  title: PRD §8.2 Security Requirements
+  section: Credential Protection
+  snippet: Mandates automatic credential sanitization, ensures passwords/API keys never appear in logs, and highlights AES-256 storage plus TLS for transport.
+- path: docs/LOCAL-DEVELOPMENT-GUIDE.md#44-create-project-structure
+  title: Local Dev Guide §4.4–4.5
+  section: Project Structure & Logs
+  snippet: Establishes the FastAPI folder layout (`app/core`, `logs/`, `tests/`) and documents how to tail `logs/app.log`, aligning with where new handlers will write files.
+- path: docs/LOCAL-DEVELOPMENT-GUIDE.md#requirements-installation
+  title: Local Dev Guide §4.3 Requirements
+  section: Python dependencies
+  snippet: Lists baseline Python stack (FastAPI, Uvicorn, MetaTrader5, cryptography, python-jose, httpx, pydantic, psutil) that the logging module must integrate with.
+      ]]>
+    </docs>
+
+    <code>
+      <![CDATA[
+- path: tnm_concept/src/utils/logger.ts
+  kind: utility
+  symbol: Logger class
+  lines: 1-100
+  reason: Frontend logger already sanitizes sensitive keys and formats context strings; backend logging should mirror the redaction list and structured output expectations.
+- path: tnm_concept/src/utils/production-logger.ts
+  kind: utility
+  symbol: ProductionLogger
+  lines: 1-120
+  reason: Demonstrates buffering, categorization, and performance annotations that can inspire backend audit/measurement fields (e.g., category, duration) in JSON logs.
+      ]]>
+    </code>
+
+    <dependencies>
+      <![CDATA[
+- ecosystem: python
+  packages:
+    - fastapi
+    - uvicorn[standard]
+    - MetaTrader5
+    - cryptography
+    - python-jose[cryptography]
+    - httpx
+    - pydantic / pydantic-settings
+    - psutil
+    - python-json-logger (required for structured formatting per Story 8.1)
+    - contextvars / uuid (standard library) for correlation IDs
+- ecosystem: node (frontend)
+  packages:
+    - Existing `tnm_concept/package.json` stack (React, Vite, Zustand) already emits sanitized logs; keep backend schemas compatible with these consumers.
+      ]]>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <![CDATA[
+- Logs must never leak secrets or PII (PRD §8.2); apply redaction filters before handlers flush content to disk/stdout.
+- Maintain daily rotation with 30-day retention and compressed archives to meet PRD §8.4 plus Local Dev Guide expectations.
+- Correlation IDs are mandatory on every request and must propagate to Supabase/edge functions for traceability.
+- `/metrics`/`/health` remain lightweight; logger health reporting should not block responses or introduce >1% CPU overhead.
+    ]]>
+  </constraints>
+
+  <interfaces>
+    <![CDATA[
+- name: GET /health
+  kind: REST endpoint
+  signature: GET /health → { status, timestamp, MT5 metrics, resource usage }
+  path: docs/stories/3-7-get-health-service-health-check-endpoint.md
+  notes: Logger health signals (file writeable, rotation success) should hook into this endpoint per Story 3.7’s monitoring scope.
+    ]]>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <![CDATA[
+Backend tests rely on pytest with fixtures/mocking per docs/epics.md guidance (use `pytest-mock`/`unittest.mock` for MT5 interactions, keep CI-ready commands). Caplog-based tests should assert JSON payloads, sanitized fields, and correlation IDs.
+      ]]>
+    </standards>
+    <locations>
+      <![CDATA[
+- tests/ (FastAPI service unit tests per Local Dev Guide structure)
+      ]]>
+    </locations>
+    <ideas>
+      <![CDATA[
+- AC1: Use pytest caplog to ensure INFO log entries include correlation_id, request_path, and redact keys named `password`/`token`.
+- AC2: Simulate FastAPI requests through TestClient verifying the middleware injects `X-Correlation-ID` and logs the same value.
+- AC3: Feed dummy credential payloads to the logger and confirm `[REDACTED]` output plus audit-log routing.
+- AC4: Mock TimedRotatingFileHandler to ensure files rotate daily and `/health` reflects handler status.
+- AC5: Add regression tests that parse generated JSON lines and validate they are accepted by a sample ELK/Grafana pipeline script (or JSON schema).
+      ]]>
+    </ideas>
+  </tests>
+</story-context>

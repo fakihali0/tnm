@@ -1,0 +1,133 @@
+<story-context id="story-context/8-3-error-tracking-with-sentry-optional" v="1.0">
+  <metadata>
+    <epicId>8</epicId>
+    <storyId>8.3</storyId>
+    <title>Error Tracking with Sentry (Optional)</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-13T00:01:13Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/8-3-error-tracking-with-sentry-optional.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>Sentry wired into the FastAPI MT5 service for automatic error/performance capture</iWant>
+    <soThat>exceptions are logged with rich context, alerts fire on spikes, and debugging time shrinks</soThat>
+    <tasks>
+      <![CDATA[
+- Install `sentry-sdk[fastapi]` and initialize it in `app/main.py` with DSN, environment, release, and sample rate settings.
+- Attach middleware/helpers that tag requests with user/account IDs, correlation IDs, and breadcrumbs sourced from Story 8.1 logging.
+- Configure sanitization (PII scrubbing) per PRD §8.2, ensuring secrets never leave the service.
+- Define Sentry alert rules (Slack/email) and document them in `docs/operations/sentry.md`.
+- Validate integration via pytest (capuring simulated errors) and manual staging tests, documenting evidence.
+      ]]>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <![CDATA[
+1. Backend imports `sentry-sdk[fastapi]` and initializes with DSN, environment, release, traces sample rate = 0.1, error sample = 1.0.
+2. Reports automatically capture unhandled exceptions, HTTP 500s, background task failures, and MT5 connection errors with stack trace, request info, and user/account context.
+3. PII scrubbing enabled (send_default_pii tuned, custom event processors) so secrets follow Story 8.1’s sanitization guidelines.
+4. Alerting: Slack notified on new issue types, email digest on spikes (>10/min), daily summary digest configured.
+5. Tests (pytest + manual) confirm events reach Sentry and evidence stored in Dev Agent Debug Log/runbook.
+    ]]>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <![CDATA[
+- path: docs/epics.md#story-8.3-error-tracking-with-sentry-optional
+  title: Epic 8 Story 8.3
+  section: Error Tracking with Sentry
+  snippet: Specifies automatic capture targets (unhandled exceptions, HTTP 500, background tasks, MT5 errors), required metadata, environment/release config, sampling, and alert rules.
+- path: docs/PRD-MT5-Integration-Service.md#8.4-operational-requirements
+  title: PRD §8.4 Operational Requirements
+  section: Logging / Monitoring Tools
+  snippet: Mandates structured logging, log rotation, and monitoring stack (UptimeRobot, Prometheus, Sentry) to ensure observability.
+- path: docs/PRD-MT5-Integration-Service.md#8.3-reliability-&-availability-requirements
+  title: PRD §8.3 Reliability & Availability
+  section: Monitoring & Alerting
+  snippet: Requires alerting when errors exceed thresholds and ensures uptime/alert SLAs matched by Sentry notifications.
+- path: docs/PRD-MT5-Integration-Service.md#8.2-security-requirements
+  title: PRD §8.2 Security
+  section: Credential Protection
+  snippet: Emphasizes sanitizing logs and preventing sensitive data leakage, driving Sentry PII scrubbing decisions.
+- path: docs/stories/8-1-structured-logging-implementation.md
+  title: Story 8.1 – Structured Logging
+  section: Acceptance Criteria / Dev Notes
+  snippet: Provides schema for JSON logs and correlation IDs; Sentry integration should reuse the same metadata and filters.
+- path: docs/LOCAL-DEVELOPMENT-GUIDE.md#requirements-installation
+  title: Local Dev Guide – Requirements
+  section: Python dependencies
+  snippet: Baseline FastAPI service stack (psutil, pydantic, etc.) where Sentry SDK will be added; includes logging directory references for parity.
+      ]]>
+    </docs>
+
+    <code>
+      <![CDATA[
+- path: tnm_concept/src/utils/logger.ts
+  kind: utility
+  symbol: Logger
+  lines: 1-100
+  reason: Frontend logging already redacts sensitive keys; backend Sentry scrubbing rules should align for consistent observability semantics.
+      ]]>
+    </code>
+
+    <dependencies>
+      <![CDATA[
+- ecosystem: python
+  packages:
+    - fastapi
+    - uvicorn[standard]
+    - sentry-sdk[fastapi]
+    - contextvars / uuid (built-in) for correlation tags
+    - existing observability stack (psutil, python-json-logger from Story 8.1)
+- ecosystem: documentation/runbooks
+  artifacts:
+    - docs/operations/sentry.md (new)
+    - docs/operations/uptimerobot.md (for cross-referencing alerts)
+      ]]>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <![CDATA[
+- DSN and auth tokens must reside in `.env`/secret stores, never in repo.
+- PII scrubbing must satisfy PRD §8.2 and Story 8.1 redaction policies.
+- Alert noise should be limited (use sampling thresholds) while still meeting SLA for spikes.
+    ]]>
+  </constraints>
+
+  <interfaces>
+    <![CDATA[
+- name: FastAPI middleware stack
+  kind: application hook
+  signature: app = FastAPI(); sentry_sdk.init(...); integrate middleware
+  path: app/main.py (to be implemented)
+  notes: Integration hooks should wrap existing middleware without altering request order significantly.
+    ]]>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <![CDATA[
+Use pytest + FastAPI TestClient to raise exceptions and inspect `sentry_sdk.Hub.current` for captured events. Manual staging tests should verify alerts hit Slack/email accounts.
+      ]]>
+    </standards>
+    <locations>
+      <![CDATA[
+- tests/ (backend unit/integration tests)
+- docs/operations/sentry.md (store evidence links)
+      ]]>
+    </locations>
+    <ideas>
+      <![CDATA[
+- Trigger HTTP 500 via TestClient and assert Sentry event contains correlation ID and sanitized context.
+- Simulate MT5 connection failure to ensure breadcrumbs and tags (e.g., `mt5_error_type`) appear.
+- Run load scenario with controlled error spike (>10/min) to validate Slack/email alert rules.
+- Capture manual staging screenshots/log IDs and reference them in Dev Agent Debug Log.
+      ]]>
+    </ideas>
+  </tests>
+</story-context>

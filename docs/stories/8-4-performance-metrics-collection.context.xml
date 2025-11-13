@@ -1,0 +1,140 @@
+<story-context id="story-context/8-4-performance-metrics-collection" v="1.0">
+  <metadata>
+    <epicId>8</epicId>
+    <storyId>8.4</storyId>
+    <title>Performance Metrics Collection</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-13T00:02:48Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/8-4-performance-metrics-collection.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>Prometheus-format metrics covering HTTP requests, MT5 pool, and system load exposed at `/metrics`</iWant>
+    <soThat>operations can monitor performance trends and detect bottlenecks quickly</soThat>
+    <tasks>
+      <![CDATA[
+- Integrate `prometheus-fastapi-instrumentator` to auto-instrument FastAPI routes.
+- Build custom collectors for MT5 connection manager metrics and wrap MT5 calls with timing hooks.
+- Implement a background sampler for CPU, memory, disk, and threads using psutil.
+- Expose `/metrics` (text format) without auth but document Nginx/IP allowlists to protect it.
+- Provide Prometheus scrape configs, Grafana notes, and testing evidence (pytest + manual curls).
+      ]]>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <![CDATA[
+1. HTTP metrics (totals per endpoint, latency histograms, status codes, active connections) emitted via Instrumentator middleware with tuned buckets.
+2. MT5-specific metrics: pool size gauge, login success/fail counters, API call duration histograms, error counters by type.
+3. System metrics gauge CPU %, memory MB, disk free GB, and active threads with <1% CPU overhead sampling.
+4. `/metrics` endpoint returns Prometheus text format without auth; docs detail Nginx rate limits/IP allowlists to prevent abuse.
+5. Tests/QA validate metrics output and document Prometheus scrape + Grafana integration steps (with evidence in Dev Agent logs).
+    ]]>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <![CDATA[
+- path: docs/epics.md#story-8.4-performance-metrics-collection
+  title: Epic 8 Story 8.4
+  section: Performance Metrics Collection
+  snippet: Lists required request/MT5/system metrics, Prometheus formatting, `/metrics` endpoint behavior, and testing expectations.
+- path: docs/PRD-MT5-Integration-Service.md#8.3-reliability-&-availability-requirements
+  title: PRD §8.3 Reliability & Availability
+  section: Monitoring & Alerting
+  snippet: Calls for health checks, CPU/error alerts, and performance visibility—metrics must feed these thresholds.
+- path: docs/PRD-MT5-Integration-Service.md#8.4-operational-requirements
+  title: PRD §8.4 Operational Requirements
+  section: Monitoring Tools
+  snippet: Mentions Prometheus/Grafana for metrics and structured logging for cross-correlation.
+- path: docs/stories/3-7-get-health-service-health-check-endpoint.md
+  title: Story 3.7 – Health Endpoint
+  section: Acceptance Criteria
+  snippet: Defines `/health` payload and performance; `/metrics` must complement it without degrading SLA.
+- path: docs/LOCAL-DEVELOPMENT-GUIDE.md#requirements-installation
+  title: Local Dev Guide – Requirements
+  section: Python dependencies / psutil usage
+  snippet: Lists psutil and project folder layout (`app/core`, `logs/`, `tests/`), aligning with where sampling/background tasks should live.
+- path: docs/technical/WINDOWS-DEPLOYMENT-GUIDE.md#7-nginx-reverse-proxy-setup
+  title: Windows Deployment Guide – Nginx
+  section: Rate limiting configuration
+  snippet: Shows how to inject limit_req/allowlist directives to guard `/metrics`.
+- path: docs/stories/8-1-structured-logging-implementation.md
+  title: Story 8.1 – Structured Logging
+  section: Dev Notes
+  snippet: Highlights correlation IDs/logging standards; metrics should reuse the same context and not break logging.
+      ]]>
+    </docs>
+
+    <code>
+      <![CDATA[
+- path: tnm_concept/src/utils/performance-monitor.ts
+  kind: service/component
+  symbol: PerformanceMonitor utilities
+  lines: 1-120
+  reason: Frontend performance monitors expect consistent metric names; backend Prometheus labels should align to feed dashboards.
+      ]]>
+    </code>
+
+    <dependencies>
+      <![CDATA[
+- ecosystem: python
+  packages:
+    - prometheus-fastapi-instrumentator
+    - prometheus_client
+    - psutil
+    - existing FastAPI stack (fastapi, uvicorn, MT5 libs)
+- ecosystem: monitoring
+  tooling:
+    - Prometheus scraper configuration
+    - Grafana dashboards (Phase 2)
+      ]]>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <![CDATA[
+- Keep sampling overhead under 1% CPU and avoid high-cardinality labels (e.g., normalize dynamic paths).
+- `/metrics` must remain unauthenticated for Prometheus but limited via firewall/Nginx allowlists.
+- Ensure metrics don’t leak sensitive identifiers—hash or omit user-specific labels.
+    ]]>
+  </constraints>
+
+  <interfaces>
+    <![CDATA[
+- name: /metrics
+  kind: endpoint
+  signature: GET /metrics → Prometheus text
+  path: app/main.py (to be instrumented)
+- name: MT5ConnectionManager hooks
+  kind: service interface
+  signature: class MT5ConnectionManager (initialize/login/get_account_info)
+  path: app/core/mt5_manager.py
+  notes: Add instrumentation wrappers for login attempts, pool size, and API call durations.
+    ]]>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <![CDATA[
+Use pytest/TestClient to hit `/metrics`, parse output with `prometheus_client.parser`, and assert custom series exist. Manual `curl`/`hey` tests should be logged in Dev Agent Debug Log.
+      ]]>
+    </standards>
+    <locations>
+      <![CDATA[
+- tests/ (backend tests)
+- docs/operations/monitoring.md (scrape configs & evidence)
+      ]]>
+    </locations>
+    <ideas>
+      <![CDATA[
+- Unit test that MT5 login calls increment success/failure counters.
+- Simulate high-latency requests and verify histogram buckets reflect counts.
+- Run load test via `hey` to ensure `/metrics` remains responsive under traffic.
+- Validate sampler handles psutil exceptions without crashing.
+      ]]>
+    </ideas>
+  </tests>
+</story-context>

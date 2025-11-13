@@ -1,0 +1,133 @@
+<story-context id="story-context/8-5-automated-backup-and-recovery-procedures" v="1.0">
+  <metadata>
+    <epicId>8</epicId>
+    <storyId>8.5</storyId>
+    <title>Automated Backup and Recovery Procedures</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-13T00:03:35Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/8-5-automated-backup-and-recovery-procedures.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>DevOps engineer</asA>
+    <iWant>daily Supabase DB backups, weekly VPS snapshots, and encrypted app-data archives with rehearsed recovery drills</iWant>
+    <soThat>we can restore service within PRD RPO/RTO targets after a disaster</soThat>
+    <tasks>
+      <![CDATA[
+- Enable and document Supabase automatic backups (daily, 30-day retention) plus monthly restore drills.
+- Automate VPS snapshots (weekly) with provider tooling and validation steps.
+- Script application data backups (configs, envs, logs) with AES-256 encryption and remote storage.
+- Create `docs/operations/dr-playbook.md` covering RPO<24h/RTO<2h restoration steps and escalation contacts.
+- Schedule and log quarterly DR tests, including evidence and lessons learned.
+      ]]>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <![CDATA[
+1. Supabase daily backups (02:00 UTC, 30-day retention) documented with how-to export/restore and monthly drill logs.
+2. VPS snapshot automation weekly (Sunday 03:00 UTC) retained for 4 weeks; verification checklist ensures snapshots boot successfully.
+3. Application data backup script runs daily, encrypts (.env/config/logs) with AES-256, stores in Supabase Storage/S3, and documents decryption procedure.
+4. Recovery playbook defines step-by-step restore procedure, escalation contacts, RPO<24h, RTO<2h.
+5. Quarterly DR test plan executed (or first scheduled) with evidence captured and stored; Dev Agent Debug Log references the test artifacts.
+    ]]>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <![CDATA[
+- path: docs/epics.md#story-8.5-automated-backup-and-recovery-procedures
+  title: Epic 8 Story 8.5
+  section: Automated Backup and Recovery Procedures
+  snippet: Specifies Supabase DB backups, VPS snapshots, app data backups, retention policies, and DR testing cadence.
+- path: docs/PRD-MT5-Integration-Service.md#8.3-reliability-&-availability-requirements
+  title: PRD §8.3 Reliability & Availability
+  section: Disaster Recovery
+  snippet: Defines RTO <2h, RPO <24h, daily DB backups, weekly VPS snapshots, and documented procedures.
+- path: docs/PRD-MT5-Integration-Service.md#8.4-operational-requirements
+  title: PRD §8.4 Operational Requirements
+  section: Maintenance / Deployment
+  snippet: Calls for automated deployment pipeline, zero-downtime ideals, and structured maintenance docs that DR playbooks should reference.
+- path: docs/LOCAL-DEVELOPMENT-GUIDE.md#quick-reference
+  title: Local Dev Guide – Quick Reference
+  section: Service commands/logs
+  snippet: Provides baseline directories (`logs/`, `.env`, scripts) that backups must capture.
+- path: docs/technical/WINDOWS-DEPLOYMENT-GUIDE.md#7-nginx-reverse-proxy-setup
+  title: Windows Deployment Guide – Nginx
+  section: Deployment steps
+  snippet: Contains instructions for VPS setup/NSSM service; snapshots must include these assets, and runbook should mention how to reapply them.
+      ]]>
+    </docs>
+
+    <code>
+      <![CDATA[
+- path: scripts/windows-setup.ps1
+  kind: script
+  symbol: windows-setup.ps1
+  lines: -
+  reason: Automation script for Windows environment provisioning; backup runbook should mention where scripts reside and how to restore them.
+      ]]>
+    </code>
+
+    <dependencies>
+      <![CDATA[
+- ecosystem: supabase
+  services:
+    - Supabase Dashboard automatic backups
+    - Supabase Storage bucket for encrypted archives
+- ecosystem: infrastructure
+  tools:
+    - VPS provider snapshot feature (Contabo/Hetzner)
+    - AES-256 encryption tooling (OpenSSL/PowerShell)
+- ecosystem: documentation
+  artifacts:
+    - docs/operations/dr-playbook.md (new)
+    - docs/operations/uptimerobot.md (for incident coordination)
+      ]]>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <![CDATA[
+- Secrets must remain encrypted; do not store raw `.env` in repo or unsecured buckets.
+- DR drills should not disrupt production; schedule during maintenance windows and document approvals.
+- Ensure backup scripts are idempotent and log success/failure for audit trails.
+    ]]>
+  </constraints>
+
+  <interfaces>
+    <![CDATA[
+- name: Supabase backup settings
+  kind: dashboard/API configuration
+  signature: Daily automatic backup (UI/API)
+  path: Supabase Dashboard (document in runbook)
+- name: VPS snapshot scheduler
+  kind: provider interface
+  signature: Weekly snapshot job (Contabo/Hetzner API)
+  path: docs/operations/dr-playbook.md (to describe API usage)
+    ]]>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <![CDATA[
+DR testing requires rehearsing backup restoration (DB + VPS + app data) and logging duration/outcome. Evidence (screenshots, job logs) stored in `docs/operations/evidence/` and linked via Dev Agent Debug Log.
+      ]]>
+    </standards>
+    <locations>
+      <![CDATA[
+- docs/operations/dr-playbook.md
+- docs/operations/evidence/ (new directory for screenshots/logs)
+      ]]>
+    </locations>
+    <ideas>
+      <![CDATA[
+- Perform Supabase restore to staging DB monthly and record completion time.
+- Restore VPS snapshot to alternate VM, run smoke tests (health checks) and document.
+- Decrypt app-data backup, validate checksums, and note any missing files.
+- Run quarterly full DR drill and capture timeline vs. RTO/RPO targets.
+      ]]>
+    </ideas>
+  </tests>
+</story-context>
