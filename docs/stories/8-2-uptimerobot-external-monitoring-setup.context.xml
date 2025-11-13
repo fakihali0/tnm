@@ -1,0 +1,138 @@
+<story-context id="story-context/8-2-uptimerobot-external-monitoring-setup" v="1.0">
+  <metadata>
+    <epicId>8</epicId>
+    <storyId>8.2</storyId>
+    <title>UptimeRobot External Monitoring Setup</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2025-11-12T23:57:06Z</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/8-2-uptimerobot-external-monitoring-setup.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>DevOps engineer</asA>
+    <iWant>UptimeRobot monitors, alerts, and status page watching MT5 and Supabase paths</iWant>
+    <soThat>production outages trigger rapid notifications and meet PRD reliability SLAs</soThat>
+    <tasks>
+      <![CDATA[
+- Configure MT5 `/health` and Supabase edge monitors with appropriate intervals, keyword checks, and auth headers.
+- Wire alert channels (email, Slack, SMS) with escalation timing and document test results.
+- Publish `status.tnm.com` via UptimeRobot status page, connect DNS/SSL, and link it from internal docs.
+- Author `docs/operations/uptimerobot.md` capturing monitor IDs, maintenance window procedures, and pause/resume steps.
+- Capture evidence (screenshots/exports/logs) from simulated outages and store references in the Dev Agent Debug Log.
+      ]]>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <![CDATA[
+1. Two HTTP monitors exist: MT5 health at 60 s cadence (expects HTTP 200 + `"status":"healthy"`) and Supabase edge sync at 5 min cadence with auth header; both log response time and alert on 4xx/5xx/DNS failures.
+2. Alert contacts configured (devops email, Slack `#alerts`, SMS) with policy: notify after 2 consecutive failures (~2 min), escalate SMS if outage >5 min, and send recovery notifications.
+3. Public status page hosted at `status.tnm.com`, listing MT5 API and Supabase edge components with recent incidents, linked from docs/LOCAL-DEVELOPMENT-GUIDE.md and customer docs.
+4. `docs/operations/uptimerobot.md` documents monitor IDs, retention, maintenance window procedures, and how to pause monitors during deployments.
+5. Verification artifacts (screenshots, exported monitor JSON, log snippets) show alerts fired when `/health` returned 503; references stored in Dev Agent Debug Log.
+    ]]>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <![CDATA[
+- path: docs/epics.md#story-8.2-uptimerobot-external-monitoring-setup
+  title: Epic 8 Story 8.2
+  section: UptimeRobot External Monitoring Setup
+  snippet: Defines required monitors, alert rules, status page, runbook needs, and verification evidence for UptimeRobot configuration.
+- path: docs/PRD-MT5-Integration-Service.md#8.3-reliability-&-availability-requirements
+  title: PRD §8.3 Reliability & Availability
+  section: Monitoring & Alerting
+  snippet: Requires health checks every 60 s, alerts on service down >2 min, CPU/ error thresholds, and establishes SLA expectations that the monitors must satisfy.
+- path: docs/PRD-MT5-Integration-Service.md#8.4-operational-requirements
+  title: PRD §8.4 Operational Requirements
+  section: Logging / Monitoring Tools
+  snippet: Lists UptimeRobot, Grafana/Prometheus, Sentry, and stipulates structured logs and daily rotation that underpins the monitoring plan.
+- path: docs/LOCAL-DEVELOPMENT-GUIDE.md#quick-reference
+  title: Local Development Guide – Quick Reference
+  section: Health check & testing commands
+  snippet: Provides `curl` commands and log viewing instructions for `/health`, informing what UptimeRobot should expect and how engineers can reproduce alerts locally.
+- path: docs/stories/3-7-get-health-service-health-check-endpoint.md
+  title: Story 3.7 – GET /health
+  section: Acceptance Criteria
+  snippet: Documents response format, latency (<100 ms), and metrics returned by `/health`, ensuring monitors validate the correct payload.
+- path: docs/stories/4-2-update-sync-trading-data-edge-function.md
+  title: Story 4.2 – Sync Edge Function
+  section: Dev Notes / Acceptance Criteria
+  snippet: Describes the Supabase edge function endpoint and scheduling expectations; monitor configuration must call this path to verify background sync availability.
+      ]]>
+    </docs>
+
+    <code>
+      <![CDATA[
+- path: tnm_concept/src/pages/admin/PerformanceMonitor.tsx
+  kind: component
+  symbol: PerformanceMonitor component
+  lines: 1-200
+  reason: Frontend admin views display service health metrics; ensure UptimeRobot status page complements existing internal dashboards rather than replacing them.
+      ]]>
+    </code>
+
+    <dependencies>
+      <![CDATA[
+- ecosystem: saas
+  services:
+    - UptimeRobot (Pro tier) for HTTP monitors, alert contacts, and public status page hosting.
+    - Slack webhook integration for #alerts channel.
+    - SMS provider via UptimeRobot for critical escalations.
+- ecosystem: supabase
+  tools:
+    - Supabase service role key (stored securely) used as HTTP header in monitor hitting the edge function endpoint.
+- ecosystem: documentation
+  assets:
+    - docs/operations/ directory (new `uptimerobot.md`, `dr-playbook.md` references) for runbooks and evidence storage.
+      ]]>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <![CDATA[
+- Monitoring cadence must not overload `/health`; keep endpoint lightweight per Story 3.7 and allowlist UptimeRobot IPs via firewall/Nginx.
+- Credentials (Supabase service role, Slack webhook URLs) must be obfuscated in documentation and stored in secure secrets, not plaintext repositories.
+- Status page incidents should align with PRD SLA definitions (alert if down >2 min, escalate at 5 min) and link to internal runbooks.
+    ]]>
+  </constraints>
+
+  <interfaces>
+    <![CDATA[
+- name: GET /health
+  kind: REST endpoint
+  signature: GET https://mt5.tnm.com/health → { status, metrics }
+  path: docs/stories/3-7-get-health-service-health-check-endpoint.md
+  notes: Primary monitor target; ensure keyword `"status":"healthy"` check is case-accurate.
+- name: POST /functions/v1/sync-trading-data
+  kind: Supabase Edge Function
+  signature: POST https://<project>.functions.supabase.co/sync-trading-data (with API key header)
+  path: docs/stories/4-2-update-sync-trading-data-edge-function.md
+  notes: Second monitor target verifying edge function orchestration; include authentication header secret.
+    ]]>
+  </interfaces>
+
+  <tests>
+    <standards>
+      <![CDATA[
+Manual validation relies on UptimeRobot “Test Alert” plus induced outages (stop FastAPI service or proxy) while observing Slack/email/SMS. Capture monitor export CSV/JSON and screenshots to satisfy audit evidence requirements.
+      ]]>
+    </standards>
+    <locations>
+      <![CDATA[
+- docs/operations/ (store monitor exports, screenshots, runbooks)
+- Dev Agent Debug Log references for alert tests
+      ]]>
+    </locations>
+    <ideas>
+      <![CDATA[
+- Simulate MT5 service outage (stop FastAPI or force `/health` to return 503) and confirm email/Slack alerts fire within 2 minutes; log timestamps.
+- Temporarily block Supabase edge endpoint to ensure the 5‑minute monitor reports failure and escalates after 5 minutes.
+- Validate public status page shows incident timeline and resolves once services recover.
+- Run UptimeRobot “Test Alert” for each contact to confirm Slack webhook/SMS integration before go-live.
+      ]]>
+    </ideas>
+  </tests>
+</story-context>
