@@ -71,17 +71,10 @@ development_status:
   epic-4: backlog
   4-1-update-connect-mt5-account-edge-function: done
   4-2-update-sync-trading-data-edge-function: done
-<<<<<<< HEAD
   4-3-database-schema-updates-for-mt5-integration: done
   4-4-row-level-security-rls-policies-update: done
   4-5-supabase-edge-function-deployment: done
 
-=======
-  4-3-database-schema-updates-for-mt5-integration: ready-for-dev
-  4-4-row-level-security-rls-policies-update: ready-for-dev
-  4-5-supabase-edge-function-deployment: ready-for-dev
-  epic-4-retrospective: optional
->>>>>>> 592f9e10aef40db281e99b03b5bbc287fabd0aab
   # Epic 5: Frontend MT5 Integration
   epic-5: backlog
   5-1-re-enable-accountlinkform-component: ready-for-dev
@@ -101,7 +94,16 @@ development_status:
   7-1-aes-256-credential-encryption-implementation: ready-for-dev
   7-2-audit-logging-for-credential-access: ready-for-dev
   7-3-gdpr-data-deletion-implementation: ready-for-dev
-<<<<<<< HEAD
+  7-4-rate-limiting-and-ddos-protection: ready-for-dev
+  epic-7-retrospective: optional
+  # Epic 8: Monitoring & Operations
+  epic-8: backlog
+  8-1-structured-logging-implementation: ready-for-dev
+  8-2-uptimerobot-external-monitoring-setup: ready-for-dev
+  8-3-error-tracking-with-sentry-optional: ready-for-dev
+  8-4-performance-metrics-collection: ready-for-dev
+  8-5-automated-backup-and-recovery-procedures: ready-for-dev
+  epic-8-retrospective: optional
 
 # =============================================================================
 # SPRINT METRICS
@@ -184,15 +186,3 @@ recent_completions:
 # - RLS policies optimized with direct auth.uid() comparison for performance
 # - All completed stories have comprehensive documentation and summaries
 
-=======
-  7-4-rate-limiting-and-ddos-protection: ready-for-dev
-  epic-7-retrospective: optional
-  # Epic 8: Monitoring & Operations
-  epic-8: backlog
-  8-1-structured-logging-implementation: ready-for-dev
-  8-2-uptimerobot-external-monitoring-setup: ready-for-dev
-  8-3-error-tracking-with-sentry-optional: ready-for-dev
-  8-4-performance-metrics-collection: ready-for-dev
-  8-5-automated-backup-and-recovery-procedures: ready-for-dev
-  epic-8-retrospective: optional
->>>>>>> 592f9e10aef40db281e99b03b5bbc287fabd0aab
