@@ -1,6 +1,6 @@
 # Story 2.4: Connection State Management and Error Handling
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

@@ -1,6 +1,6 @@
 # Story 1.8: End-to-End Local Network Testing
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

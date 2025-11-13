@@ -1,6 +1,6 @@
 # Story 4.1: Update connect-mt5-account Edge Function
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

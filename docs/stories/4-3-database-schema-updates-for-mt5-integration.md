@@ -1,6 +1,6 @@
 # Story 4.3: Database Schema Updates for MT5 Integration
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

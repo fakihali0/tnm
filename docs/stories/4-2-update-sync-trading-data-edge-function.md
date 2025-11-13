@@ -1,6 +1,6 @@
 # Story 4.2: Update sync-trading-data Edge Function
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

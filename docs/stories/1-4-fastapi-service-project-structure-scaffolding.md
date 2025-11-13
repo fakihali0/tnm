@@ -1,6 +1,6 @@
 # Story 1.4: FastAPI Service Project Structure Scaffolding
 
-**Status:** in-progress  
+**Status:** review  
 **Epic:** 1 - Foundation & Infrastructure (Local Development)  
 **Created:** November 12, 2025  
 **Story Key:** 1-4-fastapi-service-project-structure-scaffolding

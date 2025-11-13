@@ -1,6 +1,6 @@
 # Story 3.3: GET /api/mt5/account/{account_id}/info - Account Info Endpoint
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

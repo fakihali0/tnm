@@ -1,6 +1,6 @@
 # Story 1.5: ngrok Tunnel for Supabase Edge Function Testing (Optional)
 
-**Status:** drafted  
+**Status:** review  
 **Epic:** 1 - Foundation & Infrastructure (Local Development)  
 **Created:** November 12, 2025  
 **Story Key:** 1-5-ngrok-tunnel-for-supabase-edge-function-testing

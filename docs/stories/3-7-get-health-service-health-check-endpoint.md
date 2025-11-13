@@ -1,6 +1,6 @@
 # Story 3.7: GET /health - Service Health Check Endpoint
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

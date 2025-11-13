@@ -1,6 +1,6 @@
 # Story 3.5: GET /api/mt5/account/{account_id}/history - Historical Trades Endpoint
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
