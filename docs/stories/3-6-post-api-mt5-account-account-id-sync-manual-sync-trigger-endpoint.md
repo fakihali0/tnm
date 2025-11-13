@@ -1,6 +1,6 @@
 # Story 3.6: POST /api/mt5/account/{account_id}/sync - Manual Sync Trigger Endpoint
 
-Status: drafted
+Status: review
 
 ## Story
 

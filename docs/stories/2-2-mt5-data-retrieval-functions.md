@@ -1,6 +1,6 @@
 # Story 2.2: MT5 Data Retrieval Functions
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

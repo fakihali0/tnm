@@ -1,6 +1,6 @@
 # Story 3.4: GET /api/mt5/account/{account_id}/positions - Open Positions Endpoint
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

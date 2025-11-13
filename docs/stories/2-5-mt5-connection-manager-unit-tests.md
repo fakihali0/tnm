@@ -1,6 +1,6 @@
 # Story 2.5: MT5 Connection Manager Unit Tests
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

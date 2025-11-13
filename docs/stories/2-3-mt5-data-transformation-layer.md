@@ -1,6 +1,6 @@
 # Story 2.3: MT5 Data Transformation Layer
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

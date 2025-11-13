@@ -1,6 +1,6 @@
 # Story 2.1: MT5 Connection Manager with Connection Pooling
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

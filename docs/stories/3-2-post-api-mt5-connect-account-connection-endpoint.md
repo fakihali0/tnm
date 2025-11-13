@@ -1,6 +1,6 @@
 # Story 3.2: POST /api/mt5/connect - Account Connection Endpoint
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

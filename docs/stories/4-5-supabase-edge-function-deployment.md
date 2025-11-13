@@ -1,6 +1,6 @@
 # Story 4.5: Supabase Edge Function Deployment
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
