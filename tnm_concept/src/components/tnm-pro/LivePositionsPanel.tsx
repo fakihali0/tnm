@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAccountStore, useJournalStore } from '@/store/auth';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { 
   TrendingUp, 
@@ -17,15 +18,58 @@ import {
 export const LivePositionsPanel = () => {
   const { selectedAccount, syncAccount } = useAccountStore();
   const { trades, loadTrades } = useJournalStore();
+  const [positions, setPositions] = React.useState<any[]>([]);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [isSyncing, setIsSyncing] = React.useState(false);
 
+  // Fetch positions from database for selected account
+  const fetchPositions = async (accountId: string) => {
+    try {
+      console.log('🔄 Fetching open positions for account:', accountId);
+      
+      const { data, error } = await supabase
+        .from('trades')
+        .select('*')
+        .eq('account_id', accountId)
+        .is('closed_at', null)
+        .order('opened_at', { ascending: false });
+
+      if (error) throw error;
+
+      console.log('📩 Positions response:', data);
+      if (data) {
+        console.log('✅ Positions fetched successfully:', data.length);
+        // Map trades to position format
+        const mappedPositions = data.map(trade => ({
+          ticket: parseInt(trade.external_trade_id || '0'),
+          time: trade.opened_at,
+          type: trade.direction === 'BUY' ? 0 : 1,
+          type_str: trade.direction.toLowerCase() as 'buy' | 'sell',
+          volume: trade.volume,
+          symbol: trade.symbol,
+          price_open: trade.entry_price,
+          price_current: trade.entry_price,
+          sl: trade.stop_loss || 0,
+          tp: trade.take_profit || 0,
+          profit: trade.pnl || 0,
+          swap: trade.swap || 0,
+          commission: trade.commission || 0
+        }));
+        setPositions(mappedPositions);
+      } else {
+        setPositions([]);
+      }
+    } catch (err) {
+      console.error('❌ Error fetching positions:', err);
+      setPositions([]);
+    }
+  };
+
   React.useEffect(() => {
     if (selectedAccount) {
-      console.log('🔄 Loading trades for account:', selectedAccount.id);
-      loadTrades(selectedAccount.id).then(() => {
-        console.log('✅ Trades loaded from useEffect');
-      });
+      console.log('🔄 Loading trades and positions for account:', selectedAccount.id);
+      loadTrades(selectedAccount.id);
+      fetchPositions(selectedAccount.id);
     }
   }, [selectedAccount?.id, loadTrades]);
 
@@ -33,7 +77,11 @@ export const LivePositionsPanel = () => {
     if (!selectedAccount) return;
     setIsRefreshing(true);
     try {
-      await loadTrades(selectedAccount.id);
+      await Promise.all([
+        loadTrades(selectedAccount.id),
+        fetchPositions(selectedAccount.id)
+      ]);
+      console.log('✅ Trades and positions refreshed');
     } finally {
       setIsRefreshing(false);
     }
@@ -42,10 +90,10 @@ export const LivePositionsPanel = () => {
   const handleSync = async () => {
     if (!selectedAccount) return;
     setIsSyncing(true);
-    console.log('🔄 Starting sync for account:', selectedAccount.id);
+    console.log('🔄 Starting sync for account:', selectedAccount.mt5_service_account_id);
     
     try {
-      const syncResult = await syncAccount(selectedAccount.id);
+      const syncResult = await syncAccount(selectedAccount.mt5_service_account_id);
       console.log('✅ Sync result:', syncResult);
       
       if (!syncResult.success) {
@@ -56,9 +104,12 @@ export const LivePositionsPanel = () => {
           variant: "destructive",
         });
       } else {
-        console.log('✅ Sync successful, reloading trades...');
-        await loadTrades(selectedAccount.id);
-        console.log('✅ Trades reloaded, total trades:', trades.length);
+        console.log('✅ Sync successful, reloading trades and positions...');
+        await Promise.all([
+          loadTrades(selectedAccount.id),
+          fetchPositions(selectedAccount.id)
+        ]);
+        console.log('✅ Data reloaded - Trades:', trades.length, 'Positions:', positions.length);
         
         toast({
           title: "Sync Complete",
@@ -85,8 +136,8 @@ export const LivePositionsPanel = () => {
     }).format(amount);
   };
 
-  // Open positions are trades without closed_at
-  const openPositions = trades.filter(trade => !trade.closed_at);
+  // Use actual live positions from MT5
+  const openPositions = positions || [];
   
   // Recent closed trades
   const recentClosedTrades = trades
@@ -94,22 +145,25 @@ export const LivePositionsPanel = () => {
     .slice(0, 10);
 
   // Calculate total P&L from open positions (unrealized)
-  const totalOpenPnL = openPositions.reduce((sum, trade) => {
-    const pnl = ((trade.exit_price || trade.entry_price) - trade.entry_price) * (trade.volume || 1);
-    return sum + (trade.direction === 'BUY' ? pnl : -pnl);
+  const totalOpenPnL = openPositions.reduce((sum, position) => {
+    return sum + (position.profit || 0);
   }, 0);
+
+  // Determine if we truly have no live data to show
+  const hasNoData = openPositions.length === 0 && trades.length === 0;
 
   // Debug logging
   React.useEffect(() => {
     console.log('📊 LivePositionsPanel - Data State:', {
       selectedAccount: selectedAccount?.id,
       totalTrades: trades.length,
+      livePositions: positions?.length || 0,
       openPositions: openPositions.length,
       closedTrades: recentClosedTrades.length,
-      sampleTrade: trades[0],
-      allTrades: trades
+      samplePosition: positions?.[0],
+      allPositions: positions
     });
-  }, [trades, openPositions, recentClosedTrades]);
+  }, [trades, positions, openPositions, recentClosedTrades]);
 
   if (!selectedAccount) {
     return (
@@ -123,13 +177,31 @@ export const LivePositionsPanel = () => {
     );
   }
 
-  const hasNoTrades = trades.length === 0;
-
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Live Trading Activity</CardTitle>
+          <div className="flex flex-col gap-2">
+            <CardTitle className="text-lg">Live Trading Activity</CardTitle>
+            {selectedAccount && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Account:</span>
+                <Badge variant="outline" className="font-mono">
+                  {selectedAccount.login_number}
+                </Badge>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-muted-foreground">{selectedAccount.broker_name}</span>
+                {selectedAccount.is_default && (
+                  <>
+                    <span className="text-muted-foreground">•</span>
+                    <Badge variant="default" className="bg-blue-100 text-blue-800 border-blue-300">
+                      Default
+                    </Badge>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -150,7 +222,7 @@ export const LivePositionsPanel = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {hasNoTrades ? (
+        {hasNoData ? (
           <div className="text-center py-12 text-muted-foreground">
             <Activity className="h-16 w-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">No Trading Data Available</p>
@@ -193,42 +265,41 @@ export const LivePositionsPanel = () => {
                 <ScrollArea className="h-[400px]">
                   <div className="space-y-3">
                     {openPositions.map((position) => {
-                      const pnl = ((position.exit_price || position.entry_price) - position.entry_price) * (position.volume || 1);
-                      const actualPnL = position.direction === 'BUY' ? pnl : -pnl;
+                      const profit = position.profit || 0;
                       
                       return (
                         <div
-                          key={position.id}
+                          key={position.ticket}
                           className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                         >
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <Badge className={position.direction === 'BUY' ? 'bg-green-600' : 'bg-red-600'}>
-                                {position.direction}
+                              <Badge className={position.type_str === 'buy' ? 'bg-green-600' : 'bg-red-600'}>
+                                {position.type_str.toUpperCase()}
                               </Badge>
                               <span className="font-semibold">{position.symbol}</span>
                             </div>
-                            <span className={`font-semibold ${actualPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {actualPnL >= 0 ? '+' : ''}{formatCurrency(actualPnL, selectedAccount?.currency || 'USD')}
+                            <span className={`font-semibold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {profit >= 0 ? '+' : ''}{formatCurrency(profit, selectedAccount?.currency || 'USD')}
                             </span>
                           </div>
                           <div className="grid grid-cols-3 gap-2 text-sm text-muted-foreground">
                             <div>
                               <span className="block text-xs">Volume</span>
-                              <span>{(position.volume || 0).toFixed(2)}</span>
+                              <span>{position.volume.toFixed(2)}</span>
                             </div>
                             <div>
                               <span className="block text-xs">Entry</span>
-                              <span>{position.entry_price.toFixed(5)}</span>
+                              <span>{position.price_open.toFixed(5)}</span>
                             </div>
                             <div>
                               <span className="block text-xs">Current</span>
-                              <span>{(position.exit_price || position.entry_price).toFixed(5)}</span>
+                              <span>{position.price_current.toFixed(5)}</span>
                             </div>
                           </div>
                           <div className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            Opened {new Date(position.opened_at).toLocaleString()}
+                            Opened {new Date(position.time).toLocaleString()}
                           </div>
                         </div>
                       );

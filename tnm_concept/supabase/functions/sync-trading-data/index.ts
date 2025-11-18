@@ -95,20 +95,76 @@ serve(async (req) => {
     }
 
     // Create Supabase admin client
+    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+    if (!supabaseServiceRoleKey) {
+      throw new Error('Supabase service role key not configured');
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      supabaseServiceRoleKey
     );
 
     // Parse request body to check for specific account_id
     let specificAccountId: string | null = null;
+    let fetchPositionsOnly = false;
     try {
       const body = await req.json();
       specificAccountId = body.account_id || null;
+      fetchPositionsOnly = Boolean(body.fetch_positions);
       secureLog('Request body parsed', { specificAccountId });
     } catch {
       // No body or invalid JSON - sync all accounts
       secureLog('No valid request body - will sync all accounts');
+    }
+
+    // Fast-path: fetch positions only for a specific account
+    if (fetchPositionsOnly) {
+      if (!specificAccountId) {
+        throw new Error('fetch_positions requires account_id');
+      }
+
+      const { data: accountRecords, error: accountLookupError } = await supabaseAdmin
+        .from('trading_accounts')
+        .select('id, user_id, mt5_service_account_id, is_active')
+        .eq('id', specificAccountId)
+        .limit(1)
+        .maybeSingle();
+
+      if (accountLookupError) {
+        throw new Error(`Failed to load account: ${accountLookupError.message}`);
+      }
+
+      if (!accountRecords || !accountRecords.is_active) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Account not found or inactive',
+          positions: []
+        }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      if (!accountRecords.mt5_service_account_id) {
+        throw new Error('Account missing MT5 service account reference');
+      }
+
+      const positions = await fetchPositions(
+        accountRecords.mt5_service_account_id,
+        mt5ServiceUrl,
+        mt5ServiceApiKey,
+        supabaseServiceRoleKey,
+        accountRecords.user_id
+      );
+
+      return new Response(JSON.stringify({
+        success: true,
+        positions
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Load trading accounts (specific account or all active)
@@ -161,7 +217,13 @@ serve(async (req) => {
       secureLog(`Processing batch ${i + 1}/${batchCount} (${batch.length} accounts)`, { executionId });
 
       const batchResults = await Promise.allSettled(
-        batch.map(account => syncAccount(account, mt5ServiceUrl, mt5ServiceApiKey, supabaseAdmin))
+        batch.map(account => syncAccount(
+          account,
+          mt5ServiceUrl,
+          mt5ServiceApiKey,
+          supabaseAdmin,
+          supabaseServiceRoleKey
+        ))
       );
 
       // Collect results
@@ -252,7 +314,8 @@ async function syncAccount(
   account: TradingAccount,
   mt5ServiceUrl: string,
   mt5ServiceApiKey: string,
-  supabaseAdmin: any
+  supabaseAdmin: any,
+  supabaseServiceRoleKey: string
 ): Promise<SyncResult> {
   const started_at = new Date().toISOString();
   const startTime = Date.now();
@@ -269,7 +332,13 @@ async function syncAccount(
     // Fetch account info
     let accountInfo: MT5AccountInfo | null = null;
     try {
-      accountInfo = await fetchAccountInfo(account.mt5_service_account_id, mt5ServiceUrl, mt5ServiceApiKey);
+      accountInfo = await fetchAccountInfo(
+        account.mt5_service_account_id,
+        mt5ServiceUrl,
+        mt5ServiceApiKey,
+        supabaseServiceRoleKey,
+        account.user_id
+      );
     } catch (error) {
       error_message = `Failed to fetch account info: ${error instanceof Error ? error.message : 'Unknown error'}`;
       status = 'partial';
@@ -278,7 +347,13 @@ async function syncAccount(
     // Fetch positions
     let positions: MT5Position[] = [];
     try {
-      positions = await fetchPositions(account.mt5_service_account_id, mt5ServiceUrl, mt5ServiceApiKey);
+      positions = await fetchPositions(
+        account.mt5_service_account_id,
+        mt5ServiceUrl,
+        mt5ServiceApiKey,
+        supabaseServiceRoleKey,
+        account.user_id
+      );
     } catch (error) {
       error_message = error_message 
         ? `${error_message}; Failed to fetch positions` 
@@ -293,7 +368,14 @@ async function syncAccount(
         ? new Date(account.last_sync_at).toISOString().split('T')[0]
         : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // Last 30 days
       
-      historyDeals = await fetchHistory(account.mt5_service_account_id, fromDate, mt5ServiceUrl, mt5ServiceApiKey);
+      historyDeals = await fetchHistory(
+        account.mt5_service_account_id,
+        fromDate,
+        mt5ServiceUrl,
+        mt5ServiceApiKey,
+        supabaseServiceRoleKey,
+        account.user_id
+      );
     } catch (error) {
       error_message = error_message 
         ? `${error_message}; Failed to fetch history` 
@@ -433,12 +515,16 @@ async function syncAccount(
 async function fetchAccountInfo(
   accountId: string,
   mt5ServiceUrl: string,
-  mt5ServiceApiKey: string
+  mt5ServiceApiKey: string,
+  supabaseServiceRoleKey: string,
+  userId: string
 ): Promise<MT5AccountInfo> {
   const response = await fetch(`${mt5ServiceUrl}/api/mt5/account/${accountId}/info`, {
     method: 'GET',
     headers: {
       'X-API-Key': mt5ServiceApiKey,
+      'Authorization': `Bearer ${supabaseServiceRoleKey}`,
+      'X-Service-User-Id': userId,
       'ngrok-skip-browser-warning': 'true',
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT)
@@ -456,12 +542,16 @@ async function fetchAccountInfo(
 async function fetchPositions(
   accountId: string,
   mt5ServiceUrl: string,
-  mt5ServiceApiKey: string
+  mt5ServiceApiKey: string,
+  supabaseServiceRoleKey: string,
+  userId: string
 ): Promise<MT5Position[]> {
   const response = await fetch(`${mt5ServiceUrl}/api/mt5/account/${accountId}/positions`, {
     method: 'GET',
     headers: {
       'X-API-Key': mt5ServiceApiKey,
+      'Authorization': `Bearer ${supabaseServiceRoleKey}`,
+      'X-Service-User-Id': userId,
       'ngrok-skip-browser-warning': 'true',
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT)
@@ -480,7 +570,9 @@ async function fetchHistory(
   accountId: string,
   fromDate: string,
   mt5ServiceUrl: string,
-  mt5ServiceApiKey: string
+  mt5ServiceApiKey: string,
+  supabaseServiceRoleKey: string,
+  userId: string
 ): Promise<MT5HistoryDeal[]> {
   const response = await fetch(
     `${mt5ServiceUrl}/api/mt5/account/${accountId}/history?from_date=${fromDate}`,
@@ -488,6 +580,8 @@ async function fetchHistory(
       method: 'GET',
       headers: {
         'X-API-Key': mt5ServiceApiKey,
+        'Authorization': `Bearer ${supabaseServiceRoleKey}`,
+        'X-Service-User-Id': userId,
         'ngrok-skip-browser-warning': 'true',
       },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT)

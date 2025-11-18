@@ -64,7 +64,7 @@ export const ProductionTradingDashboard: React.FC = () => {
     });
 
     for (const account of accounts) {
-      await syncAccount(account.id);
+      await syncAccount(account.mt5_service_account_id);
     }
 
     toast({

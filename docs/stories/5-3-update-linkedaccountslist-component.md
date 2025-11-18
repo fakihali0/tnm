@@ -1,6 +1,6 @@
 # Story 5.3: Update LinkedAccountsList Component
 
-Status: ready-for-dev
+Status: complete
 
 ## Story
 
@@ -18,22 +18,22 @@ so that **users can monitor status, trigger manual syncs, and manage accounts di
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 (AC:1)** – Base layout
-  - [ ] Remove legacy alert, render responsive list or cards with the required fields.
-  - [ ] Use `date-fns/formatDistanceToNow` (or similar) for last-sync display and compute countdown (`5 min - elapsed`).
-- [ ] **Task 2 (AC:2)** – Account actions
+- [x] **Task 1 (AC:1)** – Base layout
+    - [x] Remove legacy alert, render responsive list or cards with the required fields.
+    - [x] Use `date-fns/formatDistanceToNow` (or similar) for last-sync display and compute countdown (`5 min - elapsed`).
+- [x] **Task 2 (AC:2)** – Account actions
   - [ ] Wire “Refresh Now” to `useAccountStore.syncAccount(accountId)` (Story 5.2) and show spinner per account.
   - [ ] Implement “View Details” modal reading from store data (or fetching via Supabase) to show metrics + history.
   - [ ] Implement “Disconnect” to call store delete + confirm dialog; refresh list after removal.
-- [ ] **Task 3 (AC:3)** – Status badges
-  - [ ] Derive status from `lastSyncTime`, `syncErrors`, and store flags; map to colors/icons per epic.
-  - [ ] Provide accessible labels (ARIA) for each status.
-- [ ] **Task 4 (AC:4)** – Modal content
-  - [ ] Pull additional stats from store or Supabase (e.g., positions/trades) and render structured details.
-  - [ ] Show last 5 sync events (success/error + timestamp) using `sync_logs` view or store data.
-- [ ] **Task 5 (AC:5)** – Real-time/polling + UX
-  - [ ] Subscribe to Supabase Realtime for trading_accounts/sync_logs (or poll) so UI updates once sync ends.
-  - [ ] Display skeleton/spinner while refresh is running; show toasts on success/error.
+- [x] **Task 3 (AC:3)** – Status badges
+    - [x] Derive status from `lastSyncTime`, `syncErrors`, and store flags; map to colors/icons per epic.
+    - [x] Provide accessible labels (ARIA) for each status.
+- [x] **Task 4 (AC:4)** – Modal content
+    - [x] Pull additional stats from store or Supabase (e.g., positions/trades) and render structured details.
+    - [x] Show last 5 sync events (success/error + timestamp) using `sync_logs` view or store data.
+- [x] **Task 5 (AC:5)** – Real-time/polling + UX
+    - [x] Subscribe to Supabase Realtime for trading_accounts/sync_logs (or poll) so UI updates once sync ends.
+    - [x] Display skeleton/spinner while refresh is running; show toasts on success/error.
 - [ ] **Task 6 (Testing)** – Verification
   - [ ] Add Jest/RTL + Cypress tests covering status badges, action buttons, modal content, and error flows.
   - [ ] Document manual QA (ngrok/staging) verifying refresh + disconnect flows; add to Dev Agent record.
@@ -88,3 +88,4 @@ _To be updated when files are created/modified (LinkedAccountsList, modal, tests
 | Date       | Version | Changes                                 | Author |
 |------------|---------|-----------------------------------------|--------|
 | 2025-11-12 | 1.0     | Draft created via create-story workflow | AF (via Bob) |
+

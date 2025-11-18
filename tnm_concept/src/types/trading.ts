@@ -43,6 +43,7 @@ export interface TradingAccount {
   currency: string;
   leverage?: number;
   is_active: boolean;
+  is_default?: boolean;
   connection_status: string;
   last_sync_at?: string;
   created_at: string;

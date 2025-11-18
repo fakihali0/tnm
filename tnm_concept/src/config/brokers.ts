@@ -109,6 +109,16 @@ export const BROKERS: BrokerConfig[] = [
       { name: 'OANDA-Demo', displayName: 'OANDA MT4 Demo', description: 'MT4 demo server' },
     ],
   },
+  {
+    id: 'bbcorp',
+    name: 'BBcorp',
+    displayName: 'BBcorp Ltd',
+    platform: 'both',
+    demoAvailable: true,
+    servers: [
+      { name: 'BBCorp-Trade', displayName: 'BBCorp Trade Server', description: 'BBCorp trading server' },
+    ],
+  },
 ];
 
 /**

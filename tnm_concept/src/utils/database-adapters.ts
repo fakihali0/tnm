@@ -7,6 +7,7 @@ import type { Trade } from '@/types/trading';
 export const adaptLinkedAccount = (dbAccount: any): LinkedAccount => ({
   id: dbAccount.id,
   user_id: dbAccount.user_id,
+  mt5_service_account_id: dbAccount.mt5_service_account_id,
   platform: dbAccount.platform as 'MT4' | 'MT5',
   broker_name: dbAccount.broker_name,
   server: dbAccount.server,
@@ -20,6 +21,7 @@ export const adaptLinkedAccount = (dbAccount: any): LinkedAccount => ({
   currency: dbAccount.currency,
   leverage: dbAccount.leverage ?? 1,
   is_active: dbAccount.is_active,
+  is_default: dbAccount.is_default ?? false,
   connection_status: dbAccount.connection_status as 'connected' | 'disconnected' | 'error',
   last_sync_at: dbAccount.last_sync_at,
   created_at: dbAccount.created_at,

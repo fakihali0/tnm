@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRTL } from '@/hooks/useRTL';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,17 +11,104 @@ import {
   TrendingUp,
   TrendingDown,
   Clock,
-  Target
+  Target,
+  Activity,
+  RefreshCw
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTradingDashboard } from '@/hooks/useTradingDashboard';
 import { EnhancedEquityCurve } from './EnhancedEquityCurve';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+import type { Position } from '@/hooks/useRealTradingData';
 
 export const SimplifiedJournal: React.FC = () => {
   const { t } = useTranslation('tnm-ai');
   const rtl = useRTL();
   const { selectedAccount, trades, closedTrades, formatCurrency } = useTradingDashboard();
   const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [positionsLoading, setPositionsLoading] = useState(false);
+  const [positionsError, setPositionsError] = useState<string | null>(null);
+
+  const fetchPositions = useCallback(async (): Promise<Position[]> => {
+    if (!selectedAccount) {
+      return [];
+    }
+
+    const { data, error } = await supabase.functions.invoke('sync-trading-data', {
+      body: {
+        account_id: selectedAccount.id,
+        fetch_positions: true
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return Array.isArray(data?.positions) ? data.positions : [];
+  }, [selectedAccount?.id]);
+
+  const loadPositions = useCallback(async () => {
+    if (!selectedAccount) {
+      setPositions([]);
+      return;
+    }
+
+    setPositionsLoading(true);
+    setPositionsError(null);
+
+    try {
+      const latestPositions = await fetchPositions();
+      setPositions(latestPositions);
+    } catch (error) {
+      console.error('Failed to load positions:', error);
+      setPositions([]);
+      setPositionsError('Unable to load open positions right now.');
+    } finally {
+      setPositionsLoading(false);
+    }
+  }, [fetchPositions, selectedAccount]);
+
+  useEffect(() => {
+    if (!selectedAccount) {
+      setPositions([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    const initialize = async () => {
+      setPositionsLoading(true);
+      setPositionsError(null);
+
+      try {
+        const latestPositions = await fetchPositions();
+        if (isMounted) {
+          setPositions(latestPositions);
+        }
+      } catch (error) {
+        console.error('Failed to load positions:', error);
+        if (isMounted) {
+          setPositions([]);
+          setPositionsError('Unable to load open positions right now.');
+        }
+      } finally {
+        if (isMounted) {
+          setPositionsLoading(false);
+        }
+      }
+    };
+
+    initialize();
+    const interval = setInterval(initialize, 5000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [fetchPositions, selectedAccount]);
 
   if (!selectedAccount) {
     return (
@@ -84,6 +171,7 @@ export const SimplifiedJournal: React.FC = () => {
       <Tabs defaultValue="timeline" className="space-y-4">
         <TabsList>
           <TabsTrigger value="timeline">{t('journal.tabs.timeline')}</TabsTrigger>
+          <TabsTrigger value="positions">Positions</TabsTrigger>
           <TabsTrigger value="performance">{t('journal.tabs.performance')}</TabsTrigger>
           <TabsTrigger value="insights">{t('journal.tabs.insights')}</TabsTrigger>
         </TabsList>
@@ -151,6 +239,97 @@ export const SimplifiedJournal: React.FC = () => {
                 );
               })}
             </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="positions" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground text-start">Total Unrealized P&L</p>
+              <p className={`text-2xl font-semibold text-start ${positions.reduce((sum, pos) => sum + (pos.profit || 0), 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {(() => {
+                  const total = positions.reduce((sum, pos) => sum + (pos.profit || 0), 0);
+                  const formatted = formatCurrency(total);
+                  return total >= 0 ? `+${formatted}` : formatted;
+                })()}
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={loadPositions} disabled={positionsLoading}>
+              <RefreshCw className={`h-4 w-4 me-2 ${positionsLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+
+          {positionsError && (
+            <Card>
+              <CardContent className="text-sm text-destructive">
+                {positionsError}
+              </CardContent>
+            </Card>
+          )}
+
+          {positionsLoading && positions.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>Loading open positions…</p>
+            </div>
+          ) : positions.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No open positions</p>
+            </div>
+          ) : (
+            <ScrollArea className="h-[400px]">
+              <div className="space-y-3 pr-2">
+                {positions.map(position => {
+                  const profit = position.profit || 0;
+                  const volume = typeof position.volume === 'number' ? position.volume.toFixed(2) : position.volume;
+                  const entryPrice = typeof position.price_open === 'number' ? position.price_open.toFixed(5) : '-';
+                  const currentPrice = typeof position.price_current === 'number' ? position.price_current.toFixed(5) : '-';
+                  const direction = position.type === 0 || position.type_str === 'buy' ? 'BUY' : 'SELL';
+
+                  return (
+                    <Card key={position.ticket} className="border">
+                      <CardContent className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Badge className={direction === 'BUY' ? 'bg-green-600' : 'bg-red-600'}>
+                              {direction}
+                            </Badge>
+                            <span className="font-semibold">{position.symbol}</span>
+                          </div>
+                          <span className={`font-semibold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {profit >= 0 ? '+' : ''}{formatCurrency(profit)}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-sm text-muted-foreground">
+                          <div>
+                            <span className="block text-xs">Volume</span>
+                            <span>{volume}</span>
+                          </div>
+                          <div>
+                            <span className="block text-xs">Entry</span>
+                            <span>{entryPrice}</span>
+                          </div>
+                          <div>
+                            <span className="block text-xs">Current</span>
+                            <span>{currentPrice}</span>
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>
+                            Opened {position.time ? new Date(position.time).toLocaleString() : 'N/A'}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </ScrollArea>
           )}
         </TabsContent>
 

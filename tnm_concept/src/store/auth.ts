@@ -382,6 +382,7 @@ export const useAuthStore = create<AuthState>()(
 export interface LinkedAccount {
   id: string;
   user_id: string;
+  mt5_service_account_id: string;
   platform: 'MT4' | 'MT5';
   broker_name: string;
   server: string;
@@ -395,6 +396,7 @@ export interface LinkedAccount {
   currency: string;
   leverage?: number;
   is_active: boolean;
+  is_default?: boolean;
   connection_status: 'connected' | 'disconnected' | 'error';
   last_sync_at?: string;
   created_at: string;
@@ -411,6 +413,7 @@ interface AccountState {
   selectedAccount: LinkedAccount | null;
   isConnecting: boolean;
   isLoading: boolean;
+  syncingAccountId: string | null;
   lastSyncTime: Record<string, Date>;
   syncErrors: Record<string, string>;
   addAccount: (account: { platform: 'MT4' | 'MT5'; broker_name: string; server: string; login_number: string; password: string }) => Promise<{ success: boolean; error?: string }>;
@@ -420,6 +423,7 @@ interface AccountState {
   refreshAccountData: (accountId: string) => Promise<{ success: boolean; error?: string }>;
   getAccountStatus: (accountId: string) => { lastSync?: Date; error?: string; isActive: boolean };
   setSelectedAccount: (account: LinkedAccount | null) => void;
+  setDefaultAccount: (accountId: string) => Promise<{ success: boolean; error?: string }>;
   loadAccounts: () => Promise<void>;
   clearAccounts: () => void;
 }
@@ -429,6 +433,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   selectedAccount: null,
   isConnecting: false,
   isLoading: false,
+  syncingAccountId: null,
   lastSyncTime: {},
   syncErrors: {},
 
@@ -447,9 +452,13 @@ export const useAccountStore = create<AccountState>((set, get) => ({
 
       const allAccounts = (data || []).map(adaptLinkedAccount);
       
+      // Prioritize default account, otherwise select first account
+      const defaultAccount = allAccounts.find(acc => acc.is_default);
+      const accountToSelect = defaultAccount || allAccounts[0] || null;
+      
       set({ 
         accounts: allAccounts,
-        selectedAccount: allAccounts[0] || null,
+        selectedAccount: accountToSelect,
         isLoading: false,
       });
     } catch (error) {
@@ -491,6 +500,20 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       // Reload accounts to include the newly added one
       await get().loadAccounts();
 
+      // Trigger sync for the newly added account to fetch fresh data
+      const newAccount = get().accounts.find(acc => 
+        acc.login_number === accountData.login_number && 
+        acc.server === accountData.server
+      );
+      
+      if (newAccount?.mt5_service_account_id) {
+        console.log('🔄 Auto-syncing newly added account:', newAccount.mt5_service_account_id);
+        // Don't await - let it sync in background
+        get().syncAccount(newAccount.mt5_service_account_id).catch(err => {
+          console.error('Failed to auto-sync new account:', err);
+        });
+      }
+
       set({ isConnecting: false });
       return { success: true };
     } catch (error: any) {
@@ -512,6 +535,53 @@ export const useAccountStore = create<AccountState>((set, get) => ({
         ? { ...state.selectedAccount, ...updates }
         : state.selectedAccount,
     }));
+  },
+
+  setDefaultAccount: async (accountId: string) => {
+    try {
+      const authState = useAuthStore.getState();
+      if (!authState.isAuthenticated) {
+        return { success: false, error: 'Not authenticated' };
+      }
+
+      const account = get().accounts.find(acc => acc.id === accountId);
+      if (!account) {
+        return { success: false, error: 'Account not found' };
+      }
+
+      // First, unset any existing default account
+      await supabase
+        .from('trading_accounts')
+        .update({ is_default: false })
+        .eq('user_id', authState.user?.id);
+
+      // Then set the new default account
+      const { error } = await supabase
+        .from('trading_accounts')
+        .update({ is_default: true })
+        .eq('id', accountId);
+
+      if (error) throw error;
+
+      // Update local state
+      const updatedAccounts = get().accounts.map(acc => ({
+        ...acc,
+        is_default: acc.id === accountId
+      }));
+
+      set({ 
+        accounts: updatedAccounts,
+        selectedAccount: { ...account, is_default: true }
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error setting default account:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to set default account' 
+      };
+    }
   },
 
   setSelectedAccount: (account: LinkedAccount | null) => {
@@ -553,53 +623,86 @@ export const useAccountStore = create<AccountState>((set, get) => ({
 
   syncAccount: async (accountId: string) => {
     try {
+      // Find the account by mt5_service_account_id to get internal id
+      const account = get().accounts.find(acc => acc.mt5_service_account_id === accountId);
+      if (!account) {
+        throw new Error('Account not found');
+      }
+      
+      // Set syncing state using internal account id
+      set({ syncingAccountId: account.id });
+      
       // Clear previous error
       set(state => ({
         syncErrors: { ...state.syncErrors, [accountId]: '' }
       }));
 
-      console.log('🔄 Calling sync-trading-data edge function with account_id:', accountId);
+      console.log('🔄 Calling MT5 service sync endpoint for account_id:', accountId);
 
-      // Call the sync edge function
-      const { data, error } = await supabase.functions.invoke('sync-trading-data', {
-        body: { account_id: accountId }
+      // Story 3.8: Call MT5 service directly instead of edge function
+      // Get the MT5 service URL from environment
+      const mt5ServiceUrl = import.meta.env.VITE_MT5_SERVICE_URL;
+      if (!mt5ServiceUrl) {
+        throw new Error('MT5 service URL not configured');
+      }
+
+      const mt5ApiKey = import.meta.env.VITE_MT5_SERVICE_API_KEY;
+      if (!mt5ApiKey) {
+        throw new Error('MT5 service API key not configured');
+      }
+
+      // Get current session to extract JWT token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No active session');
+      }
+
+      // Call the MT5 service sync endpoint directly
+      const response = await fetch(`${mt5ServiceUrl}/api/mt5/account/${accountId}/sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': mt5ApiKey,
+          'Authorization': `Bearer ${session.access_token}`,
+          'X-Service-User-Id': session.user.id,
+          'ngrok-skip-browser-warning': 'true',
+        },
+        body: JSON.stringify({
+          sync_type: 'full',
+          sync_history: true,
+          history_days: 30
+        })
       });
 
-      console.log('📦 Edge function response:', { data, error });
+      console.log('📦 MT5 service response status:', response.status);
 
-      if (error) {
-        console.error('❌ Edge function error:', error);
-        throw error;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+        throw new Error(errorData.detail || errorData.message || `Sync failed with status ${response.status}`);
       }
 
-      if (!data || !data.success) {
-        const errorMsg = data?.error || data?.message || 'Failed to sync account data';
-        console.error('❌ Edge function returned failure:', data);
-        console.log('📊 Sync details:', {
-          executionId: data?.executionId,
-          totalAccounts: data?.totalAccounts,
-          syncResults: data?.syncResults,
-          message: data?.message
-        });
-        throw new Error(errorMsg);
-      }
-
+      const data = await response.json();
       console.log('✅ Sync successful, data:', data);
-      console.log('📊 Sync summary:', {
-        executionId: data.executionId,
-        totalAccounts: data.totalAccounts,
-        successCount: data.successCount,
-        failureCount: data.failureCount,
-        syncResults: data.syncResults
-      });
 
       // Update last sync time
       set(state => ({
         lastSyncTime: { ...state.lastSyncTime, [accountId]: new Date() }
       }));
 
-      // Reload accounts to get fresh data
+      // Sync is processed in background - wait for estimated duration PLUS buffer before reloading
+      const estimatedDuration = data.estimated_duration_seconds || 12;
+      const bufferTime = 3; // Add 3 second buffer to ensure background task completes
+      const totalWaitTime = estimatedDuration + bufferTime;
+      console.log(`⏳ Waiting ${totalWaitTime}s for sync to complete (${estimatedDuration}s estimated + ${bufferTime}s buffer)...`);
+      
+      await new Promise(resolve => setTimeout(resolve, totalWaitTime * 1000));
+      
+      console.log('🔄 Reloading accounts after sync...');
+      // Reload accounts to get fresh data from database
       await get().loadAccounts();
+
+      // Clear syncing state
+      set({ syncingAccountId: null });
 
       return { success: true };
     } catch (error: any) {
@@ -611,7 +714,8 @@ export const useAccountStore = create<AccountState>((set, get) => ({
         raw: error
       });
       set(state => ({
-        syncErrors: { ...state.syncErrors, [accountId]: error.message }
+        syncErrors: { ...state.syncErrors, [accountId]: error.message },
+        syncingAccountId: null
       }));
       return { 
         success: false, 
@@ -629,9 +733,12 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     const state = get();
     const account = state.accounts.find(acc => acc.id === accountId);
     
+    // Look up sync times by mt5_service_account_id (which is what we store with)
+    const mt5ServiceAccountId = account?.mt5_service_account_id;
+    
     return {
-      lastSync: state.lastSyncTime[accountId],
-      error: state.syncErrors[accountId],
+      lastSync: mt5ServiceAccountId ? state.lastSyncTime[mt5ServiceAccountId] : undefined,
+      error: mt5ServiceAccountId ? state.syncErrors[mt5ServiceAccountId] : undefined,
       isActive: account?.is_active ?? false
     };
   },

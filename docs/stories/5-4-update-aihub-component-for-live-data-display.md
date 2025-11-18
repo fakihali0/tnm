@@ -19,23 +19,23 @@ so that **users see accurate account metrics, positions, trades, and sync status
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 (AC:1)** – Aggregate metrics
-  - [ ] Pull account list from `useAccountStore` and compute totals (balance, equity, open positions, P&L ranges).
-  - [ ] Render responsive cards using existing design tokens.
-- [ ] **Task 2 (AC:2)** – Account selector
-  - [ ] Add dropdown to filter data by account; default to “All accounts” aggregate.
-  - [ ] Persist selection (store or URL param) for deep links.
-- [ ] **Task 3 (AC:3)** – Positions & trades panels
-  - [ ] Fetch latest positions/trades from store/Supabase; show tables with sortable columns and inline P&L indicators.
-  - [ ] Support auto-refresh after sync or manual refresh button.
-- [ ] **Task 4 (AC:4)** – Sync status widget
-  - [ ] Reuse badge styles from LinkedAccountsList; show last/next sync info using `lastSyncTime` and cron interval.
-  - [ ] Emit toast when sync fails and offer retry action.
-- [ ] **Task 5 (AC:5)** – Charts + AI data binding
-  - [ ] Feed charts (line/bar) with aggregated trades history (Story 4.2 data) and refresh via real-time subscription or 30s poll.
-  - [ ] Ensure AI insight cards pull latest positions/trades; note data freshness.
+- [x] **Task 1 (AC:1)** – Aggregate metrics
+  - [x] Pull account list from `useAccountStore` and compute totals (balance, equity, open positions, P&L ranges).
+  - [x] Render responsive cards using existing design tokens.
+- [x] **Task 2 (AC:2)** – Account selector
+  - [x] Add dropdown to filter data by account; default to “All accounts” aggregate.
+  - [x] Persist selection (store or URL param) for deep links.
+- [x] **Task 3 (AC:3)** – Positions & trades panels
+  - [x] Fetch latest positions/trades from store/Supabase; show tables with sortable columns and inline P&L indicators.
+  - [x] Support auto-refresh after sync or manual refresh button.
+- [x] **Task 4 (AC:4)** – Sync status widget
+  - [x] Reuse badge styles from LinkedAccountsList; show last/next sync info using `lastSyncTime` and cron interval.
+  - [x] Emit toast when sync fails and offer retry action.
+- [x] **Task 5 (AC:5)** – Charts + AI data binding
+  - [x] Feed charts (line/bar) with aggregated trades history (Story 4.2 data) and refresh via real-time subscription or 30s poll.
+  - [x] Ensure AI insight cards pull latest positions/trades; note data freshness.
 - [ ] **Task 6 (AC:6)** – UX polish + testing
-  - [ ] Add skeleton loaders, empty states, and error boundaries.
+  - [x] Add skeleton loaders, empty states, and error boundaries.
   - [ ] Write Jest/RTL + Cypress coverage for aggregates, selector, tables, sync badge, and error states; capture manual QA steps.
 
 ## Dev Notes
@@ -89,3 +89,4 @@ _To be updated when files are created/modified (AIHub, hooks, tests)._
 | Date       | Version | Changes                                 | Author |
 |------------|---------|-----------------------------------------|--------|
 | 2025-11-12 | 1.0     | Draft created via create-story workflow | AF (via Bob) |
+

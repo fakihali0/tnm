@@ -40,7 +40,7 @@ interface UsePortfolioAnalyticsReturn {
 }
 
 export const usePortfolioAnalytics = (): UsePortfolioAnalyticsReturn => {
-  const { trades, accounts, selectedAccount, isLoading: tradesLoading } = useRealTradingData();
+  const { trades, positions: livePositions, accounts, selectedAccount, isLoading: tradesLoading } = useRealTradingData();
   const [marketQuotes, setMarketQuotes] = useState<Record<string, MarketQuote>>({});
   const [isLoadingMarket, setIsLoadingMarket] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,6 +95,95 @@ export const usePortfolioAnalytics = (): UsePortfolioAnalyticsReturn => {
   };
 
   const positions = useMemo(() => {
+    // Prioritize live positions from MT5, fallback to trades-based calculation
+    if (livePositions && livePositions.length > 0) {
+      console.log('📊 Using live MT5 positions:', livePositions.length);
+      
+      const totalAccountEquity = selectedAccount?.equity || selectedAccount?.balance || 100000;
+      
+      // Group live positions by symbol for aggregation
+      const positionMap = new Map<string, {
+        positions: typeof livePositions;
+        totalVolume: number;
+        totalProfit: number;
+      }>();
+      
+      livePositions.forEach(pos => {
+        if (!positionMap.has(pos.symbol)) {
+          positionMap.set(pos.symbol, {
+            positions: [],
+            totalVolume: 0,
+            totalProfit: 0
+          });
+        }
+        
+        const group = positionMap.get(pos.symbol)!;
+        group.positions.push(pos);
+        group.totalVolume += pos.volume * pos.price_open;
+        group.totalProfit += pos.profit;
+      });
+      
+      // Get historical trades for win rate calculations
+      const tradesBySymbol = new Map<string, Trade[]>();
+      trades.forEach(trade => {
+        if (!tradesBySymbol.has(trade.symbol)) {
+          tradesBySymbol.set(trade.symbol, []);
+        }
+        tradesBySymbol.get(trade.symbol)!.push(trade);
+      });
+      
+      return Array.from(positionMap.entries()).map(([symbol, { positions: symbolPositions, totalVolume, totalProfit }]) => {
+        const historicalTrades = tradesBySymbol.get(symbol) || [];
+        const closedTrades = historicalTrades.filter(t => t.trade_status === 'closed');
+        const winningTrades = closedTrades.filter(t => (t.pnl || 0) > 0);
+        const losingTrades = closedTrades.filter(t => (t.pnl || 0) < 0);
+        
+        const winRate = closedTrades.length > 0 ? winningTrades.length / closedTrades.length : 0;
+        const avgWin = winningTrades.length > 0 ? winningTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / winningTrades.length : 0;
+        const avgLoss = losingTrades.length > 0 ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / losingTrades.length) : 0;
+        const realizedPnL = closedTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+        
+        const exposure = totalVolume / totalAccountEquity;
+        
+        // Calculate risk from stop losses
+        const risk = symbolPositions.reduce((maxRisk, pos) => {
+          if (!pos.sl || pos.sl === 0) return maxRisk;
+          const stopDistance = Math.abs(pos.price_open - pos.sl);
+          const positionRisk = (stopDistance * pos.volume) / totalAccountEquity;
+          return Math.max(maxRisk, positionRisk);
+        }, 0);
+        
+        const currentPrice = symbolPositions[0]?.price_current || 1;
+        const performance = totalVolume > 0 ? (totalProfit / totalVolume) * 100 : 0;
+        
+        // Get most recent position time
+        const lastPositionTime = symbolPositions.reduce((latest, pos) => {
+          return pos.time > latest ? pos.time : latest;
+        }, symbolPositions[0]?.time || '');
+        
+        return {
+          symbol,
+          sector: getSectorForSymbol(symbol),
+          totalVolume,
+          realizedPnL,
+          unrealizedPnL: totalProfit,
+          totalPnL: realizedPnL + totalProfit,
+          tradeCount: historicalTrades.length,
+          winRate,
+          avgWin,
+          avgLoss,
+          currentPrice,
+          exposure: Math.min(exposure, 1),
+          risk: Math.min(risk, 1),
+          correlation: 0.5, // Default correlation
+          performance,
+          lastTradeDate: lastPositionTime,
+          openPositions: symbolPositions.length
+        };
+      }).sort((a, b) => Math.abs(b.totalPnL) - Math.abs(a.totalPnL));
+    }
+
+    // Fallback: Calculate from historical trades if no live positions
     if (!trades.length) return [];
 
     const positionMap = new Map<string, {
@@ -188,7 +277,7 @@ export const usePortfolioAnalytics = (): UsePortfolioAnalyticsReturn => {
         openPositions: openTrades.length
       };
     }).sort((a, b) => Math.abs(b.totalPnL) - Math.abs(a.totalPnL)); // Sort by total P&L
-  }, [trades, marketQuotes, selectedAccount]);
+  }, [trades, livePositions, marketQuotes, selectedAccount]);
 
   const totalEquity = selectedAccount?.equity || selectedAccount?.balance || 0;
   const totalExposure = positions.reduce((sum, pos) => sum + pos.exposure, 0);

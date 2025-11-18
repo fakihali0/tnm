@@ -609,6 +609,169 @@ This is **faster** and **more reliable** than ngrok for local-only testing.
 
 ---
 
+## Environment Configuration (Story 5.5)
+
+### Frontend Environment Variables
+
+The frontend requires specific environment variables to communicate with the MT5 service and Supabase. These are configured in the `.env` file.
+
+#### Setup Instructions:
+
+**1. Copy the example file:**
+```bash
+cd tnm_concept
+cp env.example .env
+```
+
+**2. Edit `.env` with your values:**
+```dotenv
+# Supabase Configuration (from your Supabase dashboard)
+VITE_SUPABASE_URL="https://your-project-id.supabase.co"
+VITE_SUPABASE_ANON_KEY="your-anon-key"
+VITE_SUPABASE_PROJECT_ID="your-project-id"
+
+# MT5 Service Configuration
+# Option A: Using ngrok tunnel (for Supabase edge functions)
+VITE_MT5_SERVICE_URL="https://your-subdomain.ngrok-free.app"
+VITE_MT5_SERVICE_WS="wss://your-subdomain.ngrok-free.app"
+
+# Option B: Direct local network (faster, no Supabase edge functions)
+# VITE_MT5_SERVICE_URL="http://vms.tnm.local:8000"
+# VITE_MT5_SERVICE_WS="ws://vms.tnm.local:8000"
+
+# Feature Flags
+VITE_ENABLE_REALTIME="true"
+VITE_ENABLE_MT5_WEBSOCKET="false"
+```
+
+#### Required Variables:
+
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `VITE_SUPABASE_URL` | ✅ Yes | Your Supabase project URL | `https://abc123.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | ✅ Yes | Supabase anonymous/public key | `eyJhbGci...` |
+| `VITE_MT5_SERVICE_URL` | ✅ Yes | MT5 service base URL | `https://xyz.ngrok-free.app` or `http://vms.tnm.local:8000` |
+| `VITE_MT5_SERVICE_WS` | ⚠️ Recommended | WebSocket URL for Story 6.1 | `wss://xyz.ngrok-free.app` or `ws://vms.tnm.local:8000` |
+| `VITE_ENABLE_REALTIME` | ⚠️ Recommended | Enable Supabase Realtime | `true` or `false` |
+| `VITE_SUPABASE_PROJECT_ID` | Optional | Supabase project ID | `abc123` |
+| `VITE_ENABLE_MT5_WEBSOCKET` | Optional | Enable MT5 WebSocket (Story 6.1) | `false` (until implemented) |
+
+#### Getting Supabase Credentials:
+
+1. Go to: [https://supabase.com/dashboard](https://supabase.com/dashboard)
+2. Select your project
+3. Go to: **Settings** → **API**
+4. Copy:
+   - **Project URL** → `VITE_SUPABASE_URL`
+   - **anon/public** key → `VITE_SUPABASE_ANON_KEY`
+   - **Project ID** (from URL) → `VITE_SUPABASE_PROJECT_ID`
+
+#### MT5 Service URL Configuration:
+
+**For Local Development (Windows + Mac on same network):**
+
+Choose one of these approaches:
+
+**Option A: ngrok Tunnel (Recommended for Supabase Integration)**
+- Allows Supabase edge functions to call MT5 service
+- Required for Stories 4.1, 4.2, 5.1, 5.2, 5.3, 5.4
+- See [Story 1.5](./stories/1-5-ngrok-tunnel-for-supabase-edge-function-testing.md)
+
+```bash
+# Start ngrok on Windows
+ngrok http 8000
+
+# Copy the HTTPS URL to .env
+VITE_MT5_SERVICE_URL="https://abc-xyz-123.ngrok-free.app"
+```
+
+**Option B: Direct Local Network (Faster for Testing)**
+- Direct Mac → Windows communication
+- Faster, no internet required
+- Cannot be used with Supabase edge functions
+
+```dotenv
+VITE_MT5_SERVICE_URL="http://vms.tnm.local:8000"
+# OR
+VITE_MT5_SERVICE_URL="http://10.4.0.180:8000"
+```
+
+**For Production:**
+```dotenv
+VITE_MT5_SERVICE_URL="https://mt5.yourdomain.com"
+VITE_MT5_SERVICE_WS="wss://mt5.yourdomain.com"
+```
+
+#### Validating Configuration:
+
+Run the environment checker before building:
+
+```bash
+cd tnm_concept
+npm run check-env
+```
+
+Expected output:
+```
+🔍 Validating environment variables...
+
+Required Variables:
+  ✅ VITE_SUPABASE_URL - https://edzkor...
+  ✅ VITE_SUPABASE_ANON_KEY - eyJhbGc...
+  ✅ VITE_MT5_SERVICE_URL - https://ind...
+
+Recommended Variables:
+  ✅ VITE_SUPABASE_PROJECT_ID - edzkorfdixv...
+  ✅ VITE_ENABLE_REALTIME - true
+  ✅ VITE_MT5_SERVICE_WS - wss://ind...
+
+==================================================
+✅ All environment variables validated successfully!
+```
+
+#### Syncing with Backend (.env in mt5-service):
+
+The MT5 service (Windows) has its own `.env` file. Keep these values synchronized:
+
+| Frontend Variable | Backend Variable | Must Match? |
+|-------------------|------------------|-------------|
+| `VITE_SUPABASE_URL` | `SUPABASE_URL` | ✅ Yes |
+| `VITE_SUPABASE_ANON_KEY` | `SUPABASE_ANON_KEY` | ✅ Yes |
+| `VITE_MT5_SERVICE_URL` | N/A (backend doesn't need this) | ❌ No |
+
+**Backend `.env` location:** `c:\mt5-service\.env`
+
+#### Troubleshooting:
+
+**Build fails with missing variables:**
+```bash
+# Run env checker
+npm run check-env
+
+# If variables missing, check .env file exists:
+ls -la .env
+
+# Copy from example if needed:
+cp env.example .env
+```
+
+**"Failed to fetch" errors in browser:**
+- Verify MT5 service is running: `curl http://vms.tnm.local:8000/health`
+- Check firewall allows port 8000 (see Step 1.3 above)
+- If using ngrok, verify tunnel is active: `curl https://your-subdomain.ngrok-free.app/health`
+
+**Supabase edge functions can't reach MT5 service:**
+- Must use ngrok URL (not `vms.tnm.local`)
+- Verify ngrok tunnel is running
+- Check `VITE_MT5_SERVICE_URL` uses HTTPS ngrok URL
+
+**Realtime updates not working:**
+- Check `VITE_ENABLE_REALTIME="true"` in `.env`
+- Verify Supabase Realtime is enabled in dashboard (Database → Replication)
+- Check browser console for WebSocket connection errors
+
+---
+
 ## Development Workflow
 
 ### Daily Development Routine:

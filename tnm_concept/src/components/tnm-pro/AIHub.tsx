@@ -19,87 +19,140 @@ import {
   RefreshCw,
   TrendingDown,
   DollarSign,
-  AlertCircle
+  AlertCircle,
+  Target,
+  PieChart
 } from 'lucide-react';
 import { AIInsightsDashboard } from './AIInsightsDashboard';
 import { MarketIntelligencePanel } from './MarketIntelligencePanel';
 import { AIChatAssistant } from './AIChatAssistant';
 import { LivePositionsPanel } from './LivePositionsPanel';
+import { RecentTradesPanel } from './RecentTradesPanel';
+import { SyncStatusWidget } from './SyncStatusWidget';
 import { useAccountStore } from '@/store/auth';
 import { useJournalStore } from '@/store/auth';
+import { useAccountInsights } from '@/hooks/useAccountInsights';
 import { useRTL } from '@/hooks/useRTL';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const AIHub = () => {
   const { t } = useTranslation('tnm-ai');
   const rtl = useRTL();
   const [activeTab, setActiveTab] = useState('insights');
-  const { accounts, selectedAccount, setSelectedAccount, getAccountStatus, syncAccount } = useAccountStore();
+  const { 
+    accounts, 
+    selectedAccount, 
+    setSelectedAccount, 
+    getAccountStatus, 
+    syncAccount,
+    lastSyncTime,
+    syncErrors,
+    loadAccounts
+  } = useAccountStore();
   const { trades, loadTrades } = useJournalStore();
-  const [isSyncing, setIsSyncing] = useState(false);
+  const { toast } = useToast();
+  const [syncingAccountId, setSyncingAccountId] = useState<string | null>(null);
 
   // Load trades when account changes
   useEffect(() => {
     if (selectedAccount) {
       loadTrades(selectedAccount.id);
+    } else {
+      // Load trades for all accounts
+      accounts.forEach(acc => loadTrades(acc.id));
     }
   }, [selectedAccount?.id, loadTrades]);
 
-  // Calculate aggregate metrics
-  const calculateMetrics = () => {
-    if (!selectedAccount) {
-      // Show aggregated data across all accounts
-      const totalBalance = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
-      const totalEquity = accounts.reduce((sum, acc) => sum + (acc.equity || 0), 0);
-      const totalMargin = accounts.reduce((sum, acc) => sum + (acc.margin || 0), 0);
-      const openPositions = accounts.filter(acc => (acc.margin || 0) > 0).length;
-      
-      return {
-        balance: totalBalance,
-        equity: totalEquity,
-        margin: totalMargin,
-        openPositions,
-        currency: accounts[0]?.currency || 'USD',
-        accountName: 'All Accounts'
-      };
-    } else {
-      // Show selected account data
-      return {
-        balance: selectedAccount.balance || 0,
-        equity: selectedAccount.equity || 0,
-        margin: selectedAccount.margin || 0,
-        openPositions: (selectedAccount.margin || 0) > 0 ? 1 : 0, // Simplified
-        currency: selectedAccount.currency,
-        accountName: selectedAccount.account_name || selectedAccount.login
-      };
-    }
-  };
+  // Realtime subscriptions for trading_accounts and trades
+  useEffect(() => {
+    const accountsChannel = supabase
+      .channel('accounts-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'trading_accounts',
+        },
+        () => {
+          loadAccounts();
+        }
+      )
+      .subscribe();
 
-  const metrics = calculateMetrics();
-  const accountStatus = selectedAccount ? getAccountStatus(selectedAccount.id) : null;
-  const equityChange = metrics.equity - metrics.balance;
-  const equityPercentage = metrics.balance > 0 ? (equityChange / metrics.balance) * 100 : 0;
+    const tradesChannel = supabase
+      .channel('trades-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'trades',
+        },
+        () => {
+          if (selectedAccount) {
+            loadTrades(selectedAccount.id);
+          } else {
+            accounts.forEach(acc => loadTrades(acc.id));
+          }
+        }
+      )
+      .subscribe();
 
-  // Calculate P&L from recent trades
-  const recentTrades = trades.slice(0, 50); // Last 50 trades
-  const totalPnL = recentTrades.reduce((sum, trade) => {
-    const pnl = (trade.closePrice || 0) - (trade.openPrice || 0);
-    return sum + (trade.direction === 'BUY' ? pnl : -pnl) * (trade.volume || 0);
-  }, 0);
-  
-  const winningTrades = recentTrades.filter(trade => {
-    const pnl = (trade.closePrice || 0) - (trade.openPrice || 0);
-    return trade.direction === 'BUY' ? pnl > 0 : pnl < 0;
-  });
-  const winRate = recentTrades.length > 0 ? (winningTrades.length / recentTrades.length) * 100 : 0;
+    // Polling fallback every 30 seconds
+    const pollInterval = setInterval(() => {
+      loadAccounts();
+      if (selectedAccount) {
+        loadTrades(selectedAccount.id);
+      }
+    }, 30000);
+
+    return () => {
+      supabase.removeChannel(accountsChannel);
+      supabase.removeChannel(tradesChannel);
+      clearInterval(pollInterval);
+    };
+  }, [selectedAccount?.id, accounts.length]);
+
+  // Use insights hook for aggregated metrics
+  const { metrics, pnl, syncStatus } = useAccountInsights(
+    accounts,
+    selectedAccount,
+    trades,
+    syncingAccountId,
+    syncErrors
+  );
 
   const handleSync = async () => {
-    if (!selectedAccount) return;
-    setIsSyncing(true);
+    if (!selectedAccount) {
+      toast({
+        title: "No account selected",
+        description: "Please select an account to sync",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSyncingAccountId(selectedAccount.id);
     try {
-      await syncAccount(selectedAccount.id);
-      await loadTrades(selectedAccount.id);
+      const result = await syncAccount(selectedAccount.mt5_service_account_id);
+      if (result.success) {
+        // Accounts are already reloaded by syncAccount(), just reload trades
+        await loadTrades(selectedAccount.id);
+        toast({
+          title: "Sync Complete",
+          description: "Account data synchronized successfully",
+        });
+      } else {
+        toast({
+          title: "Sync Failed",
+          description: result.error || "Failed to sync account data",
+          variant: "destructive",
+        });
+      }
     } finally {
-      setIsSyncing(false);
+      setSyncingAccountId(null);
     }
   };
 
@@ -111,36 +164,66 @@ export const AIHub = () => {
     }).format(amount);
   };
 
+  const equityChange = metrics.totalEquity - metrics.totalBalance;
+  const equityPercentage = metrics.totalBalance > 0 
+    ? (equityChange / metrics.totalBalance) * 100 
+    : 0;
+
   const stats = [
     {
       label: selectedAccount ? t('aiHub.stats.balance') : t('aiHub.stats.totalBalance'),
-      value: formatCurrency(metrics.balance),
+      value: formatCurrency(metrics.totalBalance),
       change: selectedAccount 
-        ? `Equity: ${formatCurrency(metrics.equity)}`
+        ? `Equity: ${formatCurrency(metrics.totalEquity)}`
         : `${accounts.length} accounts`,
       icon: Wallet,
       color: 'text-blue-500'
     },
     {
       label: t('aiHub.stats.equity'),
-      value: formatCurrency(metrics.equity),
+      value: formatCurrency(metrics.totalEquity),
       change: `${equityChange >= 0 ? '+' : ''}${equityPercentage.toFixed(2)}%`,
       icon: equityChange >= 0 ? TrendingUp : TrendingDown,
       color: equityChange >= 0 ? 'text-green-500' : 'text-red-500'
     },
     {
       label: t('aiHub.stats.openPositions'),
-      value: metrics.openPositions.toString(),
-      change: `Margin: ${formatCurrency(metrics.margin)}`,
+      value: metrics.openPositionCount.toString(),
+      change: `Margin: ${formatCurrency(metrics.totalMargin)}`,
       icon: Activity,
       color: 'text-purple-500'
     },
     {
-      label: t('aiHub.stats.winRate'),
-      value: `${winRate.toFixed(1)}%`,
-      change: `${recentTrades.length} trades`,
-      icon: BarChart3,
-      color: winRate >= 50 ? 'text-green-500' : 'text-amber-500'
+      label: 'Daily P&L',
+      value: formatCurrency(pnl.daily.profit),
+      change: `${pnl.daily.trades} trades`,
+      icon: pnl.daily.profit >= 0 ? TrendingUp : TrendingDown,
+      color: pnl.daily.profit >= 0 ? 'text-green-500' : 'text-red-500'
+    }
+  ];
+
+  // Additional P&L stats for expanded view
+  const pnlStats = [
+    {
+      label: 'Weekly P&L',
+      value: formatCurrency(pnl.weekly.profit),
+      trades: pnl.weekly.trades,
+      winRate: pnl.weekly.winRate,
+      color: pnl.weekly.profit >= 0 ? 'text-green-500' : 'text-red-500'
+    },
+    {
+      label: 'Monthly P&L',
+      value: formatCurrency(pnl.monthly.profit),
+      trades: pnl.monthly.trades,
+      winRate: pnl.monthly.winRate,
+      color: pnl.monthly.profit >= 0 ? 'text-green-500' : 'text-red-500'
+    },
+    {
+      label: 'Total P&L',
+      value: formatCurrency(pnl.total.profit),
+      trades: pnl.total.trades,
+      winRate: pnl.total.winRate,
+      color: pnl.total.profit >= 0 ? 'text-green-500' : 'text-red-500'
     }
   ];
 
@@ -166,9 +249,9 @@ export const AIHub = () => {
           </div>
           
           {/* Account Selector and Sync Status */}
-          <div className="flex items-center gap-2">
-            {accounts.length > 0 && (
-              <>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              {accounts.length > 0 && (
                 <Select 
                   value={selectedAccount?.id || 'all'} 
                   onValueChange={(value) => {
@@ -188,31 +271,20 @@ export const AIHub = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                
-                {selectedAccount && accountStatus && (
-                  <div className="flex items-center gap-2">
-                    {accountStatus.lastSync && (
-                      <Badge variant="outline" className="text-xs">
-                        Last sync: {new Date(accountStatus.lastSync).toLocaleTimeString()}
-                      </Badge>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleSync}
-                      disabled={isSyncing}
-                    >
-                      <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
-            {accounts.length === 0 && (
-              <Badge variant="outline" className="text-amber-600 border-amber-600">
-                <AlertCircle className="h-3 w-3 mr-1" />
-                No accounts linked
-              </Badge>
+              )}
+              {accounts.length === 0 && (
+                <Badge variant="outline" className="text-amber-600 border-amber-600">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  No accounts linked
+                </Badge>
+              )}
+            </div>
+            {accounts.length > 0 && (
+              <SyncStatusWidget
+                syncStatus={syncStatus}
+                onSync={handleSync}
+                isSyncing={syncingAccountId !== null}
+              />
             )}
           </div>
         </div>
@@ -243,6 +315,38 @@ export const AIHub = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* P&L Performance Stats */}
+        {pnl.total.trades > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {pnlStats.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + index * 0.1 }}
+              >
+                <Card className="border-border/50">
+                  <CardContent className="p-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-muted-foreground">{stat.label}</p>
+                        <Target className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{stat.trades} trades</span>
+                        <Badge variant="outline" className="text-xs">
+                          {stat.winRate.toFixed(1)}% win rate
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </motion.div>
 
       {/* Main Content */}
@@ -252,14 +356,18 @@ export const AIHub = () => {
         transition={{ delay: 0.2 }}
       >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="insights" className="flex items-center gap-2 text-start">
               <Activity className="h-4 w-4" />
               {t('aiHub.tabs.insights')}
             </TabsTrigger>
             <TabsTrigger value="positions" className="flex items-center gap-2 text-start">
-              <BarChart3 className="h-4 w-4" />
+              <PieChart className="h-4 w-4" />
               Positions
+            </TabsTrigger>
+            <TabsTrigger value="trades" className="flex items-center gap-2 text-start">
+              <BarChart3 className="h-4 w-4" />
+              Trades
             </TabsTrigger>
             <TabsTrigger value="market" className="flex items-center gap-2 text-start">
               <Globe className="h-4 w-4" />
@@ -276,7 +384,11 @@ export const AIHub = () => {
           </TabsContent>
 
           <TabsContent value="positions" className="space-y-6">
-            <LivePositionsPanel />
+            <LivePositionsPanel accountId={selectedAccount?.id} />
+          </TabsContent>
+
+          <TabsContent value="trades" className="space-y-6">
+            <RecentTradesPanel accountId={selectedAccount?.id} limit={20} />
           </TabsContent>
 
           <TabsContent value="market" className="space-y-6">
