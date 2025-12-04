@@ -22,16 +22,21 @@
 
 ## Virtual Machines
 
-### VM 1: Windows Server 2025 (MT5 + Docker)
+### VM 1: Windows Server 2025 (MT5 Docker Host)
 - **IP Address:** `172.16.16.20/24`
 - **OS:** Windows Server 2025
-- **Purpose:** MT5 Terminal + Python FastAPI Service
+- **Purpose:** MT5 Headless in Docker (Windows Server Core container) + FastAPI
 - **Current Status:**
   - ✅ VM Created
-  - ✅ Docker Installed
-  - ❌ MT5 Terminal (Not installed yet)
-  - ❌ Python Environment (Not configured yet)
+  - ✅ Docker Installed (Windows containers mode)
+  - ❌ MT5 Docker Container (Not built yet)
   - ❌ FastAPI Service (Not configured yet)
+- **Architecture:** 
+  - Base: Windows Server 2025
+  - Container: Windows Server Core (ltsc2022)
+  - MT5 Terminal: Runs natively in Windows container (no Wine/emulation)
+  - Python: Installed in container
+  - FastAPI: Runs in container, exposed on port 8000
 - **Gateway:** `172.16.16.1` (Proxmox)
 - **Access:** RDP via Proxmox or SSH tunnel
 
@@ -182,11 +187,12 @@ Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 ## Next Steps
 
 ### Phase 1: Windows Server 2025 Setup
-- [ ] Install MT5 Terminal
-- [ ] Configure Python 3.11+ environment
-- [ ] Install FastAPI dependencies
-- [ ] Create MT5 bridge service
-- [ ] Test MT5 connectivity
+- [ ] Run setup script (creates Docker structure)
+- [ ] Copy/clone MT5 service code to `C:\mt5-docker\app\`
+- [ ] Configure `.env` file with Supabase keys
+- [ ] Build Docker image with MT5 headless
+- [ ] Start Docker container
+- [ ] Test MT5 connectivity via Docker
 
 ### Phase 2: Docker VM Setup
 - [ ] Configure Supabase environment variables

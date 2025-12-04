@@ -147,83 +147,132 @@ if ($existingRule) {
 }
 Write-Host ""
 
-# Step 8: Install Python
-Write-Host "Step 7: Installing Python 3.11+..." -ForegroundColor Yellow
+# Step 8: Verify Docker Compose
+Write-Host "Step 7: Verifying Docker Compose..." -ForegroundColor Yellow
+$dockerComposeInstalled = docker compose version 2>&1
 
-# Check if Python is already installed
-$pythonInstalled = Get-Command python -ErrorAction SilentlyContinue
-
-if ($pythonInstalled) {
-    $pythonVersion = python --version
-    Write-Host "[✓] Python already installed: $pythonVersion" -ForegroundColor Green
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "[✓] Docker Compose available: $dockerComposeInstalled" -ForegroundColor Green
 } else {
-    Write-Host "   Downloading Python installer..." -ForegroundColor Gray
-    
-    # Create temp directory
-    $tempDir = "C:\Temp"
-    if (-not (Test-Path $tempDir)) {
-        New-Item -Path $tempDir -ItemType Directory -Force | Out-Null
-    }
-    
-    # Download Python 3.11
-    $pythonUrl = "https://www.python.org/ftp/python/3.11.7/python-3.11.7-amd64.exe"
-    $pythonInstaller = "$tempDir\python-installer.exe"
-    
-    try {
-        Invoke-WebRequest -Uri $pythonUrl -OutFile $pythonInstaller -UseBasicParsing
-        
-        Write-Host "   Installing Python..." -ForegroundColor Gray
-        Start-Process -FilePath $pythonInstaller -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
-        
-        # Refresh environment variables
-        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-        
-        Write-Host "[✓] Python installed successfully" -ForegroundColor Green
-    } catch {
-        Write-Host "[ERROR] Failed to install Python: $_" -ForegroundColor Red
-        Write-Host "   Please install Python manually from: https://www.python.org/downloads/" -ForegroundColor Yellow
-        exit 1
-    }
+    Write-Host "[ERROR] Docker Compose not available!" -ForegroundColor Red
+    Write-Host "   Please ensure Docker Desktop includes Compose plugin" -ForegroundColor Yellow
+    exit 1
 }
 Write-Host ""
 
-# Step 9: Create MT5 Service Directory
-Write-Host "Step 8: Creating MT5 Service Directory..." -ForegroundColor Yellow
-$serviceDir = "C:\mt5-service"
+# Step 9: Create MT5 Docker Directory
+Write-Host "Step 8: Creating MT5 Docker Directory..." -ForegroundColor Yellow
+$serviceDir = "C:\mt5-docker"
 
 if (Test-Path $serviceDir) {
-    Write-Host "[✓] Service directory already exists: $serviceDir" -ForegroundColor Green
+    Write-Host "[✓] Docker directory already exists: $serviceDir" -ForegroundColor Green
 } else {
     try {
         New-Item -Path $serviceDir -ItemType Directory -Force | Out-Null
-        Write-Host "[✓] Service directory created: $serviceDir" -ForegroundColor Green
+        Write-Host "[✓] Docker directory created: $serviceDir" -ForegroundColor Green
     } catch {
-        Write-Host "[ERROR] Failed to create service directory: $_" -ForegroundColor Red
+        Write-Host "[ERROR] Failed to create docker directory: $_" -ForegroundColor Red
         exit 1
     }
 }
 Write-Host ""
 
-# Step 10: Create Python Virtual Environment
-Write-Host "Step 9: Creating Python Virtual Environment..." -ForegroundColor Yellow
-$venvPath = "$serviceDir\venv"
+# Step 10: Create Dockerfile for MT5 Headless (Windows Server Core)
+Write-Host "Step 9: Creating Dockerfile for MT5 Headless..." -ForegroundColor Yellow
+$dockerfileContent = @"
+# Dockerfile for MT5 Headless + Python FastAPI on Windows Server Core
+# escape=``
 
-if (Test-Path "$venvPath\Scripts\activate.ps1") {
-    Write-Host "[✓] Virtual environment already exists" -ForegroundColor Green
-} else {
-    try {
-        Write-Host "   Creating virtual environment..." -ForegroundColor Gray
-        python -m venv $venvPath
-        Write-Host "[✓] Virtual environment created" -ForegroundColor Green
-    } catch {
-        Write-Host "[ERROR] Failed to create virtual environment: $_" -ForegroundColor Red
-        exit 1
-    }
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+# Install Chocolatey
+RUN powershell -Command ``
+    Set-ExecutionPolicy Bypass -Scope Process -Force; ``
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; ``
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# Install Python
+RUN choco install -y python --version=3.11.7
+
+# Set working directory
+WORKDIR C:\\app
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN python -m pip install --upgrade pip && ``
+    pip install --no-cache-dir -r requirements.txt
+
+# Download and install MT5 Terminal (silent install)
+RUN powershell -Command ``
+    Invoke-WebRequest -Uri 'https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe' -OutFile 'C:\\Temp\\mt5setup.exe'; ``
+    Start-Process -FilePath 'C:\\Temp\\mt5setup.exe' -ArgumentList '/auto' -Wait; ``
+    Remove-Item 'C:\\Temp\\mt5setup.exe'
+
+# Copy application code
+COPY app C:\\app\\app
+
+# Expose FastAPI port
+EXPOSE 8000
+
+# Run FastAPI service
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+"@
+
+$dockerfilePath = "$serviceDir\Dockerfile"
+try {
+    $dockerfileContent | Out-File -FilePath $dockerfilePath -Encoding UTF8 -Force
+    Write-Host "[✓] Dockerfile created" -ForegroundColor Green
+} catch {
+    Write-Host "[ERROR] Failed to create Dockerfile: $_" -ForegroundColor Red
 }
 Write-Host ""
 
-# Step 11: Create requirements.txt
-Write-Host "Step 10: Creating requirements.txt..." -ForegroundColor Yellow
+# Step 11: Create docker-compose.yml
+Write-Host "Step 10: Creating docker-compose.yml..." -ForegroundColor Yellow
+$composeContent = @"
+version: '3.8'
+
+services:
+  mt5-service:
+    build: .
+    container_name: mt5-fastapi
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - SUPABASE_URL=http://172.16.16.100:8000
+      - SUPABASE_SERVICE_ROLE_KEY=\${SUPABASE_SERVICE_ROLE_KEY}
+      - MT5_SERVICE_API_KEY=\${MT5_SERVICE_API_KEY}
+      - JWT_SECRET_KEY=\${JWT_SECRET_KEY}
+      - ENCRYPTION_KEY=\${ENCRYPTION_KEY}
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+    volumes:
+      - ./app:C:\\app\\app
+      - mt5-data:C:\\Users\\ContainerAdministrator\\AppData\\Roaming\\MetaQuotes
+    networks:
+      - mt5-network
+
+volumes:
+  mt5-data:
+
+networks:
+  mt5-network:
+    driver: nat
+"@
+
+$composePath = "$serviceDir\docker-compose.yml"
+try {
+    $composeContent | Out-File -FilePath $composePath -Encoding UTF8 -Force
+    Write-Host "[✓] docker-compose.yml created" -ForegroundColor Green
+} catch {
+    Write-Host "[ERROR] Failed to create docker-compose.yml: $_" -ForegroundColor Red
+}
+Write-Host ""
+
+# Step 12: Create requirements.txt
+Write-Host "Step 11: Creating requirements.txt..." -ForegroundColor Yellow
 $requirementsFile = "$serviceDir\requirements.txt"
 $requirementsContent = @"
 fastapi==0.104.1
@@ -247,19 +296,6 @@ try {
 }
 Write-Host ""
 
-# Step 12: Install Python Dependencies
-Write-Host "Step 11: Installing Python Dependencies..." -ForegroundColor Yellow
-try {
-    Write-Host "   This may take a few minutes..." -ForegroundColor Gray
-    & "$venvPath\Scripts\python.exe" -m pip install --upgrade pip | Out-Null
-    & "$venvPath\Scripts\python.exe" -m pip install -r $requirementsFile
-    Write-Host "[✓] Python dependencies installed" -ForegroundColor Green
-} catch {
-    Write-Host "[ERROR] Failed to install dependencies: $_" -ForegroundColor Red
-    Write-Host "   You can install manually later: .\venv\Scripts\activate; pip install -r requirements.txt" -ForegroundColor Yellow
-}
-Write-Host ""
-
 # Step 13: Create .env.example
 Write-Host "Step 12: Creating .env.example..." -ForegroundColor Yellow
 $envExampleFile = "$serviceDir\.env.example"
@@ -267,8 +303,6 @@ $envExampleContent = @"
 # Service Configuration
 ENVIRONMENT=development
 LOG_LEVEL=DEBUG
-API_PORT=8000
-HOST=0.0.0.0
 
 # Authentication
 MT5_SERVICE_API_KEY=dev_local_test_key_change_in_production
@@ -277,10 +311,6 @@ JWT_SECRET_KEY=dev_jwt_secret_change_in_production
 # Supabase Integration (Docker VM)
 SUPABASE_URL=http://172.16.16.100:8000
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
-
-# MT5 Configuration
-MT5_CONNECTION_POOL_SIZE=5
-MT5_CONNECTION_TIMEOUT=300
 
 # Encryption (generate: openssl rand -base64 32)
 ENCRYPTION_KEY=your_32_byte_base64_key_here
@@ -331,31 +361,39 @@ Write-Host "  Directory:     $serviceDir" -ForegroundColor Gray
 Write-Host "  Port:          $ServicePort" -ForegroundColor Gray
 Write-Host "  URL (Internal): http://$VMIP:$ServicePort" -ForegroundColor Gray
 Write-Host "  URL (Mac):     http://localhost:8000 (via SSH tunnel)" -ForegroundColor Gray
+Write-Host "  Mode:          Docker Containerized (Windows Server Core)" -ForegroundColor Gray
 Write-Host ""
 
 Write-Host "===========================================================" -ForegroundColor Cyan
 Write-Host "  Next Steps:" -ForegroundColor Cyan
 Write-Host "===========================================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "1. Install MT5 Terminal:" -ForegroundColor Yellow
-Write-Host "   Download from: https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe" -ForegroundColor White
-Write-Host ""
-Write-Host "2. Configure environment variables:" -ForegroundColor Yellow
+Write-Host "1. Configure environment variables:" -ForegroundColor Yellow
 Write-Host "   cd $serviceDir" -ForegroundColor White
 Write-Host "   copy .env.example .env" -ForegroundColor White
-Write-Host "   # Edit .env with actual values" -ForegroundColor White
+Write-Host "   # Edit .env with actual Supabase keys" -ForegroundColor White
 Write-Host ""
-Write-Host "3. Clone MT5 service repository:" -ForegroundColor Yellow
+Write-Host "2. Clone/Copy your MT5 service code:" -ForegroundColor Yellow
 Write-Host "   cd $serviceDir" -ForegroundColor White
-Write-Host "   git clone <your-repo-url> ." -ForegroundColor White
+Write-Host "   git clone <your-repo-url> app" -ForegroundColor White
+Write-Host "   # Or copy app/ folder with your FastAPI code" -ForegroundColor White
 Write-Host ""
-Write-Host "4. Test the service:" -ForegroundColor Yellow
-Write-Host "   .\\venv\\Scripts\\activate" -ForegroundColor White
-Write-Host "   python run.py" -ForegroundColor White
+Write-Host "3. Build and run Docker container:" -ForegroundColor Yellow
+Write-Host "   cd $serviceDir" -ForegroundColor White
+Write-Host "   docker compose build" -ForegroundColor White
+Write-Host "   docker compose up -d" -ForegroundColor White
+Write-Host ""
+Write-Host "4. Check container logs:" -ForegroundColor Yellow
+Write-Host "   docker compose logs -f" -ForegroundColor White
 Write-Host ""
 Write-Host "5. From Mac, create SSH tunnel:" -ForegroundColor Yellow
 Write-Host "   ssh -L 8000:$VMIP:8000 root@142.132.156.162 -N" -ForegroundColor Cyan
 Write-Host "   Then access: http://localhost:8000/health" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Note: MT5 Terminal runs inside Windows Server Core container" -ForegroundColor Yellow
+Write-Host "      - Native Windows execution (not Wine)" -ForegroundColor Gray
+Write-Host "      - No GUI - fully headless operation" -ForegroundColor Gray
+Write-Host "      - All MT5 operations via Python MetaTrader5 API" -ForegroundColor Gray
 Write-Host ""
 
 Write-Host "[✓] Windows Server 2025 VM setup completed successfully!" -ForegroundColor Green
