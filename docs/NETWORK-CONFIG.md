@@ -1,44 +1,66 @@
 # Network Configuration
 
-**Last Updated:** November 12, 2025
+**Last Updated:** December 4, 2025  
+**Environment:** Proxmox Self-Hosted Infrastructure  
+**Access Method:** IP-based (SSH tunnels from Mac)
 
-## Windows Machine (MT5 Service Host)
+## Proxmox Host
 
-- **Hostname:** `vms.tnm.local` ⭐ (Use this in all configurations)
-- **IP Address:** `10.4.0.180`
-- **Subnet Mask:** `255.255.255.0`
-- **Default Gateway:** `10.4.0.1`
-- **DNS Server:** `8.8.8.8`
+- **Local IP:** `172.16.16.1` (Internal network)
+- **Public IP:** `142.132.156.162` (Internet access)
+- **Web Interface:** `https://142.132.156.162:8006`
+- **Subnet:** `172.16.16.0/24`
+
+## Windows Server 2025 VM (MT5 Service Host)
+
+- **IP Address:** `172.16.16.20/24`
+- **Gateway:** `172.16.16.1`
 - **Service Port:** `8000` (FastAPI)
+- **Access:** Via SSH tunnel or RDP
+- **Service URL (Internal):** `http://172.16.16.20:8000`
+- **Service URL (Mac):** `http://localhost:8000` (via tunnel)
 
-> **Note:** Always use `vms.tnm.local` instead of the IP address. This allows easy IP changes by updating only the hosts file.
+## Docker VM (Supabase Host)
+
+- **IP Address:** `172.16.16.100/24`
+- **Gateway:** `172.16.16.1`
+- **Docker Bridge:** `172.17.0.1` (internal)
+- **Supabase API Port:** `8000`
+- **Supabase Studio Port:** `3000`
+- **Service URL (Internal):** `http://172.16.16.100:8000`
+- **Service URL (Mac):** `http://localhost:8001` (via tunnel)
 
 ## Mac Machine (Frontend Development)
 
-- **IP Assignment:** DHCP (automatic)
-- **Network:** Same subnet as Windows (10.4.0.x)
+- **Access to Proxmox:** `142.132.156.162` (SSH/HTTPS)
 - **Frontend Port:** `5173` (Vite development server)
+- **Access Method:** SSH tunnels to reach internal VMs
 
 ## Network Setup Commands
 
-### Windows - Configure Hosts File (PowerShell as Admin)
-
-```powershell
-# Add hostname to Windows hosts file
-Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Value "`n10.4.0.180    vms.tnm.local"
-
-# Verify
-Get-Content C:\Windows\System32\drivers\etc\hosts | Select-String "vms.tnm.local"
-```
-
-### Mac - Configure Hosts File
+### Mac - Create SSH Tunnels to VMs
 
 ```bash
-# Add hostname to Mac hosts file
-echo "10.4.0.180    vms.tnm.local" | sudo tee -a /etc/hosts
+# Tunnel to Windows MT5 Service
+ssh -L 8000:172.16.16.20:8000 root@142.132.156.162 -N
+# Access MT5 service: http://localhost:8000
 
-# Verify
-cat /etc/hosts | grep vms.tnm.local
+# Tunnel to Supabase (API + Studio)
+ssh -L 8001:172.16.16.100:8000 -L 3000:172.16.16.100:3000 root@142.132.156.162 -N
+# Access Supabase API: http://localhost:8001
+# Access Supabase Studio: http://localhost:3000
+
+# Combined tunnel (all services)
+ssh -L 8000:172.16.16.20:8000 -L 8001:172.16.16.100:8000 -L 3000:172.16.16.100:3000 root@142.132.156.162 -N
+```
+
+### Mac - RDP to Windows VM
+
+```bash
+# Create RDP tunnel
+ssh -L 3389:172.16.16.20:3389 root@142.132.156.162 -N
+
+# Then connect with Microsoft Remote Desktop to: localhost:3389
 ```
 
 ### Windows - Configure Static IP (PowerShell as Admin)
@@ -64,11 +86,19 @@ Get-NetIPAddress -InterfaceAlias "Ethernet" -AddressFamily IPv4
 ### Mac - Test Connectivity
 
 ```bash
-# Ping test (using hostname)
-ping vms.tnm.local
+# Test Proxmox host
+ping 142.132.156.162
 
-# Service health check (after FastAPI is running)
-curl http://vms.tnm.local:8000/health
+# SSH into Proxmox
+ssh root@142.132.156.162
+
+# From Proxmox, test VMs
+ping 172.16.16.20   # Windows VM
+ping 172.16.16.100  # Docker VM
+
+# Test services (after SSH tunnel established)
+curl http://localhost:8000/health      # MT5 service
+curl http://localhost:8001/health      # Supabase API
 ```
 
 ## Hosts File Management

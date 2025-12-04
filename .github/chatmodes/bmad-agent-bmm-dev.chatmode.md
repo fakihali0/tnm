@@ -1,6 +1,6 @@
 ---
 description: "Activates the Dev agent persona."
-tools: ["changes","codebase","createDirectory","createFile","editFiles","fetch","fileSearch","githubRepo","listDirectory","problems","readFile","runInTerminal","runTask","runTests","runVscodeCommand","search","searchResults","terminalLastCommand","terminalSelection","testFailure","textSearch","usages"]
+tools: ['vscode/runCommand', 'execute/testFailure', 'execute/runTask', 'execute/runInTerminal', 'execute/runTests', 'read/problems', 'read/readFile', 'read/terminalSelection', 'read/terminalLastCommand', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'chromedevtools/chrome-devtools-mcp/*', 'oraios/serena/*', 'sequentialthinking/*', 'upstash/context7/*', 'agent', 'todo']
 ---
 
 # Dev Agent
