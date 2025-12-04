@@ -185,8 +185,8 @@ Write-Host ""
 
 # Step 9: Create MT5 Docker Directories
 Write-Host "Step 8: Creating MT5 Docker Directories..." -ForegroundColor Yellow
-$orchestratorDir = "C:\mt5-orchestrator"
-$mt5ServiceDir = "C:\mt5-service-template"
+$orchestratorDir = "D:\mt5-orchestrator"
+$mt5ServiceDir = "D:\mt5-service-template"
 
 foreach ($dir in @($orchestratorDir, $mt5ServiceDir)) {
     if (Test-Path $dir) {
@@ -222,7 +222,7 @@ RUN choco install -y python --version=3.11.7
 RUN choco install -y docker-cli
 
 # Set working directory
-WORKDIR C:\\orchestrator
+WORKDIR D:\\orchestrator
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
@@ -230,7 +230,7 @@ RUN python -m pip install --upgrade pip && ``
     pip install --no-cache-dir -r requirements.txt
 
 # Copy orchestrator application code
-COPY orchestrator C:\\orchestrator\\orchestrator
+COPY orchestrator D:\\orchestrator\\orchestrator
 
 # Expose orchestrator API port
 EXPOSE 7999
@@ -265,7 +265,7 @@ RUN powershell -Command ``
 RUN choco install -y python --version=3.11.7
 
 # Set working directory
-WORKDIR C:\\app
+WORKDIR D:\\app
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
@@ -274,12 +274,12 @@ RUN python -m pip install --upgrade pip && ``
 
 # Download and install MT5 Terminal (silent install)
 RUN powershell -Command ``
-    Invoke-WebRequest -Uri 'https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe' -OutFile 'C:\\Temp\\mt5setup.exe'; ``
-    Start-Process -FilePath 'C:\\Temp\\mt5setup.exe' -ArgumentList '/auto' -Wait; ``
-    Remove-Item 'C:\\Temp\\mt5setup.exe'
+    Invoke-WebRequest -Uri 'https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe' -OutFile 'D:\\Temp\\mt5setup.exe'; ``
+    Start-Process -FilePath 'D:\\Temp\\mt5setup.exe' -ArgumentList '/auto' -Wait; ``
+    Remove-Item 'D:\\Temp\\mt5setup.exe'
 
 # Copy application code
-COPY app C:\\app\\app
+COPY app D:\\app\\app
 
 # Expose FastAPI port (dynamic per container)
 EXPOSE 8000
@@ -320,7 +320,7 @@ services:
       - MT5_PORT_RANGE_END=8999
       - DOCKER_HOST=npipe:////./pipe/docker_engine
     volumes:
-      - ./orchestrator:C:\\orchestrator\\orchestrator
+      - ./orchestrator:D:\\orchestrator\\orchestrator
       - \\\\.\\pipe\\docker_engine:\\\\.\\pipe\\docker_engine
     networks:
       - mt5-network
