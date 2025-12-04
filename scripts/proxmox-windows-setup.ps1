@@ -66,32 +66,16 @@ $adapterName = $adapter.Name
 Write-Host "[✓] Found active adapter: $adapterName" -ForegroundColor Green
 Write-Host ""
 
-# Step 4: Verify/Configure Static IP
+# Step 4: Verify Static IP (Skip Configuration)
 Write-Host "Step 3: Verifying Static IP Configuration..." -ForegroundColor Yellow
 $currentIP = (Get-NetIPAddress -InterfaceAlias $adapterName -AddressFamily IPv4 -ErrorAction SilentlyContinue).IPAddress
 
 if ($currentIP -eq $VMIP) {
     Write-Host "[✓] IP already configured: $currentIP" -ForegroundColor Green
 } else {
-    Write-Host "   Current IP: $currentIP" -ForegroundColor Gray
-    Write-Host "   Configuring static IP: $VMIP" -ForegroundColor White
-    
-    try {
-        # Remove existing IP configuration
-        Remove-NetIPAddress -InterfaceAlias $adapterName -Confirm:$false -ErrorAction SilentlyContinue
-        Remove-NetRoute -InterfaceAlias $adapterName -Confirm:$false -ErrorAction SilentlyContinue
-        
-        # Set static IP
-        New-NetIPAddress -InterfaceAlias $adapterName -IPAddress $VMIP -PrefixLength $SubnetPrefix -DefaultGateway $Gateway | Out-Null
-        
-        # Set DNS
-        Set-DnsClientServerAddress -InterfaceAlias $adapterName -ServerAddresses $DNS
-        
-        Write-Host "[✓] Static IP configured successfully" -ForegroundColor Green
-    } catch {
-        Write-Host "[ERROR] Failed to configure static IP: $_" -ForegroundColor Red
-        exit 1
-    }
+    Write-Host "[✓] Current IP: $currentIP" -ForegroundColor Yellow
+    Write-Host "    Expected IP: $VMIP" -ForegroundColor Gray
+    Write-Host "    Skipping IP configuration (already set manually)" -ForegroundColor Gray
 }
 Write-Host ""
 
