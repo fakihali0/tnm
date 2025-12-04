@@ -18,20 +18,20 @@ WINDOWS_VM="172.16.16.20"
 DOCKER_VM="172.16.16.100"
 
 # Ports
-MT5_SERVICE_PORT=8000
+MT5_ORCHESTRATOR_PORT=7999
 SUPABASE_API_PORT=8000
 SUPABASE_STUDIO_PORT=3000
 WINDOWS_RDP_PORT=3389
 
 # Local ports (on Mac)
-LOCAL_MT5_PORT=8000
+LOCAL_MT5_ORCHESTRATOR_PORT=7999
 LOCAL_SUPABASE_API_PORT=8001
 LOCAL_SUPABASE_STUDIO_PORT=3000
 LOCAL_RDP_PORT=3389
 
 # PID file locations
 PID_DIR="$HOME/.tnm-tunnels"
-MT5_PID_FILE="$PID_DIR/mt5-tunnel.pid"
+MT5_PID_FILE="$PID_DIR/orchestrator-tunnel.pid"
 SUPABASE_PID_FILE="$PID_DIR/supabase-tunnel.pid"
 RDP_PID_FILE="$PID_DIR/rdp-tunnel.pid"
 
@@ -52,16 +52,16 @@ start_tunnels() {
     echo "===========================================================${NC}"
     echo ""
     
-    # MT5 Service Tunnel
-    echo -e "${YELLOW}Starting MT5 Service tunnel...${NC}"
+    # MT5 Orchestrator Tunnel
+    echo -e "${YELLOW}Starting MT5 Orchestrator tunnel...${NC}"
     if [ -f "$MT5_PID_FILE" ] && kill -0 $(cat "$MT5_PID_FILE") 2>/dev/null; then
-        echo -e "${GREEN}[✓] MT5 tunnel already running (PID: $(cat "$MT5_PID_FILE"))${NC}"
+        echo -e "${GREEN}[✓] Orchestrator tunnel already running (PID: $(cat "$MT5_PID_FILE"))${NC}"
     else
-        ssh -f -N -L $LOCAL_MT5_PORT:$WINDOWS_VM:$MT5_SERVICE_PORT $PROXMOX_USER@$PROXMOX_IP
+        ssh -f -N -L $LOCAL_MT5_ORCHESTRATOR_PORT:$WINDOWS_VM:$MT5_ORCHESTRATOR_PORT $PROXMOX_USER@$PROXMOX_IP
         echo $! > "$MT5_PID_FILE"
-        echo -e "${GREEN}[✓] MT5 tunnel started${NC}"
-        echo "    Local:  http://localhost:$LOCAL_MT5_PORT"
-        echo "    Remote: http://$WINDOWS_VM:$MT5_SERVICE_PORT"
+        echo -e "${GREEN}[✓] Orchestrator tunnel started${NC}"
+        echo "    Local:  http://localhost:$LOCAL_MT5_ORCHESTRATOR_PORT"
+        echo "    Remote: http://$WINDOWS_VM:$MT5_ORCHESTRATOR_PORT"
     fi
     echo ""
     
@@ -98,9 +98,9 @@ start_tunnels() {
     echo "===========================================================${NC}"
     echo ""
     echo "Test connectivity:"
-    echo "  MT5:      curl http://localhost:$LOCAL_MT5_PORT/health"
-    echo "  Supabase: curl http://localhost:$LOCAL_SUPABASE_API_PORT/health"
-    echo "  Studio:   open http://localhost:$LOCAL_SUPABASE_STUDIO_PORT"
+    echo "  Orchestrator: curl http://localhost:$LOCAL_MT5_ORCHESTRATOR_PORT/health"
+    echo "  Supabase:     curl http://localhost:$LOCAL_SUPABASE_API_PORT/health"
+    echo "  Studio:       open http://localhost:$LOCAL_SUPABASE_STUDIO_PORT"
     echo ""
 }
 
@@ -113,12 +113,12 @@ stop_tunnels() {
     
     stopped=0
     
-    # Stop MT5 tunnel
+    # Stop Orchestrator tunnel
     if [ -f "$MT5_PID_FILE" ]; then
         PID=$(cat "$MT5_PID_FILE")
         if kill -0 $PID 2>/dev/null; then
             kill $PID
-            echo -e "${GREEN}[✓] MT5 tunnel stopped (PID: $PID)${NC}"
+            echo -e "${GREEN}[✓] Orchestrator tunnel stopped (PID: $PID)${NC}"
             stopped=$((stopped + 1))
         fi
         rm -f "$MT5_PID_FILE"
@@ -162,16 +162,16 @@ check_status() {
     echo "===========================================================${NC}"
     echo ""
     
-    # Check MT5 tunnel
-    echo -e "${YELLOW}MT5 Service Tunnel:${NC}"
+    # Check MT5 Orchestrator tunnel
+    echo -e "${YELLOW}MT5 Orchestrator Tunnel:${NC}"
     if [ -f "$MT5_PID_FILE" ] && kill -0 $(cat "$MT5_PID_FILE") 2>/dev/null; then
         PID=$(cat "$MT5_PID_FILE")
         echo -e "  Status: ${GREEN}RUNNING${NC} (PID: $PID)"
-        echo "  Local:  http://localhost:$LOCAL_MT5_PORT"
-        echo "  Remote: http://$WINDOWS_VM:$MT5_SERVICE_PORT"
+        echo "  Local:  http://localhost:$LOCAL_MT5_ORCHESTRATOR_PORT"
+        echo "  Remote: http://$WINDOWS_VM:$MT5_ORCHESTRATOR_PORT"
         
         # Test connectivity
-        if curl -s -f -m 2 http://localhost:$LOCAL_MT5_PORT/health > /dev/null 2>&1; then
+        if curl -s -f -m 2 http://localhost:$LOCAL_MT5_ORCHESTRATOR_PORT/health > /dev/null 2>&1; then
             echo -e "  Health: ${GREEN}✓ Responding${NC}"
         else
             echo -e "  Health: ${RED}✗ Not responding${NC}"
@@ -230,10 +230,10 @@ show_help() {
     echo "  restart  - Restart all tunnels"
     echo ""
     echo "Tunnels:"
-    echo "  MT5 Service:     localhost:$LOCAL_MT5_PORT -> $WINDOWS_VM:$MT5_SERVICE_PORT"
-    echo "  Supabase API:    localhost:$LOCAL_SUPABASE_API_PORT -> $DOCKER_VM:$SUPABASE_API_PORT"
-    echo "  Supabase Studio: localhost:$LOCAL_SUPABASE_STUDIO_PORT -> $DOCKER_VM:$SUPABASE_STUDIO_PORT"
-    echo "  RDP:             localhost:$LOCAL_RDP_PORT -> $WINDOWS_VM:$WINDOWS_RDP_PORT"
+    echo "  MT5 Orchestrator: localhost:$LOCAL_MT5_ORCHESTRATOR_PORT -> $WINDOWS_VM:$MT5_ORCHESTRATOR_PORT"
+    echo "  Supabase API:     localhost:$LOCAL_SUPABASE_API_PORT -> $DOCKER_VM:$SUPABASE_API_PORT"
+    echo "  Supabase Studio:  localhost:$LOCAL_SUPABASE_STUDIO_PORT -> $DOCKER_VM:$SUPABASE_STUDIO_PORT"
+    echo "  RDP:              localhost:$LOCAL_RDP_PORT -> $WINDOWS_VM:$WINDOWS_RDP_PORT"
     echo ""
 }
 

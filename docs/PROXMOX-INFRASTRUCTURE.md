@@ -22,21 +22,29 @@
 
 ## Virtual Machines
 
-### VM 1: Windows Server 2025 (MT5 Docker Host)
+### VM 1: Windows Server 2025 (MT5 Orchestrator + Dynamic Containers)
 - **IP Address:** `172.16.16.20/24`
 - **OS:** Windows Server 2025
-- **Purpose:** MT5 Headless in Docker (Windows Server Core container) + FastAPI
+- **Purpose:** Container Orchestrator + Dynamic MT5 Instances
 - **Current Status:**
   - ✅ VM Created
   - ✅ Docker Installed (Windows containers mode)
-  - ❌ MT5 Docker Container (Not built yet)
-  - ❌ FastAPI Service (Not configured yet)
+  - ❌ Orchestrator Service (Not built yet)
+  - ❌ MT5 Service Template (Not built yet)
 - **Architecture:** 
-  - Base: Windows Server 2025
-  - Container: Windows Server Core (ltsc2022)
-  - MT5 Terminal: Runs natively in Windows container (no Wine/emulation)
-  - Python: Installed in container
-  - FastAPI: Runs in container, exposed on port 8000
+  - **Orchestrator Service (Port 7999):**
+    - Always-running FastAPI service
+    - Manages Docker container lifecycle
+    - Handles container creation/deletion/monitoring
+    - Stores container metadata in Supabase
+  - **Dynamic MT5 Containers (Ports 8000-8999):**
+    - Created on-demand per user/broker
+    - Base: Windows Server Core (ltsc2022)
+    - MT5 Terminal: Native Windows execution (no Wine)
+    - 1 active container per user at a time
+    - Auto-cleanup after idle timeout (30 min)
+  - **MT5 Limitation:** Cannot handle multiple accounts simultaneously
+  - **Scaling:** 50 Pro+ users = 50 containers max (1 per active user)
 - **Gateway:** `172.16.16.1` (Proxmox)
 - **Access:** RDP via Proxmox or SSH tunnel
 
@@ -78,9 +86,10 @@ ssh -L 3389:172.16.16.20:3389 root@142.132.156.162
 ### Service URLs (After Setup)
 
 #### Windows Server 2025 VM (172.16.16.20)
-- **MT5 FastAPI Service:** `http://172.16.16.20:8000`
-- **Health Check:** `http://172.16.16.20:8000/health`
-- **API Docs:** `http://172.16.16.20:8000/docs`
+- **MT5 Orchestrator:** `http://172.16.16.20:7999`
+- **Orchestrator Health:** `http://172.16.16.20:7999/health`
+- **Orchestrator API Docs:** `http://172.16.16.20:7999/docs`
+- **Dynamic MT5 Containers:** `http://172.16.16.20:8000-8999` (created on-demand)
 
 #### Docker VM (172.16.16.100)
 - **Supabase API:** `http://172.16.16.100:8000`
@@ -89,13 +98,16 @@ ssh -L 3389:172.16.16.20:3389 root@142.132.156.162
 
 #### Access from Mac (via SSH Tunnel)
 ```bash
-# Tunnel to Windows MT5 Service
-ssh -L 8000:172.16.16.20:8000 root@142.132.156.162
-# Access: http://localhost:8000
+# Tunnel to Orchestrator
+ssh -L 7999:172.16.16.20:7999 root@142.132.156.162
+# Access: http://localhost:7999
 
 # Tunnel to Supabase
 ssh -L 8001:172.16.16.100:8000 -L 3000:172.16.16.100:3000 root@142.132.156.162
 # Access: http://localhost:8001 (API), http://localhost:3000 (Studio)
+
+# Note: Dynamic MT5 container ports (8000-8999) are managed by orchestrator
+# Frontend connects to orchestrator, which provides WebSocket URLs for MT5 containers
 ```
 
 ---
@@ -108,25 +120,33 @@ ssh -L 8001:172.16.16.100:8000 -L 3000:172.16.16.100:3000 root@142.132.156.162
 VITE_SUPABASE_URL=http://localhost:8001
 VITE_SUPABASE_ANON_KEY=<will-be-generated>
 
-# MT5 Service (via SSH tunnel)
-VITE_MT5_SERVICE_URL=http://localhost:8000
-VITE_MT5_SERVICE_API_KEY=<will-be-generated>
+# MT5 Orchestrator (via SSH tunnel)
+VITE_MT5_ORCHESTRATOR_URL=http://localhost:7999
+VITE_MT5_API_KEY=<will-be-generated>
 ```
 
-### MT5 Service (.env) - Windows Server 2025
+### MT5 Orchestrator (.env) - Windows Server 2025
 ```env
 # Supabase Connection (Internal Network)
 SUPABASE_URL=http://172.16.16.100:8000
 SUPABASE_SERVICE_ROLE_KEY=<will-be-generated>
 
 # Service Configuration
-API_PORT=8000
 ENVIRONMENT=development
 LOG_LEVEL=DEBUG
 
-# MT5 Configuration
-MT5_CONNECTION_POOL_SIZE=5
-MT5_CONNECTION_TIMEOUT=300
+# JWT & Encryption
+JWT_SECRET_KEY=<to-be-generated>
+ENCRYPTION_KEY=<to-be-generated>
+
+# MT5 Container Management
+MT5_SERVICE_IMAGE=mt5-service:latest
+MT5_PORT_RANGE_START=8000
+MT5_PORT_RANGE_END=8999
+MT5_CONTAINER_IDLE_TIMEOUT=1800
+
+# Docker Configuration
+DOCKER_HOST=npipe:////./pipe/docker_engine
 ```
 
 ### Supabase Stack (.env) - Docker VM
@@ -171,10 +191,17 @@ ufw allow 3000/tcp
 
 ### Windows Server 2025 Firewall
 ```powershell
-# Allow MT5 FastAPI Service
-New-NetFirewallRule -DisplayName "MT5 FastAPI Service" `
+# Allow MT5 Orchestrator Service
+New-NetFirewallRule -DisplayName "MT5 Orchestrator Service" `
   -Direction Inbound `
-  -LocalPort 8000 `
+  -LocalPort 7999 `
+  -Protocol TCP `
+  -Action Allow
+
+# Allow Dynamic MT5 Container Port Range
+New-NetFirewallRule -DisplayName "MT5 Dynamic Containers" `
+  -Direction Inbound `
+  -LocalPort "8000-8999" `
   -Protocol TCP `
   -Action Allow
 
@@ -187,12 +214,20 @@ Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 ## Next Steps
 
 ### Phase 1: Windows Server 2025 Setup
-- [ ] Run setup script (creates Docker structure)
-- [ ] Copy/clone MT5 service code to `C:\mt5-docker\app\`
-- [ ] Configure `.env` file with Supabase keys
-- [ ] Build Docker image with MT5 headless
-- [ ] Start Docker container
-- [ ] Test MT5 connectivity via Docker
+- [ ] Run setup script `proxmox-windows-setup.ps1`
+  - Creates `C:\mt5-orchestrator\` directory
+  - Creates `C:\mt5-service-template\` directory
+  - Generates Dockerfiles for both services
+  - Creates docker-compose for orchestrator
+- [ ] Build MT5 Service Template Image
+  - Copy/clone MT5 data service code to `C:\mt5-service-template\app\`
+  - Build: `docker build -t mt5-service:latest .`
+- [ ] Build and Run Orchestrator
+  - Copy/clone orchestrator code to `C:\mt5-orchestrator\orchestrator\`
+  - Configure `.env` with Supabase keys
+  - Build: `docker compose build`
+  - Start: `docker compose up -d`
+- [ ] Test orchestrator health: `http://172.16.16.20:7999/health`
 
 ### Phase 2: Docker VM Setup
 - [ ] Configure Supabase environment variables
